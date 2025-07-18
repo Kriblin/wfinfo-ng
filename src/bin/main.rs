@@ -1,6 +1,6 @@
 use std::thread::sleep;
 use std::time::Duration;
-use std::{error::Error, str::FromStr};
+use std::{error::Error};
 use std::{fs::File, thread};
 use std::{
     io::{BufRead, BufReader, Read, Seek, SeekFrom},
@@ -13,7 +13,7 @@ use env_logger::{Builder, Env};
 use global_hotkey::{hotkey::HotKey, GlobalHotKeyEvent, GlobalHotKeyManager, HotKeyState};
 use image::DynamicImage;
 use log::{debug, error, info, warn};
-use notify::{watcher, RecursiveMode, Watcher};
+use notify::{RecommendedWatcher, RecursiveMode, Watcher};
 use xcap::Window;
 
 use wfinfo::{
@@ -60,9 +60,11 @@ fn run_detection(capturer: &Window, db: &Database) -> Result<(), wfinfo::error::
             warn!("Unknown item\n\tUnknown");
         }
     }
+
+    Ok(())
 }
 
-fn log_watcher(path: PathBuf, event_sender: mpsc::Sender<()>) {
+fn log_watcher(path: PathBuf, event_sender: mpsc::Sender<()>, capture_delay_ms: u64) {
     debug!("Path: {}", path.display());
     let mut position = match File::open(&path) {
         Ok(mut file) => match file.seek(SeekFrom::End(0)) {
@@ -113,32 +115,33 @@ fn log_watcher(path: PathBuf, event_sender: mpsc::Sender<()>) {
                             continue;
                         }
 
-                    let mut reward_screen_detected = false;
+                        let mut reward_screen_detected = false;
 
-                    let reader = BufReader::new(f.by_ref());
-                    for line in reader.lines() {
-                        let line = match line {
-                            Ok(line) => line,
-                            Err(err) => {
-                                error!("Error reading line: {}", err);
-                                continue;
+                        let reader = BufReader::new(f.by_ref());
+                        for line in reader.lines() {
+                            let line = match line {
+                                Ok(line) => line,
+                                Err(err) => {
+                                    error!("Error reading line: {}", err);
+                                    continue;
+                                }
+                            };
+                            // debug!("> {:?}", line);
+                            if line.contains("Pause countdown done")
+                                || line.contains("Got rewards")
+                                || line.contains("Created /Lotus/Interface/ProjectionRewardChoice.swf")
+                            {
+                                reward_screen_detected = true;
                             }
-                        };
-                        // debug!("> {:?}", line);
-                        if line.contains("Pause countdown done")
-                            || line.contains("Got rewards")
-                            || line.contains("Created /Lotus/Interface/ProjectionRewardChoice.swf")
-                        {
-                            reward_screen_detected = true;
                         }
-                    }
 
-                    if reward_screen_detected {
-                        info!("Detected, waiting...");
-                        sleep(Duration::from_millis(1500));
-                        event_sender.send(()).unwrap();
-                    }
+                        if reward_screen_detected {
                             info!("Detected, waiting for {} ms...", capture_delay_ms);
+                            sleep(Duration::from_millis(capture_delay_ms));
+                            if let Err(err) = event_sender.send(()) {
+                                error!("Failed to send event: {}", err);
+                            }
+                        }
 
                         position = match f.metadata() {
                             Ok(metadata) => metadata.len(),
@@ -159,7 +162,7 @@ fn log_watcher(path: PathBuf, event_sender: mpsc::Sender<()>) {
 }
 
 fn hotkey_watcher(hotkey: HotKey, event_sender: mpsc::Sender<()>) {
-    debug!("watching hotkey: {hotkey:?}");
+    debug!("Watching hotkey: {hotkey:?}");
     thread::spawn(move || {
         let manager = match GlobalHotKeyManager::new() {
             Ok(manager) => manager,
@@ -175,7 +178,7 @@ fn hotkey_watcher(hotkey: HotKey, event_sender: mpsc::Sender<()>) {
         }
 
         while let Ok(event) = GlobalHotKeyEvent::receiver().recv() {
-            debug!("{:?}", event);
+            debug!("Hotkey event: {:?}", event);
             if event.state == HotKeyState::Pressed {
                 if let Err(err) = event_sender.send(()) {
                     error!("Failed to send event: {}", err);
@@ -190,7 +193,7 @@ fn benchmark() -> Result<(), Box<dyn Error>> {
     for _ in 0..10 {
         let image = image::open("input3.png").map_err(|e| Box::<dyn Error>::from(e))?;
         println!("Converted");
-        let text = reward_image_to_reward_names(image, None);
+        let text = reward_image_to_reward_names(image, None)?;
         println!("got names");
         let text = text.iter().map(|s| normalize_string(s));
         println!("{:#?}", text);
@@ -312,8 +315,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 mod test {
     use std::collections::BTreeMap;
     use std::fs::read_to_string;
-
-    use image::io::Reader;
+    use image::ImageReader;
     use indexmap::IndexMap;
     use rayon::prelude::*;
     use tesseract::Tesseract;
@@ -360,7 +362,7 @@ mod test {
 
     // #[test]
     #[allow(dead_code)]
-    fn wfi_images_exact() {
+    fn wfi_images_exact() -> Result<(), Box<dyn Error>> {
         let labels: IndexMap<String, Label> =
             serde_json::from_str(&read_to_string("WFI test images/labels.json")
                 .map_err(|e| format!("Failed to read labels file: {}", e))?)?;
@@ -392,6 +394,8 @@ mod test {
                 }
             }
         }
+
+        Ok(())
     }
 
     #[test]
@@ -453,7 +457,7 @@ mod test {
         Ok(())
     }
 
-    // #[test]
+    #[test]
     #[allow(dead_code)]
     fn images() -> Result<(), Box<dyn Error>> {
         let tests = [1];
@@ -474,7 +478,9 @@ mod test {
                 .map_err(|e| format!("Could not initialize Tesseract: {}", e))?;
 
             for part in parts {
-                let buffer = part.as_flat_samples_u8().unwrap();
+                let buffer = part.as_flat_samples_u8()
+                    .ok_or("Failed to get flat samples")?;
+
                 ocr = ocr
                     .set_frame(
                         buffer.samples,
