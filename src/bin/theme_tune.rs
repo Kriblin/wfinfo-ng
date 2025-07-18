@@ -25,7 +25,7 @@ fn main() {
         "Tune theme detection",
         options,
         Box::new(|_cc| Box::<MyApp>::default()),
-    );
+    ).expect("TODO: panic message");
 }
 
 struct MyApp {
@@ -44,7 +44,21 @@ impl Default for MyApp {
     fn default() -> Self {
         let original_images = std::env::args()
             .skip(1)
-            .map(|name| Reader::open(name).unwrap().decode().unwrap())
+            .filter_map(|name| {
+                match Reader::open(&name) {
+                    Ok(reader) => match reader.decode() {
+                        Ok(image) => Some(image),
+                        Err(e) => {
+                            eprintln!("Error decoding image {}: {}", name, e);
+                            None
+                        }
+                    },
+                    Err(e) => {
+                        eprintln!("Error opening image {}: {}", name, e);
+                        None
+                    }
+                }
+            })
             .collect();
         let settings = HslRange {
             saturation: 0.50..1.0,
@@ -78,10 +92,32 @@ fn spawn_ocr_thread(
     let images = images.to_owned();
 
     thread::spawn(move || {
-        let database = Database::load_from_file(None, None);
+        // Try to load the database
+        let database = match Database::load_from_file(None, None) {
+            Ok(db) => db,
+            Err(e) => {
+                eprintln!("Error loading database: {}", e);
+                // Send an error message to the UI and exit the thread
+                if let Err(send_err) = response_sender.send(vec![
+                    ("ERROR".to_string(), format!("Failed to load database: {}", e))
+                ]) {
+                    eprintln!("Error sending database error: {}", send_err);
+                }
+                return;
+            }
+        };
+
         loop {
-            let (mut index, mut last_request): (usize, HslRange<f32>) =
-                request_receiver.recv().unwrap();
+            // Wait for a request
+            let (mut index, mut last_request): (usize, HslRange<f32>) = match request_receiver.recv() {
+                Ok(request) => request,
+                Err(e) => {
+                    eprintln!("Error receiving request: {}", e);
+                    return; // Exit the thread if the channel is closed
+                }
+            };
+
+            // Process any additional requests that came in while we were processing
             loop {
                 match request_receiver.try_recv() {
                     Ok(request) => (index, last_request) = request,
@@ -89,11 +125,22 @@ fn spawn_ocr_thread(
                     Err(Disconnected) => return,
                 }
             }
-            let image = &images[index];
+
+            // Ensure index is valid
+            if index >= images.len() {
+                eprintln!("Invalid image index: {}", index);
+                continue;
+            }
+
+            let image: &DynamicImage = &images[index];
             let strings = ocr::reward_image_to_reward_names(
                 image.clone(),
                 Some(Theme::Custom(last_request.to_ordered())),
-            );
+            ).unwrap_or_else(|e|  {
+                eprintln!("OCR error: {:?}", e);
+                vec![]
+            });
+
             let results = strings
                 .iter()
                 .map(|string| {
@@ -105,7 +152,11 @@ fn spawn_ocr_thread(
                     )
                 })
                 .collect();
-            response_sender.send(results).unwrap();
+
+            if let Err(e) = response_sender.send(results) {
+                eprintln!("Error sending OCR results: {}", e);
+                return; // Exit the thread if the channel is closed
+            }
         }
     });
 
@@ -115,37 +166,60 @@ fn spawn_ocr_thread(
 impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         ctx.request_repaint();
-        if ctx.input_mut().consume_key(egui::Modifiers::NONE, Key::N) {
-            self.selected_image_index =
-                (self.selected_image_index + 1) % self.original_images.len();
-            self.image = None;
-            self.ocr_request_sender
-                .send((self.selected_image_index, self.settings.clone()))
-                .unwrap();
-            self.ocr_result = None;
-        }
-        if ctx.input_mut().consume_key(egui::Modifiers::NONE, Key::P) {
-            self.selected_image_index =
-                (self.selected_image_index - 1) % self.original_images.len();
-            self.image = None;
-            self.ocr_request_sender
-                .send((self.selected_image_index, self.settings.clone()))
-                .unwrap();
-            self.ocr_result = None;
-        }
-        if self.image.is_none() {
-            let image = self.process_image(&self.original_images[self.selected_image_index]);
-            self.image = Some(convert_image(&image));
-            self.ocr_request_sender
-                .send((self.selected_image_index, self.settings.clone()))
-                .unwrap();
+
+        // Handle next image key press
+        if ctx.input_mut(|i| i.consume_key(egui::Modifiers::NONE, Key::N)) {
+            if !self.original_images.is_empty() {
+                self.selected_image_index =
+                    (self.selected_image_index + 1) % self.original_images.len();
+                self.image = None;
+
+                if let Err(e) = self.ocr_request_sender
+                    .send((self.selected_image_index, self.settings.clone())) {
+                    eprintln!("Error sending OCR request: {}", e);
+                }
+
+                self.ocr_result = None;
+            }
         }
 
+        // Handle previous image key press
+        if ctx.input_mut(|i| i.consume_key(egui::Modifiers::NONE, Key::P)) {
+            if !self.original_images.is_empty() {
+                self.selected_image_index = 
+                    if self.selected_image_index == 0 {
+                        self.original_images.len() - 1
+                    } else {
+                        self.selected_image_index - 1
+                    };
+                self.image = None;
+
+                if let Err(e) = self.ocr_request_sender
+                    .send((self.selected_image_index, self.settings.clone())) {
+                    eprintln!("Error sending OCR request: {}", e);
+                }
+
+                self.ocr_result = None;
+            }
+        }
+
+        // Process image if needed
+        if self.image.is_none() && !self.original_images.is_empty() {
+            let image = self.process_image(&self.original_images[self.selected_image_index]);
+            self.image = Some(convert_image(&image));
+
+            if let Err(e) = self.ocr_request_sender
+                .send((self.selected_image_index, self.settings.clone())) {
+                eprintln!("Error sending OCR request: {}", e);
+            }
+        }
+
+        // Check for OCR results
         match self.ocr_response_receiver.try_recv() {
             Ok(response) => self.ocr_result = Some(response),
-            Err(Empty) => {}
-            other => {
-                other.unwrap();
+            Err(Empty) => {}, // No new results yet, that's fine
+            Err(Disconnected) => {
+                eprintln!("OCR thread disconnected");
             }
         }
 
@@ -201,9 +275,10 @@ impl eframe::App for MyApp {
                     .changed()
             {
                 self.image = None;
-                self.ocr_request_sender
-                    .send((self.selected_image_index, self.settings.clone()))
-                    .unwrap();
+                if let Err(e) = self.ocr_request_sender
+                    .send((self.selected_image_index, self.settings.clone())) {
+                    eprintln!("Error sending OCR request after slider change: {}", e);
+                }
                 self.ocr_result = None;
             };
         });
@@ -254,7 +329,7 @@ impl MyApp {
 
             let is_theme = self.settings.saturation.contains(&test.saturation)
                 && self.settings.lightness.contains(&test.lightness)
-                && self.settings.hue.contains(&test.hue.to_degrees());
+                && self.settings.hue.contains(&test.hue.into_degrees());
 
             *pixel = if is_theme { Rgb([0; 3]) } else { Rgb([255; 3]) }
         }
