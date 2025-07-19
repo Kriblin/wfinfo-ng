@@ -7,6 +7,7 @@ use tesseract::Tesseract;
 use image::{DynamicImage, GenericImageView, Pixel, Rgb};
 use log::debug;
 
+use crate::error::{OcrError, Result, ThemeError};
 use crate::theme::Theme;
 
 const PIXEL_REWARD_WIDTH: f32 = 968.0;
@@ -14,7 +15,7 @@ const PIXEL_REWARD_HEIGHT: f32 = 235.0;
 const PIXEL_REWARD_YDISPLAY: f32 = 316.0;
 const PIXEL_REWARD_LINE_HEIGHT: f32 = 48.0;
 
-pub fn detect_theme(image: &DynamicImage) -> Theme {
+pub fn detect_theme(image: &DynamicImage) -> Result<Theme> {
     let screen_scaling = if image.width() * 9 > image.height() * 16 {
         image.height() as f32 / 1080.0
     } else {
@@ -54,13 +55,14 @@ pub fn detect_theme(image: &DynamicImage) -> Theme {
     weights
         .iter()
         .max_by(|a, b| a.1.total_cmp(b.1))
-        .unwrap()
-        .0
-        .to_owned()
+        .ok_or_else(|| ThemeError::DetectionError("Failed to detect theme".to_string()).into())
+        .map(|(theme, _)| theme.to_owned())
 }
 
 pub fn extract_parts(image: &DynamicImage, theme: Theme) -> Vec<DynamicImage> {
-    image.save("input.png").unwrap();
+    if let Err(e) = image.save("input.png") {
+        debug!("Failed to save input image: {}", e);
+    }
     let screen_scaling = if image.width() * 9 > image.height() * 16 {
         image.height() as f32 / 1080.0
     } else {
@@ -332,9 +334,13 @@ pub fn normalize_string(string: &str) -> String {
     string.replace(|c: char| !c.is_ascii_alphabetic(), "")
 }
 
-pub fn image_to_string(tesseract: &mut Option<Tesseract>, image: &DynamicImage) -> String {
-    let mut ocr = tesseract.take().unwrap();
-    let buffer = image.as_flat_samples_u8().unwrap();
+pub fn image_to_string(tesseract: &mut Option<Tesseract>, image: &DynamicImage) -> Result<String> {
+    let mut ocr = tesseract.take()
+        .ok_or_else(|| OcrError::InitializationError("Tesseract instance is None".to_string()))?;
+
+    let buffer = image.as_flat_samples_u8()
+        .ok_or_else(|| OcrError::ImageProcessingError("Failed to convert image to flat samples".to_string()))?;
+
     ocr = ocr
         .set_frame(
             buffer.samples,
@@ -343,12 +349,14 @@ pub fn image_to_string(tesseract: &mut Option<Tesseract>, image: &DynamicImage) 
             3,
             3 * image.width() as i32,
         )
-        .expect("Failed to set image");
+        .map_err(|e| OcrError::ProcessingError(format!("Failed to set image: {}", e)))?;
 
-    let result = ocr.get_text().expect("Failed to get text");
+    let result = ocr.get_text()
+        .map_err(|e| OcrError::ProcessingError(format!("Failed to get text: {}", e)))?;
+
     tesseract.replace(ocr);
 
-    result
+    Ok(result)
 }
 
 lazy_static! {
@@ -357,13 +365,19 @@ lazy_static! {
     ));
 }
 
-pub fn reward_image_to_reward_names(image: DynamicImage, theme: Option<Theme>) -> Vec<String> {
-    let theme = theme.unwrap_or_else(|| detect_theme(&image));
+pub fn reward_image_to_reward_names(image: DynamicImage, theme: Option<Theme>) -> Result<Vec<String>> {
+    let theme = theme.unwrap_or_else(|| detect_theme(&image).expect("Failed to detect theme"));
     let parts = extract_parts(&image, theme);
     debug!("Extracted part images");
 
-    parts
-        .iter()
-        .map(|image| image_to_string(&mut OCR.lock().unwrap(), image))
-        .collect()
+    let mut results = Vec::new();
+    for part_image in parts.iter() {
+        let mut ocr_lock = OCR.lock()
+            .map_err(|e| OcrError::ProcessingError(format!("Failed to lock OCR mutex: {}", e)))?;
+
+        let text = image_to_string(&mut ocr_lock, part_image)?;
+        results.push(text);
+    }
+
+    Ok(results)
 }

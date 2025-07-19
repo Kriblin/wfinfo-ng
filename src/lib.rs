@@ -1,4 +1,6 @@
+pub mod config;
 pub mod database;
+pub mod error;
 pub mod ocr;
 pub mod statistics;
 pub mod testing;

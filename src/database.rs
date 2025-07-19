@@ -5,6 +5,7 @@ use serde::Deserialize;
 use serde_json::Value;
 
 use crate::{
+    error::{DatabaseError, Result},
     statistics::{self, Bucket},
     wfinfo_data::{
         item_data::{EquipmentType, FilteredItems, Refinement, Relic, Relics},
@@ -27,23 +28,32 @@ pub struct Item {
 }
 
 impl Database {
-    pub fn load_from_file(prices: Option<&Path>, filtered_items: Option<&Path>) -> Database {
+    pub fn load_from_file(prices: Option<&Path>, filtered_items: Option<&Path>) -> Result<Database> {
         // download file from: https://api.warframestat.us/wfinfo/prices
-        let text = read_to_string(prices.unwrap_or_else(|| Path::new("prices.json"))).unwrap();
-        let price_list: Vec<PriceItem> = serde_json::from_str(&text).unwrap();
+        let prices_path = prices.unwrap_or_else(|| Path::new("prices.json"));
+        let text = read_to_string(prices_path)
+            .map_err(|e| DatabaseError::FileNotFound(prices_path.to_path_buf(), Some(e.to_string())))?;
+
+        let price_list: Vec<PriceItem> = serde_json::from_str(&text)
+            .map_err(|e| DatabaseError::InvalidFormat(format!("Failed to parse prices JSON: {}", e)))?;
+
         let price_table: HashMap<String, f32> = price_list
             .into_iter()
             .map(|item| (item.name, item.custom_avg))
             .collect();
 
-        let text =
-            read_to_string(filtered_items.unwrap_or_else(|| Path::new("filtered_items.json")))
-                .unwrap();
-        let mut json = serde_json::from_str(&text).unwrap();
+        let filtered_items_path = filtered_items.unwrap_or_else(|| Path::new("filtered_items.json"));
+        let text = read_to_string(filtered_items_path)
+            .map_err(|e| DatabaseError::FileNotFound(filtered_items_path.to_path_buf(), Some(e.to_string())))?;
 
-        remove_empty_relics_from_json(&mut json);
+        let mut json = serde_json::from_str(&text)
+            .map_err(|e| DatabaseError::InvalidFormat(format!("Failed to parse filtered items JSON: {}", e)))?;
 
-        let filtered_items: FilteredItems = serde_json::from_value(json).unwrap();
+        remove_empty_relics_from_json(&mut json)
+            .map_err(|e| DatabaseError::InvalidFormat(format!("Failed to remove empty relics: {}", e)))?;
+
+        let filtered_items: FilteredItems = serde_json::from_value(json)
+            .map_err(|e| DatabaseError::InvalidFormat(format!("Failed to convert JSON to FilteredItems: {}", e)))?;
 
         let mut items: Vec<_> = filtered_items
             .eqmt
@@ -100,7 +110,7 @@ impl Database {
 
         let relics = filtered_items.relics;
 
-        Database { items, relics }
+        Ok(Database { items, relics })
     }
 
     pub fn find_item(&self, needle: &str, threshold: Option<usize>) -> Option<&Item> {
@@ -121,11 +131,12 @@ impl Database {
         })
     }
 
-    pub fn find_item_exact(&self, needle: &str) -> Option<&Item> {
+    pub fn find_item_exact(&self, needle: &str) -> Result<&Item> {
         self.items.iter().find(|item| item.name == needle)
+            .ok_or_else(|| DatabaseError::ItemNotFound(needle.to_string()).into())
     }
 
-    fn relic_to_bucket(&self, relic: &Relic, refinement: Refinement) -> Bucket {
+    fn relic_to_bucket(&self, relic: &Relic, refinement: Refinement) -> Result<Bucket> {
         let common_chance = refinement.common_chance();
         let uncommon_chance = refinement.uncommon_chance();
         let rare_chance = refinement.rare_chance();
@@ -138,17 +149,17 @@ impl Database {
             (&relic.uncommon2, uncommon_chance),
             (&relic.rare1, rare_chance),
         ];
-        let items = item_names
-            .into_iter()
-            .map(|(name, chance)| statistics::Item {
-                value: self
-                    .find_item_exact(name)
-                    .unwrap_or_else(|| panic!("Failed to find item {} in database", name))
-                    .platinum,
+
+        let mut items = Vec::with_capacity(item_names.len());
+        for (name, chance) in item_names {
+            let item = self.find_item_exact(name)?;
+            items.push(statistics::Item {
+                value: item.platinum,
                 probability: chance,
-            })
-            .collect();
-        Bucket::new(items)
+            });
+        }
+
+        Ok(Bucket::new(items))
     }
 
     pub fn single_relic_value(&self, relic: &Relic, refinement: Refinement) -> f32 {
@@ -156,13 +167,24 @@ impl Database {
         let uncommon_chance = refinement.uncommon_chance();
         let rare_chance = refinement.rare_chance();
 
+        // Define a helper function to safely get item platinum or log error and return 0.0
+        let get_platinum = |name: &str, item_type: &str| -> f32 {
+            match self.find_item_exact(name) {
+                Ok(item) => item.platinum,
+                Err(e) => {
+                    eprintln!("Failed to find {} item {}: {}", item_type, name, e);
+                    0.0
+                }
+            }
+        };
+
         let value = 0.0
-            + self.find_item_exact(&relic.common1).unwrap().platinum * common_chance
-            + self.find_item_exact(&relic.common2).unwrap().platinum * common_chance
-            + self.find_item_exact(&relic.common3).unwrap().platinum * common_chance
-            + self.find_item_exact(&relic.uncommon1).unwrap().platinum * uncommon_chance
-            + self.find_item_exact(&relic.uncommon2).unwrap().platinum * uncommon_chance
-            + self.find_item_exact(&relic.rare1).unwrap().platinum * rare_chance;
+            + get_platinum(&relic.common1, "common1") * common_chance
+            + get_platinum(&relic.common2, "common2") * common_chance
+            + get_platinum(&relic.common3, "common3") * common_chance
+            + get_platinum(&relic.uncommon1, "uncommon1") * uncommon_chance
+            + get_platinum(&relic.uncommon2, "uncommon2") * uncommon_chance
+            + get_platinum(&relic.rare1, "rare1") * rare_chance;
 
         let item_names = [
             (&relic.common1, common_chance),
@@ -175,7 +197,13 @@ impl Database {
         let value2: f32 = item_names
             .into_iter()
             .map(|(name, chance)| {
-                let plat = self.find_item_exact(name).unwrap().platinum;
+                let plat = match self.find_item_exact(name) {
+                    Ok(item) => item.platinum,
+                    Err(e) => {
+                        eprintln!("Failed to find item {}: {}", name, e);
+                        0.0
+                    }
+                };
                 println!("{plat} * {chance}");
                 plat * chance
             })
@@ -191,8 +219,13 @@ impl Database {
         refinement: Refinement,
         number_of_relics: u32,
     ) -> f32 {
-        let bucket = self.relic_to_bucket(relic, refinement);
-        bucket.expectation_of_best_of_n(number_of_relics)
+        match self.relic_to_bucket(relic, refinement) {
+            Ok(bucket) => bucket.expectation_of_best_of_n(number_of_relics),
+            Err(e) => {
+                eprintln!("Error calculating relic value: {}", e);
+                0.0 // Return a default value in case of error
+            }
+        }
     }
 
     pub fn shared_relic_value_bruteforce(
@@ -219,15 +252,27 @@ impl Database {
             for item2 in items.iter() {
                 for item3 in items.iter() {
                     for item4 in items.iter() {
-                        value += [item1.0, item2.0, item3.0, item4.0]
+                        // Get platinum values for all items, handling errors
+                        let platinum_values: Vec<f32> = [item1.0, item2.0, item3.0, item4.0]
                             .iter()
-                            .map(|name| self.find_item_exact(name).unwrap().platinum)
+                            .map(|name| {
+                                match self.find_item_exact(name) {
+                                    Ok(item) => item.platinum,
+                                    Err(e) => {
+                                        eprintln!("Failed to find item {}: {}", name, e);
+                                        0.0
+                                    }
+                                }
+                            })
+                            .collect();
+
+                        // Find maximum value, defaulting to 0.0 if the vector is empty
+                        let max_value = platinum_values.iter()
                             .max_by(|a, b| a.total_cmp(b))
-                            .unwrap()
-                            * item1.1
-                            * item2.1
-                            * item3.1
-                            * item4.1
+                            .copied()
+                            .unwrap_or(0.0);
+
+                        value += max_value * item1.1 * item2.1 * item3.1 * item4.1;
                     }
                 }
             }
@@ -237,13 +282,19 @@ impl Database {
     }
 }
 
-fn remove_empty_relics_from_json(value: &mut Value) {
+fn remove_empty_relics_from_json(value: &mut Value) -> Result<()> {
     let relics = &mut value["relics"];
-    for (_, kind) in relics.as_object_mut().unwrap() {
-        kind.as_object_mut()
-            .unwrap()
-            .retain(|_name, relic| serde_json::from_value::<Relic>(relic.clone()).is_ok());
+    let relics_obj = relics.as_object_mut()
+        .ok_or_else(|| DatabaseError::InvalidFormat("relics field is not an object".to_string()))?;
+
+    for (_, kind) in relics_obj {
+        let kind_obj = kind.as_object_mut()
+            .ok_or_else(|| DatabaseError::InvalidFormat("relic kind is not an object".to_string()))?;
+
+        kind_obj.retain(|_name, relic| serde_json::from_value::<Relic>(relic.clone()).is_ok());
     }
+
+    Ok(())
 }
 
 #[cfg(test)]
@@ -254,12 +305,14 @@ mod test {
 
     #[test]
     pub fn can_load_database() {
-        Database::load_from_file(None, None);
+        Database::load_from_file(None, None)
+            .expect("Failed to load database");
     }
 
     #[test]
     pub fn can_find_items() {
-        let db = Database::load_from_file(None, None);
+        let db = Database::load_from_file(None, None)
+            .expect("Failed to load database");
 
         let item = db
             .find_item("TitaniaPrimeBlueprint", Some(0))
@@ -274,7 +327,8 @@ mod test {
 
     #[test]
     pub fn can_find_fuzzy_items() {
-        let db = Database::load_from_file(None, None);
+        let db = Database::load_from_file(None, None)
+            .expect("Failed to load database");
 
         let item = db
             .find_item("Akstlett Prlme Recver", None)
@@ -294,7 +348,8 @@ mod test {
 
     #[test]
     fn validate_shared_relic_values() {
-        let database = Database::load_from_file(None, None);
+        let database = Database::load_from_file(None, None)
+            .expect("Failed to load database");
 
         for (name, relic) in database.relics.lith.iter() {
             println!("{} {:#?}", name, relic);

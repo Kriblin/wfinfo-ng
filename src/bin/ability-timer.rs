@@ -15,7 +15,7 @@ fn main() {
         "Warframe Ability Timer",
         options,
         Box::new(|_cc| Box::<MyApp>::new(MyApp::new(arguments))),
-    );
+    ).expect("TODO: panic message");
 }
 
 #[derive(Parser, Debug)]
