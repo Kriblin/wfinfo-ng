@@ -2,13 +2,13 @@ use std::collections::HashMap;
 
 use wfinfo::{
     database::Database,
-    wfinfo_data::item_data::{Refinement, Relic},
+    models::item::{Refinement, Relic},
 };
 
 fn relic_values(database: &Database, relics: &HashMap<String, Relic>, relic_count: u32) {
     let mut sorted_relics: Vec<(String, Refinement, f32)> = relics
         .iter()
-        .filter_map(|(name, item)| {
+        .filter_map(|(name, item): (&String, &Relic)| {
             let refinements = [
                 Refinement::Intact,
                 Refinement::Exceptional,

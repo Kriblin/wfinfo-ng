@@ -1,15 +1,16 @@
 use std::{collections::HashMap, fs::read_to_string, path::Path};
 
 use levenshtein::levenshtein;
+use log::{debug, error, warn};
 use serde::Deserialize;
 use serde_json::Value;
 
 use crate::{
     error::{DatabaseError, Result},
     statistics::{self, Bucket},
-    wfinfo_data::{
-        item_data::{EquipmentType, FilteredItems, Refinement, Relic, Relics},
-        price_data::PriceItem,
+    models::{
+        item::{DucatItem, EquipmentType, FilteredItems, Refinement, Relic, Relics},
+        price::PriceItem,
     },
 };
 
@@ -62,7 +63,7 @@ impl Database {
                 equipment_item
                     .parts
                     .iter()
-                    .filter_map(|(name, ducat_item)| {
+                    .filter_map(|(name, ducat_item): (&String, &DucatItem)| {
                         let item_is_part = name.ends_with("Systems")
                             || name.ends_with("Neuroptics")
                             || name.ends_with("Chassis")
@@ -82,7 +83,7 @@ impl Database {
                         {
                             Some(plat) => plat,
                             None => {
-                                println!("Failed to find price for item: {name}");
+                                warn!("Failed to find price for item: {name}");
                                 return None;
                             }
                         };
@@ -96,7 +97,7 @@ impl Database {
                         })
                     })
             })
-            .chain(filtered_items.ignored_items.keys().map(|name| Item {
+            .chain(filtered_items.ignored_items.keys().map(|name: &String| Item {
                 name: name.to_owned(),
                 drop_name: name.to_owned(),
                 platinum: 0.0,
@@ -172,7 +173,7 @@ impl Database {
             match self.find_item_exact(name) {
                 Ok(item) => item.platinum,
                 Err(e) => {
-                    eprintln!("Failed to find {} item {}: {}", item_type, name, e);
+                    warn!("Failed to find {item_type} item {name}: {e}");
                     0.0
                 }
             }
@@ -200,15 +201,15 @@ impl Database {
                 let plat = match self.find_item_exact(name) {
                     Ok(item) => item.platinum,
                     Err(e) => {
-                        eprintln!("Failed to find item {}: {}", name, e);
+                        warn!("Failed to find item {name}: {e}");
                         0.0
                     }
                 };
-                println!("{plat} * {chance}");
+                debug!("{plat} * {chance}");
                 plat * chance
             })
             .sum();
-        println!("{value} vs {value2}");
+        debug!("{value} vs {value2}");
 
         value
     }
@@ -222,7 +223,7 @@ impl Database {
         match self.relic_to_bucket(relic, refinement) {
             Ok(bucket) => bucket.expectation_of_best_of_n(number_of_relics),
             Err(e) => {
-                eprintln!("Error calculating relic value: {}", e);
+                error!("Error calculating relic value: {e}");
                 0.0 // Return a default value in case of error
             }
         }
@@ -259,7 +260,7 @@ impl Database {
                                 match self.find_item_exact(name) {
                                     Ok(item) => item.platinum,
                                     Err(e) => {
-                                        eprintln!("Failed to find item {}: {}", name, e);
+                                        warn!("Failed to find item {name}: {e}");
                                         0.0
                                     }
                                 }
@@ -268,7 +269,7 @@ impl Database {
 
                         // Find maximum value, defaulting to 0.0 if the vector is empty
                         let max_value = platinum_values.iter()
-                            .max_by(|a, b| a.total_cmp(b))
+                            .max_by(|a: &&f32, b: &&f32| a.total_cmp(b))
                             .copied()
                             .unwrap_or(0.0);
 
