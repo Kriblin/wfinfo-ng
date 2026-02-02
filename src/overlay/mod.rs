@@ -1,6 +1,7 @@
 use std::sync::mpsc::Receiver;
 use std::time::{Duration, Instant};
 use eframe::egui;
+use log::{debug, info};
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Reward {
@@ -30,10 +31,12 @@ impl OverlayApp {
         self.last_update = Some(Instant::now());
     }
 
-    pub fn check_updates(&mut self) {
+    pub fn check_updates(&mut self) -> bool {
+        let mut did_update = false;
         if let Ok(rewards) = self.receiver.try_recv() {
             self.rewards = rewards;
             self.last_update = Some(Instant::now());
+            did_update = true;
         }
 
         if let Some(last_update) = self.last_update {
@@ -42,12 +45,22 @@ impl OverlayApp {
                 self.last_update = None;
             }
         }
+        did_update
     }
 }
 
 impl eframe::App for OverlayApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        self.check_updates();
+        let did_update = self.check_updates();
+
+        if did_update {
+            debug!(
+                "Overlay received update: rewards_count={}, rewards={:?}, last_update_elapsed={:?}",
+                self.rewards.len(),
+                self.rewards,
+                self.last_update.map(|t| t.elapsed()),
+            );
+        }
 
         let panel_frame = egui::Frame {
             fill: egui::Color32::from_black_alpha(150),
@@ -56,7 +69,14 @@ impl eframe::App for OverlayApp {
             ..Default::default()
         };
 
+
         if !self.rewards.is_empty() {
+            info!(
+                "Overlay update: rewards_count={}, rewards={:?}, last_update_elapsed={:?}",
+                self.rewards.len(),
+                self.rewards,
+                self.last_update.map(|t| t.elapsed()),
+            );
             egui::CentralPanel::default()
                 .frame(panel_frame)
                 .show(ctx, |ui| {

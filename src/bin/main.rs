@@ -262,14 +262,14 @@ fn main() -> Result<(), Box<dyn Error>> {
         .init();
 
     let windows = Window::all()?;
-    let Some(warframe_window) = windows.iter().find(|x| x.title().unwrap() == config.window_name.to_string()) else {
+    let Some(warframe_window) = windows.iter().find(|x| x.title().ok().as_ref() == Some(&config.window_name)) else {
         return Err(format!("Warframe window with title '{}' not found", config.window_name).into());
     };
 
     debug!(
         "Capture source resolution: {:?}x{:?}",
-        warframe_window.width(),
-        warframe_window.height()
+        warframe_window.width().unwrap_or(0),
+        warframe_window.height().unwrap_or(0)
     );
 
     // Use configured file paths if provided, otherwise download the data
@@ -336,7 +336,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         viewport: eframe::egui::ViewportBuilder::default()
             .with_always_on_top()
             .with_decorations(false)
-            .with_transparent(true),
+            .with_transparent(true)
+            .with_mouse_passthrough(true),
         ..Default::default()
     };
 
