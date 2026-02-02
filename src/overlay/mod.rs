@@ -49,6 +49,10 @@ impl OverlayApp {
 }
 
 impl eframe::App for OverlayApp {
+
+    fn clear_color(&self, _visuals: &egui::Visuals) -> [f32; 4] {
+        [0.0, 0.0, 0.0, 0.0]
+    }
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         let did_update = self.check_updates();
 
@@ -80,19 +84,20 @@ impl eframe::App for OverlayApp {
                 .frame(panel_frame)
                 .show(ctx, |ui| {
                     ui.heading(egui::RichText::new("Rewards").color(egui::Color32::WHITE));
-                    for reward in &self.rewards {
-                        ui.horizontal(|ui| {
-                            let text = format!(
-                                "{} - {}p, {}d",
-                                reward.name,
-                                reward.platinum,
-                                reward.ducats,
-                            );
-                            if reward.is_best {
-                                ui.label(egui::RichText::new(text).color(egui::Color32::GREEN).strong());
-                                ui.label(egui::RichText::new("BEST").color(egui::Color32::GOLD).strong());
-                            } else {
-                                ui.label(egui::RichText::new(text).color(egui::Color32::LIGHT_GRAY));
+                    for chunk in self.rewards.chunks(4) {
+                        ui.columns(4, |columns| {
+                            for (i, reward) in chunk.iter().enumerate() {
+                                let ui = &mut columns[i];
+                                ui.vertical(|ui| {
+                                    if reward.is_best {
+                                        ui.label(egui::RichText::new(&reward.name).color(egui::Color32::GREEN).strong());
+                                        ui.label(egui::RichText::new(format!("{}p, {}d", reward.platinum, reward.ducats)).color(egui::Color32::GREEN).strong());
+                                        ui.label(egui::RichText::new("BEST").color(egui::Color32::GOLD).strong());
+                                    } else {
+                                        ui.label(egui::RichText::new(&reward.name).color(egui::Color32::LIGHT_GRAY));
+                                        ui.label(egui::RichText::new(format!("{}p, {}d", reward.platinum, reward.ducats)).color(egui::Color32::LIGHT_GRAY));
+                                    }
+                                });
                             }
                         });
                     }
