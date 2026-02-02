@@ -4,7 +4,6 @@ use std::{error::Error};
 use std::{fs::File, thread};
 use std::{
     io::{BufRead, BufReader, Read, Seek, SeekFrom},
-    sync::mpsc::channel,
 };
 use std::{path::PathBuf, sync::mpsc};
 
@@ -18,21 +17,22 @@ use xcap::Window;
 
 use wfinfo::{
     config::{Args, Config},
-    database::Database,
+    database::{Database, Item},
     ocr::{normalize_string, reward_image_to_reward_names, OCR},
     utils::fetch_prices_and_items,
+    overlay::{Reward, OverlayApp},
 };
 
-fn run_detection(capturer: &Window, db: &Database) -> Result<(), wfinfo::error::Error> {
+fn run_detection(capturer: &Window, db: &Database) -> Result<Vec<Reward>, wfinfo::error::Error> {
     let frame = capturer.capture_image().map_err(|e| wfinfo::error::OcrError::CaptureError(e.to_string()))?;
     info!("Captured");
     let image = DynamicImage::ImageRgba8(frame);
     info!("Converted");
     let text = reward_image_to_reward_names(image, None)?;
-    let text = text.iter().map(|s| normalize_string(s));
+    let text: Vec<String> = text.iter().map(|s| normalize_string(s)).collect();
     debug!("{:#?}", text);
 
-    let items: Vec<_> = text.map(|s| db.find_item(&s, None)).collect();
+    let items: Vec<Option<&Item>> = text.iter().map(|s| db.find_item(s, None)).collect();
 
     let best = items
         .iter()
@@ -47,6 +47,7 @@ fn run_detection(capturer: &Window, db: &Database) -> Result<(), wfinfo::error::
         .max_by(|a, b| a.1.total_cmp(&b.1))
         .map(|best| best.0);
 
+    let mut rewards = Vec::new();
     for (index, item) in items.iter().enumerate() {
         if let Some(item) = item {
             info!(
@@ -56,12 +57,18 @@ fn run_detection(capturer: &Window, db: &Database) -> Result<(), wfinfo::error::
                 item.ducats as f32 / 10.0,
                 if Some(index) == best { "<----" } else { "" }
             );
+            rewards.push(Reward {
+                name: item.drop_name.clone(),
+                platinum: item.platinum,
+                ducats: item.ducats,
+                is_best: Some(index) == best,
+            });
         } else {
             warn!("Unknown item\n\tUnknown");
         }
     }
 
-    Ok(())
+    Ok(rewards)
 }
 
 fn log_watcher(path: PathBuf, event_sender: mpsc::Sender<()>, capture_delay_ms: u64) {
@@ -285,7 +292,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     info!("Loaded database");
 
-    let (event_sender, event_receiver) = channel();
+    let (event_sender, event_receiver) = mpsc::channel();
+    let (reward_sender, reward_receiver) = mpsc::channel();
 
     if let Some(log_path) = &config.game_log_file_path {
         log_watcher(log_path.clone(), event_sender.clone(), config.capture_delay_ms);
@@ -295,12 +303,47 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     hotkey_watcher(config.hotkey.parse()?, event_sender);
 
-    while let Ok(()) = event_receiver.recv() {
-        info!("Capturing");
-        if let Err(e) = run_detection(warframe_window, &db) {
-            error!("Error during detection: {}", e);
+    let window_title = config.window_name.clone();
+    thread::spawn(move || {
+        while let Ok(()) = event_receiver.recv() {
+            info!("Capturing");
+            let windows = match Window::all() {
+                Ok(windows) => windows,
+                Err(e) => {
+                    error!("Failed to get windows: {}", e);
+                    continue;
+                }
+            };
+            let Some(warframe_window) = windows.iter().find(|x| x.title().ok().as_ref() == Some(&window_title)) else {
+                error!("Warframe window not found during detection");
+                continue;
+            };
+
+            match run_detection(warframe_window, &db) {
+                Ok(rewards) => {
+                    if let Err(e) = reward_sender.send(rewards) {
+                        error!("Failed to send rewards to UI: {}", e);
+                    }
+                }
+                Err(e) => {
+                    error!("Error during detection: {}", e);
+                }
+            }
         }
-    }
+    });
+
+    let options = eframe::NativeOptions {
+        always_on_top: true,
+        decorated: false,
+        transparent: true,
+        ..Default::default()
+    };
+
+    eframe::run_native(
+        "Warframe Reward Overlay",
+        options,
+        Box::new(|_cc| Box::new(OverlayApp::new(reward_receiver))),
+    ).map_err(|e| Box::new(e) as Box<dyn Error>)?;
 
     // Clean up OCR resources
     if let Ok(mut guard) = OCR.lock() {
