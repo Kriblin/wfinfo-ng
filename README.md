@@ -1,60 +1,123 @@
 # WFinfo-ng
 
-A Linux compatible version of the great [WFinfo](https://github.com/WFCD/WFinfo/).
+A Linux-compatible version of the [WFinfo](https://github.com/WFCD/WFinfo/) tool for Warframe, written in Rust. This project is a fork of [knoellle/wfinfo-ng](https://github.com/knoellle/wfinfo-ng).
 
-Does support:
+WFinfo-ng helps you determine the value of relic rewards in real-time by capturing your screen, performing OCR (Optical Character Recognition) to detect item names, and looking up their current platinum and ducat values.
 
-- Detecting relic reward screens
-- Taking a screenshot the game
-- Detecting items
-- Displaying platinum values for each item
-- X11 & Wayland
-- Game in windowed or fullscreen mode
+## Features
 
-Doesn't support:
+- **Relic Reward Detection**: Automatically detects when you are on a reward screen by monitoring `EE.log`.
+- **OCR Integration**: Uses Tesseract to read item names from screenshots.
+- **Value Lookup**: Displays platinum and ducat values for each detected item.
+- **Transparent Overlay**: Real-time overlay showing reward values directly over the game window.
+- **Multi-Server Support**: Compatible with both X11 and Wayland (via `xcap`).
+- **Manual Trigger**: Trigger detection manually with a customizable hotkey (default: `F12`).
+- **UI Theme Support**: Supports various Warframe UI themes (Vitruvian, Stalker, Baruuk, Corpus, etc.).
 
-- Market integration
-- Inventory tracking
-- Interactive "snap-it" features
+## Prerequisites
 
-# Prerequisites and Dependencies
+To build and run WFinfo-ng, you need the following system dependencies:
 
-- `rust` rustc >= 1.74 & cargo. I recommend installation via [rustup](https://rustup.rs).
-- `libxrandr` for taking screenshots
-- `tesseract` for OCR processing
-- `curl`, `jq` for updating the databases
+- **Rust**: Edition 2024 (stable recommended). Install via [rustup.rs](https://rustup.rs).
+- **Tesseract OCR**: Required for OCR processing. Ensure English language data (`tessdata/eng.traineddata`) is installed.
+- **libxrandr**: Required for X11 screenshot capturing.
+- **curl & jq**: Required for the `update.sh` script to fetch data.
 
-# Installation
+## Installation
 
-1. Clone this repository
-1. Install only reward screen helper: `cargo install --path . --bin wfinfo`
-1. Or install all tools: `cargo install --path .`
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/yourusername/wfinfo-ng.git
+    cd wfinfo-ng
+    ```
 
-# Usage
+2.  **Setup the database**:
+    The application requires item price and metadata to function. Run the update script:
+    ```bash
+    sh update.sh
+    ```
+    *Note: The application will also attempt to download this data on startup if it's missing.*
 
-Run the `update.sh` script to download the latest database files.
+3.  **Build the project**:
+    ```bash
+    cargo build --release
+    ```
 
-Find where your game puts it's `EE.log` file. Mine is located at `.local/share/Steam/steamapps/compatdata/230410/pfx/drive_c/users/steamuser/AppData/Local/Warframe/EE.log`.
+4.  **Install the binary**:
+    ```bash
+    cargo install --path .
+    ```
 
-Now run `wfinfo <path to your EE.log file>` (the path is optional if your EE.log file is in the default location)
-This will run the program, immediately taking a screenshot and analyzing it, see section Issues and Workarounds for why.
-The program then waits for the reward screen, trying to detect items in the screenshot.
+## Usage
 
-Once items are found, their platinum and ducat values are looked up in the database downloaded previously.
-Each item is printed to stdout along with it's platinum and ducat value in platinum (assuming 10:1 conversion).
-The highest value item is also indicated with a little arrow.
-When the highest value is determined by the ducat value and there is more than one item with the same ducat value, the platinum values are used as a tie breaker.
+### Running the Application
 
-# Issue and Workarounds
+WFinfo-ng needs access to Warframe's `EE.log` file to detect reward screens automatically. On most Linux systems (via Steam/Proton), it is located at:
+`~/.local/share/Steam/steamapps/compatdata/230410/pfx/drive_c/users/steamuser/AppData/Local/Warframe/EE.log`
 
-- Due to buffering when the game writes the `EE.log` file, it is possible that WFInfo doesn't pick up the reward screen event until the screen has disappeared. I haven't found a way of getting around the buffered writer.
-  If this happens, you can manually trigger the detection by pressing the F12 key.
+Run `wfinfo` (optionally specifying the log path):
+```bash
+wfinfo --game-log-file-path /path/to/EE.log
+```
 
+If the log file is at the default location, you can simply run:
+```bash
+wfinfo
+```
 
-- If you are using gamescope add the flag `--window-name=gamescope`
+### Controls
+- **F12**: Manually trigger screen capture and reward detection.
 
-# Logging
+### Configuration
 
-Using the Environment Variables WFINFO_LOG you can control the output.
-There are several levels: error, warn, info, debug, trace, off
-[docs](https://docs.rs/env_logger/latest/env_logger/index.html#enabling-logging)
+WFinfo-ng uses a YAML configuration file located at `~/.config/wfinfo-ng/config.yaml`.
+
+| Option | CLI Argument | Description | Default |
+| :--- | :--- | :--- | :--- |
+| `game_log_file_path` | `-g`, `--game-log-file-path` | Path to Warframe's `EE.log` | Auto-detected |
+| `window_name` | `-w`, `--window-name` | Title of the Warframe window | `Warframe` |
+| `hotkey` | `--hotkey` | Hotkey for manual detection | `F12` |
+| `capture_delay_ms` | `--capture-delay-ms` | Delay (ms) after event before capturing | `1500` |
+| `log_level` | `--log-level` | Logging level (error, warn, info, debug, trace) | `info` |
+| `log_timestamps` | `-l`, `--log-timestamps` | Enable timestamps in logs | `false` |
+
+### Environment Variables
+- `WFINFO_LOG`: Overrides the logging level (e.g., `WFINFO_LOG=debug`).
+- `WFINFO_STYLE`: Controls terminal output styling (e.g., `WFINFO_STYLE=always`).
+
+## Project Structure
+
+- `src/lib.rs`: Core library defining modules for database, OCR, and models.
+- `src/bin/main.rs`: Main entry point for the `wfinfo` binary (CLI + Overlay).
+- `src/ocr/`: Tesseract OCR integration and image preprocessing.
+- `src/database/`: Database loading and fuzzy item searching logic.
+- `src/overlay/`: Egui-based implementation of the transparent HUD.
+- `src/theme/`: Detection logic for different Warframe UI color themes.
+- `update.sh`: Fetches latest price data from WarframeStat.us.
+
+## Utility Binaries
+
+The project includes several specialized tools:
+- `theme_tune`: Debugging tool for tuning UI theme detection and color ranges.
+- `ability-timer`: A small overlay tool to track ESO ability timeouts.
+- `relics`: CLI tool to calculate and display potential relic values.
+- `image`: Tool to batch process images for OCR verification and labeling.
+
+## Testing
+
+Run the test suite using Cargo:
+```bash
+cargo test
+```
+- **Unit Tests**: Found within individual module files.
+- **Integration Tests**: OCR verification using images in `test-images/` and `WFI test images/`.
+
+## License
+
+This project is licensed under the **GNU General Public License v3.0** - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- This project is a fork of [knoellle/wfinfo-ng](https://github.com/knoellle/wfinfo-ng).
+- Inspired by the [WFinfo](https://github.com/WFCD/WFinfo/) project by the WFCD team.
+- Item and price data provided by [WarframeStat.us](https://warframestat.us/).
