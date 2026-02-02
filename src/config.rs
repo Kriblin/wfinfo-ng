@@ -5,7 +5,7 @@ use std::str::FromStr;
 
 use anyhow::{Context, Result};
 use clap::Parser;
-use log::{debug, error, info, warn};
+use log::{info, warn};
 use serde::{Deserialize, Serialize};
 
 /// Configuration for WFinfo-ng

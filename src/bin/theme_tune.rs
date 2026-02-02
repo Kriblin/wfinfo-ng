@@ -10,8 +10,7 @@ use eframe::{
     egui::{self, Key},
     epaint::ColorImage,
 };
-use egui_extras::RetainedImage;
-use image::{io::Reader, DynamicImage, Rgb};
+use image::{ImageReader, DynamicImage, Rgb};
 use palette::{FromColor, Hsl, Srgb};
 use wfinfo::{
     database::Database,
@@ -31,7 +30,7 @@ fn main() {
 struct MyApp {
     original_images: Vec<DynamicImage>,
     selected_image_index: usize,
-    image: Option<RetainedImage>,
+    image: Option<egui::TextureHandle>,
 
     ocr_request_sender: Sender<(usize, HslRange<f32>)>,
     ocr_response_receiver: Receiver<Vec<(String, String)>>,
@@ -45,7 +44,7 @@ impl Default for MyApp {
         let original_images = std::env::args()
             .skip(1)
             .filter_map(|name| {
-                match Reader::open(&name) {
+                match ImageReader::open(&name) {
                     Ok(reader) => match reader.decode() {
                         Ok(image) => Some(image),
                         Err(e) => {
@@ -206,7 +205,7 @@ impl eframe::App for MyApp {
         // Process image if needed
         if self.image.is_none() && !self.original_images.is_empty() {
             let image = self.process_image(&self.original_images[self.selected_image_index]);
-            self.image = Some(convert_image(&image));
+            self.image = Some(convert_image(ctx, &image));
 
             if let Err(e) = self.ocr_request_sender
                 .send((self.selected_image_index, self.settings.clone())) {
@@ -224,8 +223,9 @@ impl eframe::App for MyApp {
         }
 
         egui::CentralPanel::default().show(ctx, |ui| match self.image.as_ref() {
-            Some(image) => {
-                image.show_scaled(ui, 3.0);
+            Some(texture) => {
+                let size = texture.size_vec2();
+                ui.add(egui::Image::new(texture).fit_to_exact_size(size * 3.0));
                 if let Some(detections) = self.ocr_result.as_ref() {
                     ui.label(format!("{:#?}", detections));
                 } else {
@@ -338,11 +338,10 @@ impl MyApp {
     }
 }
 
-fn convert_image(original_image: &DynamicImage) -> RetainedImage {
+fn convert_image(ctx: &egui::Context, original_image: &DynamicImage) -> egui::TextureHandle {
     let ui_image = ColorImage::from_rgba_unmultiplied(
         [original_image.width() as _, original_image.height() as _],
         &original_image.to_rgba8(),
     );
-    RetainedImage::from_color_image("Temp", ui_image)
-        .with_texture_filter(egui::TextureFilter::Nearest)
+    ctx.load_texture("Temp", ui_image, egui::TextureOptions::NEAREST)
 }

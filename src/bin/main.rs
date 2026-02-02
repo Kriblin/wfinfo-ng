@@ -333,9 +333,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     });
 
     let options = eframe::NativeOptions {
-        always_on_top: true,
-        decorated: false,
-        transparent: true,
+        viewport: eframe::egui::ViewportBuilder::default()
+            .with_always_on_top()
+            .with_decorations(false)
+            .with_transparent(true),
         ..Default::default()
     };
 
