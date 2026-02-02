@@ -36,6 +36,13 @@ pub enum Refinement {
     Radiant,
 }
 
+#[derive(Copy, Clone, Debug)]
+pub enum RewardType {
+    Common,
+    Uncommon,
+    Rare,
+}
+
 #[derive(Clone, Debug, Deserialize)]
 pub struct Relic {
     pub vaulted: bool,
@@ -45,6 +52,19 @@ pub struct Relic {
     pub common1: String,
     pub common2: String,
     pub common3: String,
+}
+
+impl Relic {
+    pub fn rewards(&self) -> [(&str, RewardType); 6] {
+        [
+            (&self.common1, RewardType::Common),
+            (&self.common2, RewardType::Common),
+            (&self.common3, RewardType::Common),
+            (&self.uncommon1, RewardType::Uncommon),
+            (&self.uncommon2, RewardType::Uncommon),
+            (&self.rare1, RewardType::Rare),
+        ]
+    }
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -68,6 +88,14 @@ pub struct FilteredItems {
 }
 
 impl Refinement {
+    pub fn chance(&self, reward_type: RewardType) -> f32 {
+        match reward_type {
+            RewardType::Common => self.common_chance(),
+            RewardType::Uncommon => self.uncommon_chance(),
+            RewardType::Rare => self.rare_chance(),
+        }
+    }
+
     pub fn common_chance(&self) -> f32 {
         match self {
             Refinement::Intact => 0.2533,

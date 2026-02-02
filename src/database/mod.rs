@@ -1,7 +1,7 @@
 use std::{collections::HashMap, fs::read_to_string, path::Path};
 
 use levenshtein::levenshtein;
-use log::{debug, error, warn};
+use log::{error, warn};
 use serde::Deserialize;
 use serde_json::Value;
 
@@ -9,7 +9,7 @@ use crate::{
     error::{DatabaseError, Result},
     statistics::{self, Bucket},
     models::{
-        item::{DucatItem, EquipmentType, FilteredItems, Refinement, Relic, Relics},
+        item::{DucatItem, EquipmentItem, EquipmentType, FilteredItems, Refinement, Relic, Relics},
         price::PriceItem,
     },
 };
@@ -30,80 +30,17 @@ pub struct Item {
 
 impl Database {
     pub fn load_from_file(prices: Option<&Path>, filtered_items: Option<&Path>) -> Result<Database> {
-        // download file from: https://api.warframestat.us/wfinfo/prices
         let prices_path = prices.unwrap_or_else(|| Path::new("prices.json"));
-        let text = read_to_string(prices_path)
-            .map_err(|e| DatabaseError::FileNotFound(prices_path.to_path_buf(), Some(e.to_string())))?;
-
-        let price_list: Vec<PriceItem> = serde_json::from_str(&text)
-            .map_err(|e| DatabaseError::InvalidFormat(format!("Failed to parse prices JSON: {}", e)))?;
-
-        let price_table: HashMap<String, f32> = price_list
-            .into_iter()
-            .map(|item| (item.name, item.custom_avg))
-            .collect();
+        let price_table = Self::load_prices(prices_path)?;
 
         let filtered_items_path = filtered_items.unwrap_or_else(|| Path::new("filtered_items.json"));
-        let text = read_to_string(filtered_items_path)
-            .map_err(|e| DatabaseError::FileNotFound(filtered_items_path.to_path_buf(), Some(e.to_string())))?;
+        let filtered_items = Self::load_filtered_items(filtered_items_path)?;
 
-        let mut json = serde_json::from_str(&text)
-            .map_err(|e| DatabaseError::InvalidFormat(format!("Failed to parse filtered items JSON: {}", e)))?;
-
-        remove_empty_relics_from_json(&mut json)
-            .map_err(|e| DatabaseError::InvalidFormat(format!("Failed to remove empty relics: {}", e)))?;
-
-        let filtered_items: FilteredItems = serde_json::from_value(json)
-            .map_err(|e| DatabaseError::InvalidFormat(format!("Failed to convert JSON to FilteredItems: {}", e)))?;
-
-        let mut items: Vec<_> = filtered_items
-            .eqmt
-            .iter()
-            .flat_map(|(_name, equipment_item)| {
-                equipment_item
-                    .parts
-                    .iter()
-                    .filter_map(|(name, ducat_item): (&String, &DucatItem)| {
-                        let item_is_part = name.ends_with("Systems")
-                            || name.ends_with("Neuroptics")
-                            || name.ends_with("Chassis")
-                            || name.ends_with("Harness")
-                            || name.ends_with("Wings");
-                        let drop_name = match equipment_item.item_type {
-                            EquipmentType::Warframes | EquipmentType::Archwing
-                                if item_is_part && !name.ends_with("Blueprint") =>
-                            {
-                                name.to_owned() + " Blueprint"
-                            }
-                            _ => name.to_owned(),
-                        };
-                        let platinum = *match price_table
-                            .get(name)
-                            .or_else(|| price_table.get(&format!("{name} Blueprint")))
-                        {
-                            Some(plat) => plat,
-                            None => {
-                                warn!("Failed to find price for item: {name}");
-                                return None;
-                            }
-                        };
-                        let ducats = ducat_item.ducats;
-
-                        Some(Item {
-                            name: name.to_string(),
-                            drop_name,
-                            platinum,
-                            ducats,
-                        })
-                    })
-            })
-            .chain(filtered_items.ignored_items.keys().map(|name: &String| Item {
-                name: name.to_owned(),
-                drop_name: name.to_owned(),
-                platinum: 0.0,
-                ducats: 0,
-            }))
-            .collect();
+        let mut items = Self::process_items(
+            filtered_items.eqmt,
+            filtered_items.ignored_items,
+            &price_table,
+        );
 
         if let Some(item) = items.iter_mut().find(|item| item.name == "Forma Blueprint") {
             item.platinum = 35.0 / 3.0;
@@ -114,22 +51,98 @@ impl Database {
         Ok(Database { items, relics })
     }
 
+    fn load_prices(prices_path: &Path) -> Result<HashMap<String, f32>> {
+        let text = read_to_string(prices_path)
+            .map_err(|e| DatabaseError::FileNotFound(prices_path.to_path_buf(), Some(e.to_string())))?;
+
+        let price_list: Vec<PriceItem> = serde_json::from_str(&text)
+            .map_err(|e| DatabaseError::InvalidFormat(format!("Failed to parse prices JSON: {}", e)))?;
+
+        Ok(price_list
+            .into_iter()
+            .map(|item| (item.name, item.custom_avg))
+            .collect())
+    }
+
+    fn load_filtered_items(filtered_items_path: &Path) -> Result<FilteredItems> {
+        let text = read_to_string(filtered_items_path)
+            .map_err(|e| DatabaseError::FileNotFound(filtered_items_path.to_path_buf(), Some(e.to_string())))?;
+
+        let mut json = serde_json::from_str(&text)
+            .map_err(|e| DatabaseError::InvalidFormat(format!("Failed to parse filtered items JSON: {}", e)))?;
+
+        remove_empty_relics_from_json(&mut json)?;
+
+        serde_json::from_value(json)
+            .map_err(|e| DatabaseError::InvalidFormat(format!("Failed to convert JSON to FilteredItems: {}", e)).into())
+    }
+
+    fn process_items(
+        eqmt: HashMap<String, EquipmentItem>,
+        ignored_items: HashMap<String, DucatItem>,
+        price_table: &HashMap<String, f32>,
+    ) -> Vec<Item> {
+        eqmt.into_iter()
+            .flat_map(|(_name, equipment_item)| {
+                let item_type = equipment_item.item_type;
+                equipment_item.parts.into_iter().filter_map(move |(name, ducat_item)| {
+                    let item_is_part = name.ends_with("Systems")
+                        || name.ends_with("Neuroptics")
+                        || name.ends_with("Chassis")
+                        || name.ends_with("Harness")
+                        || name.ends_with("Wings");
+
+                    let drop_name = match item_type {
+                        EquipmentType::Warframes | EquipmentType::Archwing
+                            if item_is_part && !name.ends_with("Blueprint") =>
+                        {
+                            format!("{} Blueprint", name)
+                        }
+                        _ => name.to_owned(),
+                    };
+
+                    let platinum = price_table
+                        .get(&name)
+                        .or_else(|| price_table.get(&format!("{} Blueprint", name)))
+                        .copied()
+                        .or_else(|| {
+                            warn!("Failed to find price for item: {}", name);
+                            None
+                        })?;
+
+                    Some(Item {
+                        name,
+                        drop_name,
+                        platinum,
+                        ducats: ducat_item.ducats,
+                    })
+                })
+            })
+            .chain(ignored_items.into_iter().map(|(name, _)| Item {
+                name: name.to_owned(),
+                drop_name: name.to_owned(),
+                platinum: 0.0,
+                ducats: 0,
+            }))
+            .collect()
+    }
+
     pub fn find_item(&self, needle: &str, threshold: Option<usize>) -> Option<&Item> {
-        let best_match = self
-            .items
+        let needle_clean = needle.replace([' ', '\n'], "");
+        self.items
             .iter()
             .filter(|item| !item.name.ends_with("Set"))
-            .min_by_key(|item| levenshtein(&item.drop_name, needle));
-
-        best_match.and_then(|item| {
-            if levenshtein(&item.drop_name.replace(' ', ""), needle)
-                <= threshold.unwrap_or(item.drop_name.len() / 3)
-            {
-                Some(item)
-            } else {
-                None
-            }
-        })
+            .filter_map(|item| {
+                let dist = levenshtein(&item.drop_name.replace(' ', ""), &needle_clean);
+                let current_threshold = threshold.unwrap_or(item.drop_name.len() / 3);
+                if dist <= current_threshold {
+                    Some((item, dist))
+                } else {
+                    None
+                }
+            })
+            .min_by_key(|(_, dist)| *dist)
+            .map(|(item, _)| item)
     }
 
     pub fn find_item_exact(&self, needle: &str) -> Result<&Item> {
@@ -138,66 +151,26 @@ impl Database {
     }
 
     fn relic_to_bucket(&self, relic: &Relic, refinement: Refinement) -> Result<Bucket> {
-        let common_chance = refinement.common_chance();
-        let uncommon_chance = refinement.uncommon_chance();
-        let rare_chance = refinement.rare_chance();
-
-        let item_names = [
-            (&relic.common1, common_chance),
-            (&relic.common2, common_chance),
-            (&relic.common3, common_chance),
-            (&relic.uncommon1, uncommon_chance),
-            (&relic.uncommon2, uncommon_chance),
-            (&relic.rare1, rare_chance),
-        ];
-
-        let mut items = Vec::with_capacity(item_names.len());
-        for (name, chance) in item_names {
-            let item = self.find_item_exact(name)?;
-            items.push(statistics::Item {
-                value: item.platinum,
-                probability: chance,
-            });
-        }
+        let items = relic
+            .rewards()
+            .into_iter()
+            .map(|(name, reward_type)| {
+                let item = self.find_item_exact(name)?;
+                Ok(statistics::Item {
+                    value: item.platinum,
+                    probability: refinement.chance(reward_type),
+                })
+            })
+            .collect::<Result<Vec<_>>>()?;
 
         Ok(Bucket::new(items))
     }
 
     pub fn single_relic_value(&self, relic: &Relic, refinement: Refinement) -> f32 {
-        let common_chance = refinement.common_chance();
-        let uncommon_chance = refinement.uncommon_chance();
-        let rare_chance = refinement.rare_chance();
-
-        // Define a helper function to safely get item platinum or log error and return 0.0
-        let get_platinum = |name: &str, item_type: &str| -> f32 {
-            match self.find_item_exact(name) {
-                Ok(item) => item.platinum,
-                Err(e) => {
-                    warn!("Failed to find {item_type} item {name}: {e}");
-                    0.0
-                }
-            }
-        };
-
-        let value = 0.0
-            + get_platinum(&relic.common1, "common1") * common_chance
-            + get_platinum(&relic.common2, "common2") * common_chance
-            + get_platinum(&relic.common3, "common3") * common_chance
-            + get_platinum(&relic.uncommon1, "uncommon1") * uncommon_chance
-            + get_platinum(&relic.uncommon2, "uncommon2") * uncommon_chance
-            + get_platinum(&relic.rare1, "rare1") * rare_chance;
-
-        let item_names = [
-            (&relic.common1, common_chance),
-            (&relic.common2, common_chance),
-            (&relic.common3, common_chance),
-            (&relic.uncommon1, uncommon_chance),
-            (&relic.uncommon2, uncommon_chance),
-            (&relic.rare1, rare_chance),
-        ];
-        let value2: f32 = item_names
+        relic
+            .rewards()
             .into_iter()
-            .map(|(name, chance)| {
+            .map(|(name, reward_type)| {
                 let plat = match self.find_item_exact(name) {
                     Ok(item) => item.platinum,
                     Err(e) => {
@@ -205,13 +178,9 @@ impl Database {
                         0.0
                     }
                 };
-                debug!("{plat} * {chance}");
-                plat * chance
+                plat * refinement.chance(reward_type)
             })
-            .sum();
-        debug!("{value} vs {value2}");
-
-        value
+            .sum()
     }
 
     pub fn shared_relic_value(
@@ -235,66 +204,51 @@ impl Database {
         refinement: Refinement,
         _number_of_relics: u32,
     ) -> f32 {
-        let common_chance = refinement.common_chance();
-        let uncommon_chance = refinement.uncommon_chance();
-        let rare_chance = refinement.rare_chance();
-
-        let items = [
-            (&relic.common1, common_chance),
-            (&relic.common2, common_chance),
-            (&relic.common3, common_chance),
-            (&relic.uncommon1, uncommon_chance),
-            (&relic.uncommon2, uncommon_chance),
-            (&relic.rare1, rare_chance),
-        ];
+        let rewards: Vec<_> = relic
+            .rewards()
+            .into_iter()
+            .map(|(name, reward_type)| {
+                let plat = match self.find_item_exact(name) {
+                    Ok(item) => item.platinum,
+                    Err(e) => {
+                        warn!("Failed to find item {name}: {e}");
+                        0.0
+                    }
+                };
+                (plat, refinement.chance(reward_type))
+            })
+            .collect();
 
         let mut value = 0.0;
-        for item1 in items.iter() {
-            for item2 in items.iter() {
-                for item3 in items.iter() {
-                    for item4 in items.iter() {
-                        // Get platinum values for all items, handling errors
-                        let platinum_values: Vec<f32> = [item1.0, item2.0, item3.0, item4.0]
-                            .iter()
-                            .map(|name| {
-                                match self.find_item_exact(name) {
-                                    Ok(item) => item.platinum,
-                                    Err(e) => {
-                                        warn!("Failed to find item {name}: {e}");
-                                        0.0
-                                    }
-                                }
-                            })
-                            .collect();
-
-                        // Find maximum value, defaulting to 0.0 if the vector is empty
-                        let max_value = platinum_values.iter()
-                            .max_by(|a: &&f32, b: &&f32| a.total_cmp(b))
-                            .copied()
+        for r1 in &rewards {
+            for r2 in &rewards {
+                for r3 in &rewards {
+                    for r4 in &rewards {
+                        let max_value = [r1.0, r2.0, r3.0, r4.0]
+                            .into_iter()
+                            .max_by(|a, b| a.total_cmp(b))
                             .unwrap_or(0.0);
 
-                        value += max_value * item1.1 * item2.1 * item3.1 * item4.1;
+                        value += max_value * r1.1 * r2.1 * r3.1 * r4.1;
                     }
                 }
             }
         }
-
         value
     }
 }
 
 fn remove_empty_relics_from_json(value: &mut Value) -> Result<()> {
-    let relics = &mut value["relics"];
-    let relics_obj = relics.as_object_mut()
+    let relics = value
+        .get_mut("relics")
+        .and_then(|v| v.as_object_mut())
         .ok_or_else(|| DatabaseError::InvalidFormat("relics field is not an object".to_string()))?;
 
-    for (_, kind) in relics_obj {
-        let kind_obj = kind.as_object_mut()
-            .ok_or_else(|| DatabaseError::InvalidFormat("relic kind is not an object".to_string()))?;
-
-        kind_obj.retain(|_name, relic| serde_json::from_value::<Relic>(relic.clone()).is_ok());
+    for kind in relics.values_mut() {
+        if let Some(kind_obj) = kind.as_object_mut() {
+            kind_obj.retain(|_, relic| serde_json::from_value::<Relic>(relic.clone()).is_ok());
+        }
     }
-
     Ok(())
 }
 

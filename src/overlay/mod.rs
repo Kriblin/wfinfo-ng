@@ -49,10 +49,6 @@ impl OverlayApp {
 }
 
 impl eframe::App for OverlayApp {
-
-    fn clear_color(&self, _visuals: &egui::Visuals) -> [f32; 4] {
-        [0.0, 0.0, 0.0, 0.0]
-    }
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         let did_update = self.check_updates();
 
@@ -107,6 +103,10 @@ impl eframe::App for OverlayApp {
             // Request repaint less frequently when hidden
             ctx.request_repaint_after(Duration::from_millis(100));
         }
+    }
+
+    fn clear_color(&self, _visuals: &egui::Visuals) -> [f32; 4] {
+        [0.0, 0.0, 0.0, 0.0]
     }
 }
 

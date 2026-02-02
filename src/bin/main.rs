@@ -225,14 +225,11 @@ fn main() -> Result<(), Box<dyn Error>> {
         None => Config::get_config_file_path()?,
     };
 
-    let mut config = match Config::load_from_file(&config_path) {
-        Ok(config) => config,
-        Err(err) => {
-            eprintln!("Error loading config file: {}", err);
-            eprintln!("Using default configuration");
-            Config::default()
-        }
-    };
+    let mut config = Config::load_from_file(&config_path).unwrap_or_else(|err| {
+        eprintln!("Error loading config file: {}", err);
+        eprintln!("Using default configuration");
+        Config::default()
+    });
 
     // Update configuration with command-line arguments
     config.update_from_args(&args);
