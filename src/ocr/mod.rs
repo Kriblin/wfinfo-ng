@@ -80,18 +80,21 @@ pub fn extract_parts(image: &DynamicImage, theme: Theme) -> Vec<DynamicImage> {
     let (most_top, most_bot, most_left, most_width) =
         calculate_prefilter_bounds(image.width(), image.height(), screen_scaling);
 
-    let prefilter = image.crop_imm(
-        most_left,
-        most_top,
-        most_width,
-        most_bot - most_top,
-    );
+    let prefilter = image.crop_imm(most_left, most_top, most_width, most_bot - most_top);
 
     let rows = calculate_row_histogram(&prefilter, &theme);
     let scaling = find_best_scaling(prefilter.height(), prefilter.width(), &rows, screen_scaling);
 
-    let high_scaling = if scaling < 1.0 { scaling + 0.01 } else { scaling };
-    let low_scaling = if scaling > 0.5 { scaling + 0.01 } else { scaling };
+    let high_scaling = if scaling < 1.0 {
+        scaling + 0.01
+    } else {
+        scaling
+    };
+    let low_scaling = if scaling > 0.5 {
+        scaling + 0.01
+    } else {
+        scaling
+    };
 
     let crop_width = PIXEL_REWARD_WIDTH * screen_scaling * high_scaling;
     let crop_left = prefilter.width() as f32 / 2.0 - crop_width / 2.0;
@@ -101,8 +104,8 @@ pub fn extract_parts(image: &DynamicImage, theme: Theme) -> Vec<DynamicImage> {
             * screen_scaling
             * high_scaling;
 
-    let crop_bot_abs = height / 2.0
-        - (PIXEL_REWARD_YDISPLAY - PIXEL_REWARD_HEIGHT) * screen_scaling * low_scaling;
+    let crop_bot_abs =
+        height / 2.0 - (PIXEL_REWARD_YDISPLAY - PIXEL_REWARD_HEIGHT) * screen_scaling * low_scaling;
 
     let crop_top = crop_top_abs - most_top as f32;
     let crop_height = crop_bot_abs - crop_top_abs;
@@ -174,11 +177,13 @@ pub fn normalize_string(string: &str) -> String {
 }
 
 pub fn image_to_string(tesseract: &mut Option<Tesseract>, image: &DynamicImage) -> Result<String> {
-    let mut ocr = tesseract.take()
+    let mut ocr = tesseract
+        .take()
         .ok_or_else(|| OcrError::InitializationError("Tesseract instance is None".to_string()))?;
 
-    let buffer = image.as_flat_samples_u8()
-        .ok_or_else(|| OcrError::ImageProcessingError("Failed to convert image to flat samples".to_string()))?;
+    let buffer = image.as_flat_samples_u8().ok_or_else(|| {
+        OcrError::ImageProcessingError("Failed to convert image to flat samples".to_string())
+    })?;
 
     ocr = ocr
         .set_frame(
@@ -190,7 +195,8 @@ pub fn image_to_string(tesseract: &mut Option<Tesseract>, image: &DynamicImage) 
         )
         .map_err(|e| OcrError::ProcessingError(format!("Failed to set image: {}", e)))?;
 
-    let result = ocr.get_text()
+    let result = ocr
+        .get_text()
         .map_err(|e| OcrError::ProcessingError(format!("Failed to get text: {}", e)))?;
 
     tesseract.replace(ocr);
@@ -210,7 +216,8 @@ pub fn reward_image_to_reward_names(
     debug!("Extracted {} part images", parts.len());
 
     let mut results = Vec::new();
-    let mut ocr_lock = OCR.lock()
+    let mut ocr_lock = OCR
+        .lock()
         .map_err(|e| OcrError::ProcessingError(format!("Failed to lock OCR mutex: {}", e)))?;
 
     for part_image in parts {
@@ -231,7 +238,11 @@ fn get_screen_scaling(width: u32, height: u32) -> f32 {
     }
 }
 
-fn calculate_prefilter_bounds(width: u32, height: u32, screen_scaling: f32) -> (u32, u32, u32, u32) {
+fn calculate_prefilter_bounds(
+    width: u32,
+    height: u32,
+    screen_scaling: f32,
+) -> (u32, u32, u32, u32) {
     let width_f = width as f32;
     let height_f = height as f32;
     let most_width = PIXEL_REWARD_WIDTH * screen_scaling;

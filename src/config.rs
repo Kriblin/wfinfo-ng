@@ -70,7 +70,10 @@ impl Config {
     /// Load configuration from the specified file path
     pub fn load_from_file(path: &Path) -> Result<Self> {
         if !path.exists() {
-            info!("Config file not found at {}, creating default config", path.display());
+            info!(
+                "Config file not found at {}, creating default config",
+                path.display()
+            );
             let config = Self::default();
             config.save_to_file(path)?;
             return Ok(config);
@@ -98,12 +101,12 @@ impl Config {
     pub fn save_to_file(&self, path: &Path) -> Result<()> {
         // Create parent directories if they don't exist
         if let Some(parent) = path.parent() {
-            fs::create_dir_all(parent)
-                .with_context(|| format!("Failed to create config directory: {}", parent.display()))?;
+            fs::create_dir_all(parent).with_context(|| {
+                format!("Failed to create config directory: {}", parent.display())
+            })?;
         }
 
-        let contents = serde_yaml::to_string(self)
-            .context("Failed to serialize config to YAML")?;
+        let contents = serde_yaml::to_string(self).context("Failed to serialize config to YAML")?;
 
         let mut file = File::create(path)
             .with_context(|| format!("Failed to create config file: {}", path.display()))?;
@@ -118,7 +121,7 @@ impl Config {
         let config_dir = dirs::config_dir()
             .ok_or_else(|| anyhow::anyhow!("Could not determine config directory"))?
             .join("wfinfo-ng");
-        
+
         Ok(config_dir.join("config.yaml"))
     }
 
@@ -164,7 +167,8 @@ impl Config {
 
         // Validate game log file path if specified
         if let Some(ref path) = self.game_log_file_path
-            && !path.exists() {
+            && !path.exists()
+        {
             warn!("Game log file not found at {}", path.display());
         }
 

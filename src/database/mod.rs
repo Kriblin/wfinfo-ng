@@ -7,11 +7,11 @@ use serde_json::Value;
 
 use crate::{
     error::{DatabaseError, Result},
-    statistics::{self, Bucket},
     models::{
         item::{DucatItem, EquipmentItem, EquipmentType, FilteredItems, Refinement, Relic, Relics},
         price::PriceItem,
     },
+    statistics::{self, Bucket},
 };
 
 #[derive(Clone, Debug, Deserialize)]
@@ -29,11 +29,15 @@ pub struct Item {
 }
 
 impl Database {
-    pub fn load_from_file(prices: Option<&Path>, filtered_items: Option<&Path>) -> Result<Database> {
+    pub fn load_from_file(
+        prices: Option<&Path>,
+        filtered_items: Option<&Path>,
+    ) -> Result<Database> {
         let prices_path = prices.unwrap_or_else(|| Path::new("prices.json"));
         let price_table = Self::load_prices(prices_path)?;
 
-        let filtered_items_path = filtered_items.unwrap_or_else(|| Path::new("filtered_items.json"));
+        let filtered_items_path =
+            filtered_items.unwrap_or_else(|| Path::new("filtered_items.json"));
         let filtered_items = Self::load_filtered_items(filtered_items_path)?;
 
         let mut items = Self::process_items(
@@ -52,11 +56,13 @@ impl Database {
     }
 
     fn load_prices(prices_path: &Path) -> Result<HashMap<String, f32>> {
-        let text = read_to_string(prices_path)
-            .map_err(|e| DatabaseError::FileNotFound(prices_path.to_path_buf(), Some(e.to_string())))?;
+        let text = read_to_string(prices_path).map_err(|e| {
+            DatabaseError::FileNotFound(prices_path.to_path_buf(), Some(e.to_string()))
+        })?;
 
-        let price_list: Vec<PriceItem> = serde_json::from_str(&text)
-            .map_err(|e| DatabaseError::InvalidFormat(format!("Failed to parse prices JSON: {}", e)))?;
+        let price_list: Vec<PriceItem> = serde_json::from_str(&text).map_err(|e| {
+            DatabaseError::InvalidFormat(format!("Failed to parse prices JSON: {}", e))
+        })?;
 
         Ok(price_list
             .into_iter()
@@ -65,16 +71,20 @@ impl Database {
     }
 
     fn load_filtered_items(filtered_items_path: &Path) -> Result<FilteredItems> {
-        let text = read_to_string(filtered_items_path)
-            .map_err(|e| DatabaseError::FileNotFound(filtered_items_path.to_path_buf(), Some(e.to_string())))?;
+        let text = read_to_string(filtered_items_path).map_err(|e| {
+            DatabaseError::FileNotFound(filtered_items_path.to_path_buf(), Some(e.to_string()))
+        })?;
 
-        let mut json = serde_json::from_str(&text)
-            .map_err(|e| DatabaseError::InvalidFormat(format!("Failed to parse filtered items JSON: {}", e)))?;
+        let mut json = serde_json::from_str(&text).map_err(|e| {
+            DatabaseError::InvalidFormat(format!("Failed to parse filtered items JSON: {}", e))
+        })?;
 
         remove_empty_relics_from_json(&mut json)?;
 
-        serde_json::from_value(json)
-            .map_err(|e| DatabaseError::InvalidFormat(format!("Failed to convert JSON to FilteredItems: {}", e)).into())
+        serde_json::from_value(json).map_err(|e| {
+            DatabaseError::InvalidFormat(format!("Failed to convert JSON to FilteredItems: {}", e))
+                .into()
+        })
     }
 
     fn process_items(
@@ -85,38 +95,41 @@ impl Database {
         eqmt.into_iter()
             .flat_map(|(_name, equipment_item)| {
                 let item_type = equipment_item.item_type;
-                equipment_item.parts.into_iter().filter_map(move |(name, ducat_item)| {
-                    let item_is_part = name.ends_with("Systems")
-                        || name.ends_with("Neuroptics")
-                        || name.ends_with("Chassis")
-                        || name.ends_with("Harness")
-                        || name.ends_with("Wings");
+                equipment_item
+                    .parts
+                    .into_iter()
+                    .filter_map(move |(name, ducat_item)| {
+                        let item_is_part = name.ends_with("Systems")
+                            || name.ends_with("Neuroptics")
+                            || name.ends_with("Chassis")
+                            || name.ends_with("Harness")
+                            || name.ends_with("Wings");
 
-                    let drop_name = match item_type {
-                        EquipmentType::Warframes | EquipmentType::Archwing
-                            if item_is_part && !name.ends_with("Blueprint") =>
-                        {
-                            format!("{} Blueprint", name)
-                        }
-                        _ => name.to_owned(),
-                    };
+                        let drop_name = match item_type {
+                            EquipmentType::Warframes | EquipmentType::Archwing
+                                if item_is_part && !name.ends_with("Blueprint") =>
+                            {
+                                format!("{} Blueprint", name)
+                            }
+                            _ => name.to_owned(),
+                        };
 
-                    let platinum = price_table
-                        .get(&name)
-                        .or_else(|| price_table.get(&format!("{} Blueprint", name)))
-                        .copied()
-                        .or_else(|| {
-                            warn!("Failed to find price for item: {}", name);
-                            None
-                        })?;
+                        let platinum = price_table
+                            .get(&name)
+                            .or_else(|| price_table.get(&format!("{} Blueprint", name)))
+                            .copied()
+                            .or_else(|| {
+                                warn!("Failed to find price for item: {}", name);
+                                None
+                            })?;
 
-                    Some(Item {
-                        name,
-                        drop_name,
-                        platinum,
-                        ducats: ducat_item.ducats,
+                        Some(Item {
+                            name,
+                            drop_name,
+                            platinum,
+                            ducats: ducat_item.ducats,
+                        })
                     })
-                })
             })
             .chain(ignored_items.into_iter().map(|(name, _)| Item {
                 name: name.to_owned(),
@@ -146,7 +159,9 @@ impl Database {
     }
 
     pub fn find_item_exact(&self, needle: &str) -> Result<&Item> {
-        self.items.iter().find(|item| item.name == needle)
+        self.items
+            .iter()
+            .find(|item| item.name == needle)
             .ok_or_else(|| DatabaseError::ItemNotFound(needle.to_string()).into())
     }
 
@@ -260,14 +275,12 @@ mod test {
 
     #[test]
     pub fn can_load_database() {
-        Database::load_from_file(None, None)
-            .expect("Failed to load database");
+        Database::load_from_file(None, None).expect("Failed to load database");
     }
 
     #[test]
     pub fn can_find_items() {
-        let db = Database::load_from_file(None, None)
-            .expect("Failed to load database");
+        let db = Database::load_from_file(None, None).expect("Failed to load database");
 
         let item = db
             .find_item("TitaniaPrimeBlueprint", Some(0))
@@ -282,8 +295,7 @@ mod test {
 
     #[test]
     pub fn can_find_fuzzy_items() {
-        let db = Database::load_from_file(None, None)
-            .expect("Failed to load database");
+        let db = Database::load_from_file(None, None).expect("Failed to load database");
 
         let item = db
             .find_item("Akstlett Prlme Recver", None)
@@ -303,8 +315,7 @@ mod test {
 
     #[test]
     fn validate_shared_relic_values() {
-        let database = Database::load_from_file(None, None)
-            .expect("Failed to load database");
+        let database = Database::load_from_file(None, None).expect("Failed to load database");
 
         for (name, relic) in database.relics.lith.iter() {
             println!("{} {:#?}", name, relic);

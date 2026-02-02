@@ -1,15 +1,13 @@
+use std::error::Error;
+use std::io::{BufRead, BufReader, Read, Seek, SeekFrom};
 use std::thread::sleep;
 use std::time::Duration;
-use std::{error::Error};
 use std::{fs::File, thread};
-use std::{
-    io::{BufRead, BufReader, Read, Seek, SeekFrom},
-};
 use std::{path::PathBuf, sync::mpsc};
 
 use clap::Parser;
 use env_logger::{Builder, Env};
-use global_hotkey::{hotkey::HotKey, GlobalHotKeyEvent, GlobalHotKeyManager, HotKeyState};
+use global_hotkey::{GlobalHotKeyEvent, GlobalHotKeyManager, HotKeyState, hotkey::HotKey};
 use image::DynamicImage;
 use log::{debug, error, info, warn};
 use notify::{RecommendedWatcher, RecursiveMode, Watcher};
@@ -18,13 +16,15 @@ use xcap::Window;
 use wfinfo::{
     config::{Args, Config},
     database::{Database, Item},
-    ocr::{normalize_string, reward_image_to_reward_names, OCR},
+    ocr::{OCR, normalize_string, reward_image_to_reward_names},
+    overlay::{OverlayApp, Reward},
     utils::fetch_prices_and_items,
-    overlay::{Reward, OverlayApp},
 };
 
 fn run_detection(capturer: &Window, db: &Database) -> Result<Vec<Reward>, wfinfo::error::Error> {
-    let frame = capturer.capture_image().map_err(|e| wfinfo::error::OcrError::CaptureError(e.to_string()))?;
+    let frame = capturer
+        .capture_image()
+        .map_err(|e| wfinfo::error::OcrError::CaptureError(e.to_string()))?;
     info!("Captured");
     let image = DynamicImage::ImageRgba8(frame);
     info!("Converted");
@@ -91,7 +91,8 @@ fn log_watcher(path: PathBuf, event_sender: mpsc::Sender<()>, capture_delay_ms: 
         debug!("Position: {}", position);
 
         let (tx, rx) = mpsc::channel();
-        let watcher_config = notify::Config::default().with_poll_interval(Duration::from_millis(100));
+        let watcher_config =
+            notify::Config::default().with_poll_interval(Duration::from_millis(100));
         let mut watcher = match RecommendedWatcher::new(tx, watcher_config) {
             Ok(watcher) => watcher,
             Err(err) => {
@@ -118,7 +119,12 @@ fn log_watcher(path: PathBuf, event_sender: mpsc::Sender<()>, capture_delay_ms: 
                         };
 
                         if let Err(err) = f.seek(SeekFrom::Start(position)) {
-                            error!("Failed to seek to position {} in file {}: {}", position, path.display(), err);
+                            error!(
+                                "Failed to seek to position {} in file {}: {}",
+                                position,
+                                path.display(),
+                                err
+                            );
                             continue;
                         }
 
@@ -136,7 +142,8 @@ fn log_watcher(path: PathBuf, event_sender: mpsc::Sender<()>, capture_delay_ms: 
                             // debug!("> {:?}", line);
                             if line.contains("Pause countdown done")
                                 || line.contains("Got rewards")
-                                || line.contains("Created /Lotus/Interface/ProjectionRewardChoice.swf")
+                                || line
+                                    .contains("Created /Lotus/Interface/ProjectionRewardChoice.swf")
                             {
                                 reward_screen_detected = true;
                             }
@@ -259,8 +266,15 @@ fn main() -> Result<(), Box<dyn Error>> {
         .init();
 
     let windows = Window::all()?;
-    let Some(warframe_window) = windows.iter().find(|x| x.title().ok().as_ref() == Some(&config.window_name)) else {
-        return Err(format!("Warframe window with title '{}' not found", config.window_name).into());
+    let Some(warframe_window) = windows
+        .iter()
+        .find(|x| x.title().ok().as_ref() == Some(&config.window_name))
+    else {
+        return Err(format!(
+            "Warframe window with title '{}' not found",
+            config.window_name
+        )
+        .into());
     };
 
     debug!(
@@ -270,22 +284,24 @@ fn main() -> Result<(), Box<dyn Error>> {
     );
 
     // Use configured file paths if provided, otherwise download the data
-    let (prices_path, items_path) = if config.prices_file_path.is_some() && config.items_file_path.is_some() {
-        info!("Using configured database file paths");
-        (
-            config.prices_file_path.as_ref().map(|p| p.clone()),
-            config.items_file_path.as_ref().map(|p| p.clone())
-        )
-    } else {
-        info!("Downloading database files");
-        let (prices, items) = fetch_prices_and_items()?;
-        (Some(prices), Some(items))
-    };
+    let (prices_path, items_path) =
+        if config.prices_file_path.is_some() && config.items_file_path.is_some() {
+            info!("Using configured database file paths");
+            (
+                config.prices_file_path.as_ref().map(|p| p.clone()),
+                config.items_file_path.as_ref().map(|p| p.clone()),
+            )
+        } else {
+            info!("Downloading database files");
+            let (prices, items) = fetch_prices_and_items()?;
+            (Some(prices), Some(items))
+        };
 
     let db = Database::load_from_file(
         prices_path.as_ref().map(|p| p.as_path()),
-        items_path.as_ref().map(|p| p.as_path())
-    ).map_err(|e| Box::<dyn Error>::from(e))?;
+        items_path.as_ref().map(|p| p.as_path()),
+    )
+    .map_err(|e| Box::<dyn Error>::from(e))?;
 
     info!("Loaded database");
 
@@ -293,7 +309,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     let (reward_sender, reward_receiver) = mpsc::channel();
 
     if let Some(log_path) = &config.game_log_file_path {
-        log_watcher(log_path.clone(), event_sender.clone(), config.capture_delay_ms);
+        log_watcher(
+            log_path.clone(),
+            event_sender.clone(),
+            config.capture_delay_ms,
+        );
     } else {
         warn!("No game log file path specified, automatic detection disabled");
     }
@@ -311,7 +331,10 @@ fn main() -> Result<(), Box<dyn Error>> {
                     continue;
                 }
             };
-            let Some(warframe_window) = windows.iter().find(|x| x.title().ok().as_ref() == Some(&window_title)) else {
+            let Some(warframe_window) = windows
+                .iter()
+                .find(|x| x.title().ok().as_ref() == Some(&window_title))
+            else {
                 error!("Warframe window not found during detection");
                 continue;
             };
@@ -342,7 +365,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         "Warframe Reward Overlay",
         options,
         Box::new(|_cc| Box::new(OverlayApp::new(reward_receiver))),
-    ).map_err(|e| Box::new(e) as Box<dyn Error>)?;
+    )
+    .map_err(|e| Box::new(e) as Box<dyn Error>)?;
 
     // Clean up OCR resources
     if let Ok(mut guard) = OCR.lock() {
@@ -355,11 +379,11 @@ fn main() -> Result<(), Box<dyn Error>> {
 
 #[cfg(test)]
 mod test {
-    use std::collections::BTreeMap;
-    use std::fs::read_to_string;
     use image::ImageReader;
     use indexmap::IndexMap;
     use rayon::prelude::*;
+    use std::collections::BTreeMap;
+    use std::fs::read_to_string;
     use tesseract::Tesseract;
     use wfinfo::ocr::detect_theme;
     use wfinfo::ocr::extract_parts;
@@ -405,9 +429,10 @@ mod test {
     // #[test]
     #[allow(dead_code)]
     fn wfi_images_exact() -> Result<(), Box<dyn Error>> {
-        let labels: IndexMap<String, Label> =
-            serde_json::from_str(&read_to_string("WFI test images/labels.json")
-                .map_err(|e| format!("Failed to read labels file: {}", e))?)?;
+        let labels: IndexMap<String, Label> = serde_json::from_str(
+            &read_to_string("WFI test images/labels.json")
+                .map_err(|e| format!("Failed to read labels file: {}", e))?,
+        )?;
 
         for (filename, label) in labels {
             let image = ImageReader::open("WFI test images/".to_string() + &filename)
@@ -453,57 +478,60 @@ mod test {
             .unwrap_or(false);
         if !has_images {
             eprintln!("Skipping wfi_images_99_percent: no images found in 'WFI test images/'");
-            return Ok(())
+            return Ok(());
         }
 
-        let labels: BTreeMap<String, Label> =
-            serde_json::from_str(&read_to_string("WFI test images/labels.json")
-                .map_err(|e| format!("Failed to read labels file: {}", e))?)?;
+        let labels: BTreeMap<String, Label> = serde_json::from_str(
+            &read_to_string("WFI test images/labels.json")
+                .map_err(|e| format!("Failed to read labels file: {}", e))?,
+        )?;
 
         let total = labels.len();
         let success_count: usize = labels
             .into_par_iter()
-            .map(|(filename, label)| -> Result<usize, Box<dyn Error + Send + Sync>> {
-                let image = ImageReader::open("WFI test images/".to_string() + &filename)
-                    .map_err(|e| format!("Failed to open image {}: {}", filename, e))?
-                    .decode()
-                    .map_err(|e| format!("Failed to decode image {}: {}", filename, e))?;
+            .map(
+                |(filename, label)| -> Result<usize, Box<dyn Error + Send + Sync>> {
+                    let image = ImageReader::open("WFI test images/".to_string() + &filename)
+                        .map_err(|e| format!("Failed to open image {}: {}", filename, e))?
+                        .decode()
+                        .map_err(|e| format!("Failed to decode image {}: {}", filename, e))?;
 
-                let text = match reward_image_to_reward_names(image, None) {
-                    Ok(text) => text,
-                    Err(e) => {
-                        println!("Error processing image {}: {}", filename, e);
-                        return Ok(0);
+                    let text = match reward_image_to_reward_names(image, None) {
+                        Ok(text) => text,
+                        Err(e) => {
+                            println!("Error processing image {}: {}", filename, e);
+                            return Ok(0);
+                        }
+                    };
+
+                    let text: Vec<_> = text.iter().map(|s| normalize_string(s)).collect();
+                    println!("{:#?}", text);
+
+                    let db = match Database::load_from_file(None, None) {
+                        Ok(db) => db,
+                        Err(e) => {
+                            println!("Error loading database for image {}: {}", filename, e);
+                            return Ok(0);
+                        }
+                    };
+
+                    let items: Vec<_> = text.iter().map(|s| db.find_item(s, None)).collect();
+                    println!("{:#?}", items);
+                    println!("{}", filename);
+
+                    let item_names = items
+                        .iter()
+                        .map(|item| item.map(|item| item.drop_name.clone()));
+
+                    if item_names.zip(label.items).all(|(result, expectation)| {
+                        expectation == result.unwrap_or_else(|| "".to_string())
+                    }) {
+                        Ok(1)
+                    } else {
+                        Ok(0)
                     }
-                };
-
-                let text: Vec<_> = text.iter().map(|s| normalize_string(s)).collect();
-                println!("{:#?}", text);
-
-                let db = match Database::load_from_file(None, None) {
-                    Ok(db) => db,
-                    Err(e) => {
-                        println!("Error loading database for image {}: {}", filename, e);
-                        return Ok(0);
-                    }
-                };
-
-                let items: Vec<_> = text.iter().map(|s| db.find_item(s, None)).collect();
-                println!("{:#?}", items);
-                println!("{}", filename);
-
-                let item_names = items
-                    .iter()
-                    .map(|item| item.map(|item| item.drop_name.clone()));
-
-                if item_names.zip(label.items).all(|(result, expectation)| {
-                    expectation == result.unwrap_or_else(|| "".to_string())
-                }) {
-                    Ok(1)
-                } else {
-                    Ok(0)
-                }
-            })
+                },
+            )
             .filter_map(Result::ok)
             .sum();
 
@@ -534,7 +562,8 @@ mod test {
                 .map_err(|e| format!("Could not initialize Tesseract: {}", e))?;
 
             for part in parts {
-                let buffer = part.as_flat_samples_u8()
+                let buffer = part
+                    .as_flat_samples_u8()
                     .ok_or("Failed to get flat samples")?;
 
                 ocr = ocr
@@ -547,7 +576,8 @@ mod test {
                     )
                     .map_err(|e| format!("Failed to set image: {}", e))?;
 
-                let text = ocr.get_text()
+                let text = ocr
+                    .get_text()
                     .map_err(|e| format!("Failed to get text: {}", e))?;
                 println!("{}", text);
             }

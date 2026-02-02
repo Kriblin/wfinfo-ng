@@ -1,7 +1,7 @@
-use std::sync::mpsc::Receiver;
-use std::time::{Duration, Instant};
 use eframe::egui;
 use log::{debug, info};
+use std::sync::mpsc::Receiver;
+use std::time::{Duration, Instant};
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Reward {
@@ -40,7 +40,8 @@ impl OverlayApp {
         }
 
         if let Some(last_update) = self.last_update
-            && last_update.elapsed() > Duration::from_secs(10) {
+            && last_update.elapsed() > Duration::from_secs(10)
+        {
             self.rewards.clear();
             self.last_update = None;
         }
@@ -68,7 +69,6 @@ impl eframe::App for OverlayApp {
             ..Default::default()
         };
 
-
         if !self.rewards.is_empty() {
             info!(
                 "Overlay update: rewards_count={}, rewards={:?}, last_update_elapsed={:?}",
@@ -86,12 +86,36 @@ impl eframe::App for OverlayApp {
                                 let ui = &mut columns[i];
                                 ui.vertical(|ui| {
                                     if reward.is_best {
-                                        ui.label(egui::RichText::new(&reward.name).color(egui::Color32::GREEN).strong());
-                                        ui.label(egui::RichText::new(format!("{}p, {}d", reward.platinum, reward.ducats)).color(egui::Color32::GREEN).strong());
-                                        ui.label(egui::RichText::new("BEST").color(egui::Color32::GOLD).strong());
+                                        ui.label(
+                                            egui::RichText::new(&reward.name)
+                                                .color(egui::Color32::GREEN)
+                                                .strong(),
+                                        );
+                                        ui.label(
+                                            egui::RichText::new(format!(
+                                                "{}p, {}d",
+                                                reward.platinum, reward.ducats
+                                            ))
+                                            .color(egui::Color32::GREEN)
+                                            .strong(),
+                                        );
+                                        ui.label(
+                                            egui::RichText::new("BEST")
+                                                .color(egui::Color32::GOLD)
+                                                .strong(),
+                                        );
                                     } else {
-                                        ui.label(egui::RichText::new(&reward.name).color(egui::Color32::LIGHT_GRAY));
-                                        ui.label(egui::RichText::new(format!("{}p, {}d", reward.platinum, reward.ducats)).color(egui::Color32::LIGHT_GRAY));
+                                        ui.label(
+                                            egui::RichText::new(&reward.name)
+                                                .color(egui::Color32::LIGHT_GRAY),
+                                        );
+                                        ui.label(
+                                            egui::RichText::new(format!(
+                                                "{}p, {}d",
+                                                reward.platinum, reward.ducats
+                                            ))
+                                            .color(egui::Color32::LIGHT_GRAY),
+                                        );
                                     }
                                 });
                             }
@@ -118,14 +142,12 @@ mod tests {
     fn test_set_rewards() {
         let (_tx, rx) = std::sync::mpsc::channel();
         let mut app = OverlayApp::new(rx);
-        let rewards = vec![
-            Reward {
-                name: "Test Item".to_string(),
-                platinum: 10.0,
-                ducats: 15,
-                is_best: true,
-            }
-        ];
+        let rewards = vec![Reward {
+            name: "Test Item".to_string(),
+            platinum: 10.0,
+            ducats: 15,
+            is_best: true,
+        }];
         app.set_rewards(rewards.clone());
         assert_eq!(app.rewards, rewards);
     }
@@ -134,14 +156,12 @@ mod tests {
     fn test_receiver_updates_rewards() {
         let (tx, rx) = std::sync::mpsc::channel();
         let mut app = OverlayApp::new(rx);
-        let rewards = vec![
-            Reward {
-                name: "Test Item".to_string(),
-                platinum: 10.0,
-                ducats: 15,
-                is_best: true,
-            }
-        ];
+        let rewards = vec![Reward {
+            name: "Test Item".to_string(),
+            platinum: 10.0,
+            ducats: 15,
+            is_best: true,
+        }];
         tx.send(rewards.clone()).unwrap();
 
         // In a real app, update would be called by eframe
@@ -157,18 +177,16 @@ mod tests {
     fn test_timeout_clears_rewards() {
         let (_tx, rx) = std::sync::mpsc::channel();
         let mut app = OverlayApp::new(rx);
-        app.rewards = vec![
-            Reward {
-                name: "Test Item".to_string(),
-                platinum: 10.0,
-                ducats: 15,
-                is_best: true,
-            }
-        ];
+        app.rewards = vec![Reward {
+            name: "Test Item".to_string(),
+            platinum: 10.0,
+            ducats: 15,
+            is_best: true,
+        }];
         app.last_update = Some(Instant::now() - Duration::from_secs(11));
-        
+
         app.check_updates();
-        
+
         assert!(app.rewards.is_empty());
         assert!(app.last_update.is_none());
     }

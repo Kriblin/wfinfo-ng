@@ -1,7 +1,8 @@
 use std::{
     sync::mpsc::{
-        channel, Receiver, Sender,
+        Receiver, Sender,
         TryRecvError::{Disconnected, Empty},
+        channel,
     },
     thread,
 };
@@ -10,7 +11,7 @@ use eframe::{
     egui::{self, Key},
     epaint::ColorImage,
 };
-use image::{ImageReader, DynamicImage, Rgb};
+use image::{DynamicImage, ImageReader, Rgb};
 use palette::{FromColor, Hsl, Srgb};
 use wfinfo::{
     database::Database,
@@ -24,7 +25,8 @@ fn main() {
         "Tune theme detection",
         options,
         Box::new(|_cc| Box::<MyApp>::default()),
-    ).expect("TODO: panic message");
+    )
+    .expect("TODO: panic message");
 }
 
 struct MyApp {
@@ -43,19 +45,17 @@ impl Default for MyApp {
     fn default() -> Self {
         let original_images = std::env::args()
             .skip(1)
-            .filter_map(|name| {
-                match ImageReader::open(&name) {
-                    Ok(reader) => match reader.decode() {
-                        Ok(image) => Some(image),
-                        Err(e) => {
-                            eprintln!("Error decoding image {}: {}", name, e);
-                            None
-                        }
-                    },
+            .filter_map(|name| match ImageReader::open(&name) {
+                Ok(reader) => match reader.decode() {
+                    Ok(image) => Some(image),
                     Err(e) => {
-                        eprintln!("Error opening image {}: {}", name, e);
+                        eprintln!("Error decoding image {}: {}", name, e);
                         None
                     }
+                },
+                Err(e) => {
+                    eprintln!("Error opening image {}: {}", name, e);
+                    None
                 }
             })
             .collect();
@@ -97,9 +97,10 @@ fn spawn_ocr_thread(
             Err(e) => {
                 eprintln!("Error loading database: {}", e);
                 // Send an error message to the UI and exit the thread
-                if let Err(send_err) = response_sender.send(vec![
-                    ("ERROR".to_string(), format!("Failed to load database: {}", e))
-                ]) {
+                if let Err(send_err) = response_sender.send(vec![(
+                    "ERROR".to_string(),
+                    format!("Failed to load database: {}", e),
+                )]) {
                     eprintln!("Error sending database error: {}", send_err);
                 }
                 return;
@@ -108,13 +109,14 @@ fn spawn_ocr_thread(
 
         loop {
             // Wait for a request
-            let (mut index, mut last_request): (usize, HslRange<f32>) = match request_receiver.recv() {
-                Ok(request) => request,
-                Err(e) => {
-                    eprintln!("Error receiving request: {}", e);
-                    return; // Exit the thread if the channel is closed
-                }
-            };
+            let (mut index, mut last_request): (usize, HslRange<f32>) =
+                match request_receiver.recv() {
+                    Ok(request) => request,
+                    Err(e) => {
+                        eprintln!("Error receiving request: {}", e);
+                        return; // Exit the thread if the channel is closed
+                    }
+                };
 
             // Process any additional requests that came in while we were processing
             loop {
@@ -135,7 +137,8 @@ fn spawn_ocr_thread(
             let strings = ocr::reward_image_to_reward_names(
                 image.clone(),
                 Some(Theme::Custom(last_request.to_ordered())),
-            ).unwrap_or_else(|e|  {
+            )
+            .unwrap_or_else(|e| {
                 eprintln!("OCR error: {:?}", e);
                 vec![]
             });
@@ -168,13 +171,16 @@ impl eframe::App for MyApp {
 
         // Handle next image key press
         if ctx.input_mut(|i| i.consume_key(egui::Modifiers::NONE, Key::N))
-            && !self.original_images.is_empty() {
+            && !self.original_images.is_empty()
+        {
             self.selected_image_index =
                 (self.selected_image_index + 1) % self.original_images.len();
             self.image = None;
 
-            if let Err(e) = self.ocr_request_sender
-                .send((self.selected_image_index, self.settings.clone())) {
+            if let Err(e) = self
+                .ocr_request_sender
+                .send((self.selected_image_index, self.settings.clone()))
+            {
                 eprintln!("Error sending OCR request: {}", e);
             }
 
@@ -183,17 +189,19 @@ impl eframe::App for MyApp {
 
         // Handle previous image key press
         if ctx.input_mut(|i| i.consume_key(egui::Modifiers::NONE, Key::P))
-            && !self.original_images.is_empty() {
-            self.selected_image_index = 
-                if self.selected_image_index == 0 {
-                    self.original_images.len() - 1
-                } else {
-                    self.selected_image_index - 1
-                };
+            && !self.original_images.is_empty()
+        {
+            self.selected_image_index = if self.selected_image_index == 0 {
+                self.original_images.len() - 1
+            } else {
+                self.selected_image_index - 1
+            };
             self.image = None;
 
-            if let Err(e) = self.ocr_request_sender
-                .send((self.selected_image_index, self.settings.clone())) {
+            if let Err(e) = self
+                .ocr_request_sender
+                .send((self.selected_image_index, self.settings.clone()))
+            {
                 eprintln!("Error sending OCR request: {}", e);
             }
 
@@ -205,8 +213,10 @@ impl eframe::App for MyApp {
             let image = self.process_image(&self.original_images[self.selected_image_index]);
             self.image = Some(convert_image(ctx, &image));
 
-            if let Err(e) = self.ocr_request_sender
-                .send((self.selected_image_index, self.settings.clone())) {
+            if let Err(e) = self
+                .ocr_request_sender
+                .send((self.selected_image_index, self.settings.clone()))
+            {
                 eprintln!("Error sending OCR request: {}", e);
             }
         }
@@ -214,7 +224,7 @@ impl eframe::App for MyApp {
         // Check for OCR results
         match self.ocr_response_receiver.try_recv() {
             Ok(response) => self.ocr_result = Some(response),
-            Err(Empty) => {}, // No new results yet, that's fine
+            Err(Empty) => {} // No new results yet, that's fine
             Err(Disconnected) => {
                 eprintln!("OCR thread disconnected");
             }
@@ -273,8 +283,10 @@ impl eframe::App for MyApp {
                     .changed()
             {
                 self.image = None;
-                if let Err(e) = self.ocr_request_sender
-                    .send((self.selected_image_index, self.settings.clone())) {
+                if let Err(e) = self
+                    .ocr_request_sender
+                    .send((self.selected_image_index, self.settings.clone()))
+                {
                     eprintln!("Error sending OCR request after slider change: {}", e);
                 }
                 self.ocr_result = None;

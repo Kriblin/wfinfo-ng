@@ -33,7 +33,10 @@ fn relic_values(database: &Database, relics: &HashMap<String, Relic>, relic_coun
             match max_value {
                 Some((refinement, value)) => Some((name.to_owned(), *refinement, *value)),
                 None => {
-                    eprintln!("Warning: Could not determine best refinement for relic {}", name);
+                    eprintln!(
+                        "Warning: Could not determine best refinement for relic {}",
+                        name
+                    );
                     None
                 }
             }

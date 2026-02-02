@@ -1,10 +1,10 @@
 pub mod config;
 pub mod database;
 pub mod error;
+pub mod models;
 pub mod ocr;
+pub mod overlay;
 pub mod statistics;
 pub mod testing;
 pub mod theme;
 pub mod utils;
-pub mod models;
-pub mod overlay;
