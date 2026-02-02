@@ -167,39 +167,37 @@ impl eframe::App for MyApp {
         ctx.request_repaint();
 
         // Handle next image key press
-        if ctx.input_mut(|i| i.consume_key(egui::Modifiers::NONE, Key::N)) {
-            if !self.original_images.is_empty() {
-                self.selected_image_index =
-                    (self.selected_image_index + 1) % self.original_images.len();
-                self.image = None;
+        if ctx.input_mut(|i| i.consume_key(egui::Modifiers::NONE, Key::N))
+            && !self.original_images.is_empty() {
+            self.selected_image_index =
+                (self.selected_image_index + 1) % self.original_images.len();
+            self.image = None;
 
-                if let Err(e) = self.ocr_request_sender
-                    .send((self.selected_image_index, self.settings.clone())) {
-                    eprintln!("Error sending OCR request: {}", e);
-                }
-
-                self.ocr_result = None;
+            if let Err(e) = self.ocr_request_sender
+                .send((self.selected_image_index, self.settings.clone())) {
+                eprintln!("Error sending OCR request: {}", e);
             }
+
+            self.ocr_result = None;
         }
 
         // Handle previous image key press
-        if ctx.input_mut(|i| i.consume_key(egui::Modifiers::NONE, Key::P)) {
-            if !self.original_images.is_empty() {
-                self.selected_image_index = 
-                    if self.selected_image_index == 0 {
-                        self.original_images.len() - 1
-                    } else {
-                        self.selected_image_index - 1
-                    };
-                self.image = None;
+        if ctx.input_mut(|i| i.consume_key(egui::Modifiers::NONE, Key::P))
+            && !self.original_images.is_empty() {
+            self.selected_image_index = 
+                if self.selected_image_index == 0 {
+                    self.original_images.len() - 1
+                } else {
+                    self.selected_image_index - 1
+                };
+            self.image = None;
 
-                if let Err(e) = self.ocr_request_sender
-                    .send((self.selected_image_index, self.settings.clone())) {
-                    eprintln!("Error sending OCR request: {}", e);
-                }
-
-                self.ocr_result = None;
+            if let Err(e) = self.ocr_request_sender
+                .send((self.selected_image_index, self.settings.clone())) {
+                eprintln!("Error sending OCR request: {}", e);
             }
+
+            self.ocr_result = None;
         }
 
         // Process image if needed

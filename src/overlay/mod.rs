@@ -39,11 +39,10 @@ impl OverlayApp {
             did_update = true;
         }
 
-        if let Some(last_update) = self.last_update {
-            if last_update.elapsed() > Duration::from_secs(10) {
-                self.rewards.clear();
-                self.last_update = None;
-            }
+        if let Some(last_update) = self.last_update
+            && last_update.elapsed() > Duration::from_secs(10) {
+            self.rewards.clear();
+            self.last_update = None;
         }
         did_update
     }

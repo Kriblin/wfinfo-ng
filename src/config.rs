@@ -163,10 +163,9 @@ impl Config {
         }
 
         // Validate game log file path if specified
-        if let Some(ref path) = self.game_log_file_path {
-            if !path.exists() {
-                warn!("Game log file not found at {}", path.display());
-            }
+        if let Some(ref path) = self.game_log_file_path
+            && !path.exists() {
+            warn!("Game log file not found at {}", path.display());
         }
 
         Ok(())
