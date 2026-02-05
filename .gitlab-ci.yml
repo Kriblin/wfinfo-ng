@@ -11,6 +11,7 @@ before_script:
 test:cargo:
   script:
     - rustc --version && cargo --version  # Print version info for debugging
+    - rustup update
     - cargo test --workspace --verbose
 
 deploy:
