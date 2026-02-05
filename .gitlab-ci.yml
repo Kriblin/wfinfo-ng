@@ -6,7 +6,7 @@ image: "rust:latest"
 
 before_script:
    - apt-get update -yqq
-   - apt-get install -yqq --no-install-recommends libclang-dev build-essential libtesseract-eng libtesseract-dev xorg-dev libwayland-dev libwayland-egl1 libegl1-mesa-dev libpipewire-0.3-dev libgbm-dev jq
+   - apt-get install -yqq --no-install-recommends libclang-dev build-essential libtesseract-dev tesseract-ocr-eng xorg-dev libwayland-dev libwayland-egl1 libegl1-mesa-dev libpipewire-0.3-dev libgbm-dev jq
 
 test:cargo:
   script:
