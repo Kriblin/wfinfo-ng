@@ -64,8 +64,8 @@ impl eframe::App for OverlayApp {
 
         let panel_frame = egui::Frame {
             fill: egui::Color32::from_black_alpha(150),
-            rounding: egui::Rounding::same(8.0),
-            inner_margin: egui::Margin::same(10.0),
+            corner_radius: egui::CornerRadius::same(8),
+            inner_margin: egui::Margin::same(10),
             ..Default::default()
         };
 
