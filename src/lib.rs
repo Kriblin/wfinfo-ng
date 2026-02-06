@@ -1,9 +1,11 @@
 pub mod config;
 pub mod database;
 pub mod error;
+pub mod main_ui;
 pub mod models;
 pub mod ocr;
 pub mod overlay;
+pub mod settings;
 pub mod statistics;
 pub mod testing;
 pub mod theme;

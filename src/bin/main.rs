@@ -6,6 +6,7 @@ use std::{fs::File, thread};
 use std::{path::PathBuf, sync::mpsc};
 
 use clap::Parser;
+use eframe::egui;
 use env_logger::{Builder, Env};
 use global_hotkey::{GlobalHotKeyEvent, GlobalHotKeyManager, HotKeyState, hotkey::HotKey};
 use image::DynamicImage;
@@ -16,8 +17,9 @@ use xcap::Window;
 use wfinfo::{
     config::{Args, Config},
     database::{Database, Item},
+    main_ui::{DetectionState, MainUiState, SettingsLauncher, WindowTitleState},
     ocr::{OCR, normalize_string, reward_image_to_reward_names},
-    overlay::{OverlayApp, Reward},
+    overlay::{OverlayState, Reward, draw_overlay},
     utils::fetch_prices_and_items,
 };
 
@@ -202,6 +204,129 @@ fn hotkey_watcher(hotkey: HotKey, event_sender: mpsc::Sender<()>) {
     });
 }
 
+struct ProcessSettingsLauncher {
+    settings_executable: PathBuf,
+}
+
+impl ProcessSettingsLauncher {
+    fn new() -> Self {
+        let settings_executable = std::env::current_exe()
+            .ok()
+            .and_then(|exe| exe.parent().map(|dir| dir.join("settings")))
+            .unwrap_or_else(|| PathBuf::from("settings"));
+        Self {
+            settings_executable,
+        }
+    }
+}
+
+impl SettingsLauncher for ProcessSettingsLauncher {
+    fn open_settings(&self) -> Result<(), String> {
+
+        let settings_executable = self.settings_executable.clone();
+
+        std::thread::spawn(move || {
+            std::process::Command::new(settings_executable)
+                .spawn()
+                .expect("Failed to start settings process")
+                .wait()
+                .expect("Failed to start settings process");
+        });
+        Ok(())
+    }
+}
+
+struct MainApp<L: SettingsLauncher> {
+    overlay_state: OverlayState,
+    reward_receiver: mpsc::Receiver<Vec<Reward>>,
+    ui_state: MainUiState<L>,
+    window_title_state: WindowTitleState,
+    window_title_input: String,
+    overlay_active: bool,
+}
+
+impl<L: SettingsLauncher> MainApp<L> {
+    fn new(
+        reward_receiver: mpsc::Receiver<Vec<Reward>>,
+        detection: DetectionState,
+        launcher: L,
+        window_title_state: WindowTitleState,
+    ) -> Self {
+        let window_title_input = window_title_state.get();
+        Self {
+            overlay_state: OverlayState::new(),
+            reward_receiver,
+            ui_state: MainUiState::new(detection, launcher),
+            window_title_state,
+            window_title_input,
+            overlay_active: false,
+        }
+    }
+}
+
+impl<L: SettingsLauncher> eframe::App for MainApp<L> {
+    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        let did_update = self.overlay_state.try_receive(&self.reward_receiver);
+        self.overlay_state
+            .clear_if_timed_out(Duration::from_secs(10));
+
+        if did_update {
+            self.overlay_active = true;
+            debug!(
+                "Main UI received update: rewards_count={}, rewards={:?}, last_update_elapsed={:?}",
+                self.overlay_state.rewards.len(),
+                self.overlay_state.rewards,
+                self.overlay_state.last_update.map(|t| t.elapsed()),
+            );
+        }
+
+        egui::CentralPanel::default().show(ctx, |ui| {
+            ui.heading("WFinfo-ng");
+            ui.horizontal(|ui| {
+                ui.label("Detection status:");
+                ui.strong(self.ui_state.detection.status_label());
+            });
+
+            ui.separator();
+            ui.label("Window title");
+            let response = ui.text_edit_singleline(&mut self.window_title_input);
+            if response.changed() {
+                debug!("Window title changed to {}", self.window_title_input);
+                self.window_title_state
+                    .set(self.window_title_input.trim().to_string());
+            }
+
+            if let Some(error) = &self.ui_state.last_error {
+                ui.colored_label(egui::Color32::RED, error);
+            }
+
+            ui.with_layout(egui::Layout::bottom_up(egui::Align::RIGHT), |ui| {
+                if ui.button("Settings").clicked() {
+                    let _ = self.ui_state.open_settings();
+                }
+            });
+        });
+
+        if self.overlay_active {
+            let overlay_snapshot = self.overlay_state.clone();
+            let overlay_builder = egui::ViewportBuilder::default()
+                .with_title("WFinfo-ng Overlay")
+                .with_always_on_top()
+                .with_decorations(false)
+                .with_transparent(true)
+                .with_mouse_passthrough(true);
+
+            ctx.show_viewport_deferred(
+                egui::ViewportId::from_hash_of("wfinfo-overlay"),
+                overlay_builder,
+                move |overlay_ctx, _class| {
+                    draw_overlay(overlay_ctx, &overlay_snapshot);
+                },
+            );
+        }
+    }
+}
+
 #[allow(dead_code)]
 fn benchmark() -> Result<(), Box<dyn Error>> {
     for _ in 0..10 {
@@ -266,22 +391,21 @@ fn main() -> Result<(), Box<dyn Error>> {
         .init();
 
     let windows = Window::all()?;
-    let Some(warframe_window) = windows
+    if let Some(warframe_window) = windows
         .iter()
         .find(|x| x.title().ok().as_ref() == Some(&config.window_name))
-    else {
-        return Err(format!(
-            "Warframe window with title '{}' not found",
+    {
+        debug!(
+            "Capture source resolution: {:?}x{:?}",
+            warframe_window.width().unwrap_or(0),
+            warframe_window.height().unwrap_or(0)
+        );
+    } else {
+        warn!(
+            "Warframe window with title '{}' not found. Update the title in the main UI to continue.",
             config.window_name
-        )
-        .into());
-    };
-
-    debug!(
-        "Capture source resolution: {:?}x{:?}",
-        warframe_window.width().unwrap_or(0),
-        warframe_window.height().unwrap_or(0)
-    );
+        );
+    }
 
     // Use configured file paths if provided, otherwise download the data
     let (prices_path, items_path) =
@@ -307,6 +431,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let (event_sender, event_receiver) = mpsc::channel();
     let (reward_sender, reward_receiver) = mpsc::channel();
+    let detection_state = DetectionState::new();
 
     if let Some(log_path) = &config.game_log_file_path {
         log_watcher(
@@ -320,22 +445,28 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     hotkey_watcher(config.hotkey.parse()?, event_sender);
 
-    let window_title = config.window_name.clone();
+    let window_title_state = WindowTitleState::new(config.window_name.clone());
+    let detection_state_thread = detection_state.clone();
+    let window_title_thread = window_title_state.clone();
     thread::spawn(move || {
         while let Ok(()) = event_receiver.recv() {
             info!("Capturing");
+            detection_state_thread.set_running(true);
             let windows = match Window::all() {
                 Ok(windows) => windows,
                 Err(e) => {
                     error!("Failed to get windows: {}", e);
+                    detection_state_thread.set_running(false);
                     continue;
                 }
             };
+            let current_title = window_title_thread.get();
             let Some(warframe_window) = windows
                 .iter()
-                .find(|x| x.title().ok().as_ref() == Some(&window_title))
+                .find(|x| x.title().ok().as_ref() == Some(&current_title))
             else {
                 error!("Warframe window not found during detection");
+                detection_state_thread.set_running(false);
                 continue;
             };
 
@@ -349,22 +480,25 @@ fn main() -> Result<(), Box<dyn Error>> {
                     error!("Error during detection: {}", e);
                 }
             }
+            detection_state_thread.set_running(false);
         }
     });
 
-    let options = eframe::NativeOptions {
-        viewport: eframe::egui::ViewportBuilder::default()
-            .with_always_on_top()
-            .with_decorations(false)
-            .with_transparent(true)
-            .with_mouse_passthrough(true),
-        ..Default::default()
-    };
+    let options = eframe::NativeOptions::default();
+    let detection_state_ui = detection_state.clone();
+    let window_title_ui = window_title_state.clone();
 
     eframe::run_native(
-        "Warframe Reward Overlay",
+        "WFinfo-ng",
         options,
-        Box::new(|_cc| Ok(Box::new(OverlayApp::new(reward_receiver)))),
+        Box::new(move |_cc| {
+            Ok(Box::new(MainApp::new(
+                reward_receiver,
+                detection_state_ui,
+                ProcessSettingsLauncher::new(),
+                window_title_ui,
+            )))
+        }),
     )
     .map_err(|e| Box::new(e) as Box<dyn Error>)?;
 
