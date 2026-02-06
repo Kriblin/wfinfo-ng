@@ -24,7 +24,7 @@ fn main() {
     eframe::run_native(
         "Tune theme detection",
         options,
-        Box::new(|_cc| Box::<MyApp>::default()),
+        Box::new(|_cc| Ok(Box::<MyApp>::default())),
     )
     .expect("TODO: panic message");
 }

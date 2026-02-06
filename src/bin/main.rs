@@ -364,7 +364,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     eframe::run_native(
         "Warframe Reward Overlay",
         options,
-        Box::new(|_cc| Box::new(OverlayApp::new(reward_receiver))),
+        Box::new(|_cc| Ok(Box::new(OverlayApp::new(reward_receiver)))),
     )
     .map_err(|e| Box::new(e) as Box<dyn Error>)?;
 

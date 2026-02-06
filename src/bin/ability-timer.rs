@@ -14,7 +14,7 @@ fn main() {
     eframe::run_native(
         "Warframe Ability Timer",
         options,
-        Box::new(|_cc| Box::<MyApp>::new(MyApp::new(arguments))),
+        Box::new(|_cc| Ok(Box::<MyApp>::new(MyApp::new(arguments)))),
     )
     .expect("TODO: panic message");
 }
