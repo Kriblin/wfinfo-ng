@@ -245,6 +245,7 @@ impl ProcessSettingsLauncher {
 
 impl SettingsLauncher for ProcessSettingsLauncher {
     fn open_settings(&self) -> Result<(), String> {
+
         let settings_executable = self.settings_executable.clone();
 
         std::thread::spawn(move || {
@@ -601,6 +602,8 @@ mod test {
     use rayon::prelude::*;
     use std::collections::BTreeMap;
     use std::fs::read_to_string;
+    use kreuzberg_tesseract::TesseractAPI as Tesseract;
+    use wfinfo::ocr::detect_theme;
     use wfinfo::ocr::extract_parts;
     use wfinfo::ocr::{detect_theme, get_tessdata_path};
     use wfinfo::testing::Label;

@@ -10,6 +10,7 @@ use std::env;
 use std::f32::consts::PI;
 use std::path::Path;
 use std::sync::Mutex;
+use kreuzberg_tesseract::TesseractAPI as Tesseract;
 
 // Constants for UI elements at 1920x1080
 const BASE_WIDTH: f32 = 1920.0;
