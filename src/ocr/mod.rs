@@ -1,15 +1,14 @@
 use crate::error::{OcrError, Result, ThemeError};
 use crate::theme::Theme;
 use image::{DynamicImage, GenericImageView, Pixel, Rgb};
-use kreuzberg_tesseract::TesseractAPI as Tesseract;
 use lazy_static::lazy_static;
 use log::debug;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use std::collections::HashMap;
-use std::env;
 use std::f32::consts::PI;
 use std::path::Path;
 use std::sync::Mutex;
+use std::env;
 use kreuzberg_tesseract::TesseractAPI as Tesseract;
 
 // Constants for UI elements at 1920x1080

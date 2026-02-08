@@ -603,7 +603,7 @@ mod test {
     use std::collections::BTreeMap;
     use std::fs::read_to_string;
     use kreuzberg_tesseract::TesseractAPI as Tesseract;
-    use wfinfo::ocr::detect_theme;
+    use wfinfo::ocr::{detect_theme, get_tessdata_path};
     use wfinfo::ocr::extract_parts;
     use wfinfo::ocr::{detect_theme, get_tessdata_path};
     use wfinfo::testing::Label;
