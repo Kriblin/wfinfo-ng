@@ -75,7 +75,7 @@ wfinfo
 
 ### Configuration
 
-WFinfo-ng uses a YAML configuration file located at `~/.config/wfinfo-ng/config.yaml`.
+WFinfo-ng uses a TOML configuration file located at `~/.config/wfinfo-ng/config.toml`.
 
 | Option | CLI Argument | Description | Default |
 | :--- | :--- | :--- | :--- |

@@ -93,8 +93,19 @@ impl Database {
         price_table: &HashMap<String, f32>,
     ) -> Vec<Item> {
         eqmt.into_iter()
-            .flat_map(|(_name, equipment_item)| {
+            .flat_map(|(equipment_name, equipment_item)| {
                 let item_type = equipment_item.item_type;
+                let set_name = format!("{} Set", equipment_name);
+                let set_platinum = price_table.get(&set_name).copied();
+                if set_platinum.is_none() {
+                    warn!("Failed to find price for item: {}", set_name);
+                }
+                let set_item = set_platinum.map(|platinum| Item {
+                    name: set_name.clone(),
+                    drop_name: set_name,
+                    platinum,
+                    ducats: 0,
+                });
                 equipment_item
                     .parts
                     .into_iter()
@@ -130,6 +141,7 @@ impl Database {
                             ducats: ducat_item.ducats,
                         })
                     })
+                    .chain(set_item.into_iter())
             })
             .chain(ignored_items.into_iter().map(|(name, _)| Item {
                 name: name.to_owned(),
@@ -142,9 +154,10 @@ impl Database {
 
     pub fn find_item(&self, needle: &str, threshold: Option<usize>) -> Option<&Item> {
         let needle_clean = needle.replace([' ', '\n'], "");
+        let needle_is_set = needle_clean.ends_with("Set");
         self.items
             .iter()
-            .filter(|item| !item.name.ends_with("Set"))
+            .filter(|item| needle_is_set || !item.name.ends_with("Set"))
             .filter_map(|item| {
                 let dist = levenshtein(&item.drop_name.replace(' ', ""), &needle_clean);
                 let current_threshold = threshold.unwrap_or(item.drop_name.len() / 3);
