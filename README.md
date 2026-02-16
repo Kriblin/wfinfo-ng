@@ -7,7 +7,7 @@ WFinfo-ng helps you determine the value of relic rewards in real-time by capturi
 ## Features
 
 - **Relic Reward Detection**: Automatically detects when you are on a reward screen by monitoring `EE.log`.
-- **OCR Integration**: Uses Tesseract to read item names from screenshots.
+- **OCR Integration**: Uses Kreuzberg Tesseract to read item names from screenshots.
 - **Value Lookup**: Displays platinum and ducat values for each detected item.
 - **Transparent Overlay**: Real-time overlay showing reward values directly over the game window.
 - **Multi-Server Support**: Compatible with both X11 and Wayland (via `xcap`).
@@ -19,9 +19,9 @@ WFinfo-ng helps you determine the value of relic rewards in real-time by capturi
 To build and run WFinfo-ng, you need the following system dependencies:
 
 - **Rust**: Edition 2024 (stable recommended). Install via [rustup.rs](https://rustup.rs).
-- **Tesseract OCR**: Required for OCR processing. Ensure English language data (`tessdata/eng.traineddata`) is installed.
+- **Kreuzberg Tesseract OCR**: Required for OCR processing. Ensure English language data (`tessdata/eng.traineddata`) is installed.
 - **libxrandr**: Required for X11 screenshot capturing.
-- **curl & jq**: Required for the `update.sh` script to fetch data.
+- **curl & jq**: Required for the update scripts (`update.sh` / `update.bat`) to fetch data.
 
 ## Installation
 
@@ -31,12 +31,17 @@ To build and run WFinfo-ng, you need the following system dependencies:
     cd wfinfo-ng
     ```
 
-2.  **Setup the database**:
-    The application requires item price and metadata to function. Run the update script:
-    ```bash
-    sh update.sh
-    ```
-    *Note: The application will also attempt to download this data on startup if it's missing.*
+2.  **Setup the database and Tesseract data**:
+    The application requires item price, metadata, and Tesseract OCR data to function. Run the update script:
+    - **Linux/macOS**:
+      ```bash
+      sh update.sh
+      ```
+    - **Windows**:
+      ```batch
+      update.bat
+      ```
+    *Note: The application will also attempt to download price data on startup if it's missing, but Tesseract data must be present in `tessdata/` or installed on the system.*
 
 3.  **Build the project**:
     ```bash
@@ -89,11 +94,11 @@ WFinfo-ng uses a YAML configuration file located at `~/.config/wfinfo-ng/config.
 
 - `src/lib.rs`: Core library defining modules for database, OCR, and models.
 - `src/bin/main.rs`: Main entry point for the `wfinfo` binary (CLI + Overlay).
-- `src/ocr/`: Tesseract OCR integration and image preprocessing.
+- `src/ocr/`: Kreuzberg Tesseract OCR integration and image preprocessing.
 - `src/database/`: Database loading and fuzzy item searching logic.
 - `src/overlay/`: Egui-based implementation of the transparent HUD.
 - `src/theme/`: Detection logic for different Warframe UI color themes.
-- `update.sh`: Fetches latest price data from WarframeStat.us.
+- `update.sh` / `update.bat`: Fetches latest price data from WarframeStat.us.
 
 ## Utility Binaries
 

@@ -52,6 +52,56 @@ impl WindowTitleState {
     }
 }
 
+#[derive(Clone, Debug)]
+pub struct WindowCaptureState {
+    status: Arc<Mutex<WindowCaptureStatus>>,
+}
+
+#[derive(Clone, Debug)]
+struct WindowCaptureStatus {
+    found: bool,
+    window_title: String,
+}
+
+impl WindowCaptureState {
+    pub fn new(initial_window: String) -> Self {
+        Self {
+            status: Arc::new(Mutex::new(WindowCaptureStatus {
+                found: false,
+                window_title: initial_window,
+            })),
+        }
+    }
+
+    pub fn set_found(&self, window_title: String) {
+        self.set_status(true, window_title);
+    }
+
+    pub fn set_not_found(&self, window_title: String) {
+        self.set_status(false, window_title);
+    }
+
+    pub fn status_label(&self) -> String {
+        self.status
+            .lock()
+            .map(|status| {
+                if status.found {
+                    "Window Capture attached".to_string()
+                } else {
+                    format!("No Window '{}' found", status.window_title)
+                }
+            })
+            .unwrap_or_else(|_| "Window capture status unavailable".to_string())
+    }
+
+    fn set_status(&self, found: bool, window_title: String) {
+        if let Ok(mut guard) = self.status.lock() {
+            guard.found = found;
+            guard.window_title = window_title;
+        }
+    }
+}
+
 pub trait SettingsLauncher {
     fn open_settings(&self) -> Result<(), String>;
 }
@@ -162,5 +212,17 @@ mod tests {
 
         assert_eq!(state.get(), "Warframe Test");
         assert_eq!(clone.get(), "Warframe Test");
+    }
+
+    #[test]
+    fn window_capture_state_reports_status() {
+        let state = WindowCaptureState::new("Warframe".to_string());
+        assert_eq!(state.status_label(), "No Window 'Warframe' found");
+
+        state.set_found("Warframe".to_string());
+        assert_eq!(state.status_label(), "Window Capture attached");
+
+        state.set_not_found("Warframe Test".to_string());
+        assert_eq!(state.status_label(), "No Window 'Warframe Test' found");
     }
 }
