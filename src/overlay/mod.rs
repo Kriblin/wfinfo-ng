@@ -51,21 +51,9 @@ impl OverlayState {
                     );
                     self.rewards.clear();
                     self.last_update = None;
-                } else {
-                    debug!(
-                        "Overlay timeout check: elapsed={:?} <= timeout={:?}, rewards_count={}",
-                        elapsed,
-                        timeout,
-                        self.rewards.len()
-                    );
                 }
             }
-            None => {
-                debug!(
-                    "Overlay timeout check: no last_update, rewards_count={}",
-                    self.rewards.len()
-                );
-            }
+            _ => {}
         }
     }
 
@@ -146,7 +134,7 @@ pub fn draw_overlay(ctx: &egui::Context, state: &OverlayState) {
             });
         ctx.request_repaint();
     } else {
-        // Request repaint less frequently when hidden
+        // Request to repaint less frequently when hidden
         ctx.request_repaint_after(Duration::from_millis(100));
     }
 }

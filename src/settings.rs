@@ -136,7 +136,7 @@ mod tests {
     }
 
     #[test]
-    fn save_to_file_writes_config_yaml() {
+    fn save_to_file_writes_config_toml() {
         let config = Config {
             game_log_file_path: Some(PathBuf::from("/tmp/EE.log")),
             window_name: "WarframeTest".to_string(),
@@ -149,7 +149,7 @@ mod tests {
         };
         let state = SettingsState::from_config(&config);
         let dir = unique_temp_dir();
-        let path = dir.join("config.yaml");
+        let path = dir.join("config.toml");
 
         state.save_to_file(&path).expect("save failed");
 

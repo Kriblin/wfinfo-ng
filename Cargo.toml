@@ -35,7 +35,7 @@ rdev = "0.5.3"
 serde = { version = "1.0.228", features = ["serde_derive"] }
 serde-aux = "4.7.0"
 serde_json = "1.0.149"
-serde_yaml = "0.9.32"
+toml = "0.8.19"
 kreuzberg-tesseract = "4.2.14"
 thiserror = "2.0.18"
 xcap = "0.8.1"
