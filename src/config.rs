@@ -85,7 +85,7 @@ impl Config {
         file.read_to_string(&mut contents)
             .with_context(|| format!("Failed to read config file: {}", path.display()))?;
 
-        let config: Self = serde_yaml::from_str(&contents)
+        let config: Self = toml::from_str(&contents)
             .with_context(|| format!("Failed to parse config file: {}", path.display()))?;
 
         Ok(config)
@@ -106,7 +106,7 @@ impl Config {
             })?;
         }
 
-        let contents = serde_yaml::to_string(self).context("Failed to serialize config to YAML")?;
+        let contents = toml::to_string(self).context("Failed to serialize config to TOML")?;
 
         let mut file = File::create(path)
             .with_context(|| format!("Failed to create config file: {}", path.display()))?;
@@ -122,7 +122,7 @@ impl Config {
             .ok_or_else(|| anyhow::anyhow!("Could not determine config directory"))?
             .join("wfinfo-ng");
 
-        Ok(config_dir.join("config.yaml"))
+        Ok(config_dir.join("config.toml"))
     }
 
     /// Update configuration with command-line arguments
