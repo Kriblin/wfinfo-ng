@@ -9,6 +9,7 @@ pub struct Reward {
     pub platinum: f32,
     pub ducats: usize,
     pub is_best: bool,
+    pub set_info: String,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -38,11 +39,33 @@ impl OverlayState {
     }
 
     pub fn clear_if_timed_out(&mut self, timeout: Duration) {
-        if let Some(last_update) = self.last_update
-            && last_update.elapsed() > timeout
-        {
-            self.rewards.clear();
-            self.last_update = None;
+        match self.last_update {
+            Some(last_update) => {
+                let elapsed = last_update.elapsed();
+                if elapsed > timeout {
+                    debug!(
+                        "Overlay timed out: elapsed={:?} > timeout={:?}, clearing rewards_count={}",
+                        elapsed,
+                        timeout,
+                        self.rewards.len()
+                    );
+                    self.rewards.clear();
+                    self.last_update = None;
+                } else {
+                    debug!(
+                        "Overlay timeout check: elapsed={:?} <= timeout={:?}, rewards_count={}",
+                        elapsed,
+                        timeout,
+                        self.rewards.len()
+                    );
+                }
+            }
+            None => {
+                debug!(
+                    "Overlay timeout check: no last_update, rewards_count={}",
+                    self.rewards.len()
+                );
+            }
         }
     }
 
@@ -94,6 +117,10 @@ pub fn draw_overlay(ctx: &egui::Context, state: &OverlayState) {
                                             .color(egui::Color32::GOLD)
                                             .strong(),
                                     );
+                                    ui.label(
+                                        egui::RichText::new(&reward.set_info)
+                                            .color(egui::Color32::LIGHT_GRAY),
+                                    );
                                 } else {
                                     ui.label(
                                         egui::RichText::new(&reward.name)
@@ -105,6 +132,11 @@ pub fn draw_overlay(ctx: &egui::Context, state: &OverlayState) {
                                             reward.platinum, reward.ducats
                                         ))
                                         .color(egui::Color32::LIGHT_GRAY),
+                                    );
+
+                                    ui.label(
+                                        egui::RichText::new(&reward.set_info)
+                                            .color(egui::Color32::LIGHT_GRAY),
                                     );
                                 }
                             });
@@ -136,7 +168,6 @@ impl OverlayApp {
 impl eframe::App for OverlayApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         let did_update = self.state.try_receive(&self.receiver);
-        self.state.clear_if_timed_out(Duration::from_secs(10));
 
         if did_update {
             debug!(
@@ -146,8 +177,8 @@ impl eframe::App for OverlayApp {
                 self.state.last_update.map(|t| t.elapsed()),
             );
         }
-
         draw_overlay(ctx, &self.state);
+        self.state.clear_if_timed_out(Duration::from_secs(10));
     }
 
     fn clear_color(&self, _visuals: &egui::Visuals) -> [f32; 4] {
@@ -167,6 +198,7 @@ mod tests {
             platinum: 10.0,
             ducats: 15,
             is_best: true,
+            set_info: "".to_string(),
         }];
         state.set_rewards(rewards.clone());
         assert_eq!(state.rewards, rewards);
@@ -181,6 +213,7 @@ mod tests {
             platinum: 10.0,
             ducats: 15,
             is_best: true,
+            set_info: "".to_string(),
         }];
         tx.send(rewards.clone()).unwrap();
 
@@ -196,6 +229,7 @@ mod tests {
             platinum: 10.0,
             ducats: 15,
             is_best: true,
+            set_info: "".to_string(),
         }];
         state.last_update = Some(Instant::now() - Duration::from_secs(11));
 
