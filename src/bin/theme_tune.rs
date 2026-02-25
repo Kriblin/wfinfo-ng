@@ -134,13 +134,13 @@ fn spawn_ocr_thread(
             }
 
             let image: &DynamicImage = &images[index];
-            let strings = ocr::reward_image_to_reward_names(
+            let (strings, _theme) = ocr::reward_image_to_reward_names(
                 image.clone(),
                 Some(Theme::Custom(last_request.to_ordered())),
             )
             .unwrap_or_else(|e| {
                 eprintln!("OCR error: {:?}", e);
-                vec![]
+                (vec![], Theme::Vitruvian)
             });
 
             let results = strings
