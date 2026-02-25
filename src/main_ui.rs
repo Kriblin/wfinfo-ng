@@ -86,12 +86,16 @@ impl WindowCaptureState {
             .lock()
             .map(|status| {
                 if status.found {
-                    "Window Capture attached".to_string()
+                    if status.window_title == "Primary Monitor" {
+                        "Monitor Capture attached".to_string()
+                    } else {
+                        "Window Capture attached".to_string()
+                    }
                 } else {
                     format!("No Window '{}' found", status.window_title)
                 }
             })
-            .unwrap_or_else(|_| "Window capture status unavailable".to_string())
+            .unwrap_or_else(|_| "Capture status unavailable".to_string())
     }
 
     fn set_status(&self, found: bool, window_title: String) {
@@ -221,6 +225,9 @@ mod tests {
 
         state.set_found("Warframe".to_string());
         assert_eq!(state.status_label(), "Window Capture attached");
+
+        state.set_found("Primary Monitor".to_string());
+        assert_eq!(state.status_label(), "Monitor Capture attached");
 
         state.set_not_found("Warframe Test".to_string());
         assert_eq!(state.status_label(), "No Window 'Warframe Test' found");

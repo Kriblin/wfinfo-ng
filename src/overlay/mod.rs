@@ -71,12 +71,6 @@ pub fn draw_overlay(ctx: &egui::Context, state: &OverlayState) {
     };
 
     if !state.rewards.is_empty() {
-        info!(
-            "Overlay update: rewards_count={}, rewards={:?}, last_update_elapsed={:?}",
-            state.rewards.len(),
-            state.rewards,
-            state.last_update.map(|t| t.elapsed()),
-        );
         egui::CentralPanel::default()
             .frame(panel_frame)
             .show(ctx, |ui| {
@@ -132,10 +126,6 @@ pub fn draw_overlay(ctx: &egui::Context, state: &OverlayState) {
                     });
                 }
             });
-        ctx.request_repaint();
-    } else {
-        // Request to repaint less frequently when hidden
-        ctx.request_repaint_after(Duration::from_millis(100));
     }
 }
 
@@ -158,6 +148,7 @@ impl eframe::App for OverlayApp {
         let did_update = self.state.try_receive(&self.receiver);
 
         if did_update {
+            ctx.request_repaint();
             debug!(
                 "Overlay received update: rewards_count={}, rewards={:?}, last_update_elapsed={:?}",
                 self.state.rewards.len(),
@@ -165,8 +156,20 @@ impl eframe::App for OverlayApp {
                 self.state.last_update.map(|t| t.elapsed()),
             );
         }
+
         draw_overlay(ctx, &self.state);
-        self.state.clear_if_timed_out(Duration::from_secs(10));
+
+        if self.state.is_visible() {
+            if let Some(last_update) = self.state.last_update {
+                let timeout = Duration::from_secs(10);
+                if last_update.elapsed() >= timeout {
+                    self.state.rewards.clear();
+                    ctx.request_repaint();
+                } else {
+                    ctx.request_repaint_after(timeout - last_update.elapsed());
+                }
+            }
+        }
     }
 
     fn clear_color(&self, _visuals: &egui::Visuals) -> [f32; 4] {

@@ -2,7 +2,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::Result;
 
-use crate::config::Config;
+use crate::config::{Config, CaptureMode};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct SettingsState {
@@ -14,6 +14,8 @@ pub struct SettingsState {
     pub items_file_path: String,
     pub log_level: String,
     pub log_timestamps: bool,
+    pub save_screenshots: bool,
+    pub capture_mode: CaptureMode,
 }
 
 impl SettingsState {
@@ -39,6 +41,8 @@ impl SettingsState {
                 .unwrap_or_default(),
             log_level: config.log_level.clone(),
             log_timestamps: config.log_timestamps,
+            save_screenshots: config.save_screenshots,
+            capture_mode: config.capture_mode.clone(),
         }
     }
 
@@ -52,6 +56,8 @@ impl SettingsState {
             items_file_path: Self::parse_optional_path(&self.items_file_path),
             log_level: self.log_level.trim().to_string(),
             log_timestamps: self.log_timestamps,
+            save_screenshots: self.save_screenshots,
+            capture_mode: self.capture_mode.clone(),
         }
     }
 
@@ -107,6 +113,8 @@ mod tests {
             items_file_path: Some(PathBuf::from("/tmp/items.json")),
             log_level: "debug".to_string(),
             log_timestamps: true,
+            save_screenshots: false,
+            capture_mode: CaptureMode::Window,
         };
 
         let state = SettingsState::from_config(&config);
@@ -120,6 +128,7 @@ mod tests {
         assert_eq!(rebuilt.items_file_path, config.items_file_path);
         assert_eq!(rebuilt.log_level, config.log_level);
         assert_eq!(rebuilt.log_timestamps, config.log_timestamps);
+        assert_eq!(rebuilt.capture_mode, config.capture_mode);
     }
 
     #[test]
@@ -146,6 +155,8 @@ mod tests {
             items_file_path: None,
             log_level: "info".to_string(),
             log_timestamps: false,
+            save_screenshots: false,
+            capture_mode: CaptureMode::Window,
         };
         let state = SettingsState::from_config(&config);
         let dir = unique_temp_dir();
@@ -159,6 +170,7 @@ mod tests {
         assert_eq!(loaded.capture_delay_ms, config.capture_delay_ms);
         assert_eq!(loaded.log_level, config.log_level);
         assert_eq!(loaded.log_timestamps, config.log_timestamps);
+        assert_eq!(loaded.capture_mode, config.capture_mode);
         assert_eq!(loaded.game_log_file_path, config.game_log_file_path);
     }
 }

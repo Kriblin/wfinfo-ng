@@ -2,7 +2,7 @@ use std::error::Error;
 
 use eframe::egui;
 
-use wfinfo::config::Config;
+use wfinfo::config::{Config, CaptureMode};
 use wfinfo::settings::SettingsState;
 
 struct SettingsApp {
@@ -59,6 +59,15 @@ impl eframe::App for SettingsApp {
             ui.text_edit_singleline(&mut self.state.log_level);
 
             ui.checkbox(&mut self.state.log_timestamps, "Log timestamps");
+            ui.checkbox(&mut self.state.save_screenshots, "Save screenshots to test-images");
+
+            ui.separator();
+
+            ui.label("Capture mode");
+            ui.horizontal(|ui| {
+                ui.radio_value(&mut self.state.capture_mode, CaptureMode::Window, "Window");
+                ui.radio_value(&mut self.state.capture_mode, CaptureMode::Monitor, "Monitor");
+            });
 
             ui.separator();
             if ui.button("Save settings").clicked() {
