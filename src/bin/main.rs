@@ -361,7 +361,7 @@ impl<L: SettingsLauncher> MainApp<L> {
 }
 
 impl<L: SettingsLauncher> eframe::App for MainApp<L> {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
         let check_interval = Duration::from_secs(3);
         let elapsed = self.last_window_check.elapsed();
         if self.capture_mode == CaptureMode::Window {
@@ -369,9 +369,9 @@ impl<L: SettingsLauncher> eframe::App for MainApp<L> {
                 let current_title = self.window_title_state.get();
                 find_window_by_title(&current_title, &self.window_capture_state);
                 self.last_window_check = std::time::Instant::now();
-                ctx.request_repaint_after(check_interval);
+                ui.ctx().request_repaint_after(check_interval);
             } else {
-                ctx.request_repaint_after(check_interval - elapsed);
+                ui.ctx().request_repaint_after(check_interval - elapsed);
             }
         }
 
@@ -385,7 +385,7 @@ impl<L: SettingsLauncher> eframe::App for MainApp<L> {
 
         if did_update {
             self.overlay_active = true;
-            ctx.request_repaint();
+            ui.ctx().request_repaint();
             debug!(
                 "Main UI received update: rewards_count={}, rewards={:?}, last_update_elapsed={:?}",
                 self.overlay_state.rewards.len(),
@@ -400,58 +400,56 @@ impl<L: SettingsLauncher> eframe::App for MainApp<L> {
                 if last_update.elapsed() >= timeout {
                     self.overlay_state.rewards.clear();
                     self.overlay_active = false;
-                    ctx.request_repaint();
+                    ui.ctx().request_repaint();
                 } else {
-                    ctx.request_repaint_after(timeout - last_update.elapsed());
+                    ui.ctx().request_repaint_after(timeout - last_update.elapsed());
                 }
             }
         }
 
-        egui::CentralPanel::default().show(ctx, |ui| {
-            ui.horizontal(|ui| {
-                ui.heading("WFinfo-ng");
-                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                    if ui.button("Settings").clicked() {
-                        let _ = self.ui_state.open_settings();
-                    }
-                });
+        ui.horizontal(|ui| {
+            ui.heading("WFinfo-ng");
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                if ui.button("Settings").clicked() {
+                    let _ = self.ui_state.open_settings();
+                }
             });
+        });
 
-            ui.horizontal(|ui| {
-                ui.label("Status:");
-                ui.strong(self.ui_state.detection.status_label());
-                ui.separator();
-                ui.label("Capture:");
-                ui.strong(self.window_capture_state.status_label());
-            });
-
+        ui.horizontal(|ui| {
+            ui.label("Status:");
+            ui.strong(self.ui_state.detection.status_label());
             ui.separator();
+            ui.label("Capture:");
+            ui.strong(self.window_capture_state.status_label());
+        });
 
-            ui.horizontal(|ui| {
-                ui.label("Window:");
-                let response = ui.text_edit_singleline(&mut self.window_title_input);
-                if response.changed() && self.capture_mode == CaptureMode::Window {
-                    debug!("Window title changed to {}", self.window_title_input);
-                    let new_title = self.window_title_input.trim().to_string();
-                    self.window_title_state.set(new_title.clone());
-                    self.window_capture_state.set_not_found(new_title);
-                } else if response.changed() {
-                    let new_title = self.window_title_input.trim().to_string();
-                    self.window_title_state.set(new_title);
-                }
+        ui.separator();
 
-                if self.capture_mode == CaptureMode::Window && ui.button("Refresh").clicked() {
-                    let current_title = self.window_title_state.get();
-                    find_window_by_title(&current_title, &self.window_capture_state);
-                } else if self.capture_mode == CaptureMode::Monitor && ui.button("Refresh").clicked() {
-                    self.window_capture_state.set_found("Primary Monitor".to_string());
-                }
-            });
+        ui.horizontal(|ui| {
+            ui.label("Window:");
+            let response = ui.text_edit_singleline(&mut self.window_title_input);
+            if response.changed() && self.capture_mode == CaptureMode::Window {
+                debug!("Window title changed to {}", self.window_title_input);
+                let new_title = self.window_title_input.trim().to_string();
+                self.window_title_state.set(new_title.clone());
+                self.window_capture_state.set_not_found(new_title);
+            } else if response.changed() {
+                let new_title = self.window_title_input.trim().to_string();
+                self.window_title_state.set(new_title);
+            }
 
-            if let Some(error) = &self.ui_state.last_error {
-                ui.colored_label(egui::Color32::RED, error);
+            if self.capture_mode == CaptureMode::Window && ui.button("Refresh").clicked() {
+                let current_title = self.window_title_state.get();
+                find_window_by_title(&current_title, &self.window_capture_state);
+            } else if self.capture_mode == CaptureMode::Monitor && ui.button("Refresh").clicked() {
+                self.window_capture_state.set_found("Primary Monitor".to_string());
             }
         });
+
+        if let Some(error) = &self.ui_state.last_error {
+            ui.colored_label(egui::Color32::RED, error);
+        }
 
         if self.overlay_active {
             let overlay_snapshot = self.overlay_state.clone();
@@ -462,11 +460,13 @@ impl<L: SettingsLauncher> eframe::App for MainApp<L> {
                 .with_transparent(true)
                 .with_mouse_passthrough(true);
 
-            ctx.show_viewport_deferred(
+            ui.ctx().show_viewport_deferred(
                 egui::ViewportId::from_hash_of("wfinfo-overlay"),
                 overlay_builder,
                 move |overlay_ctx, _class| {
-                    draw_overlay(overlay_ctx, &overlay_snapshot);
+                    egui::CentralPanel::default().show(overlay_ctx, |ui| {
+                        draw_overlay(ui, &overlay_snapshot);
+                    });
                 },
             );
         }

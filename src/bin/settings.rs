@@ -29,72 +29,70 @@ impl SettingsApp {
 }
 
 impl eframe::App for SettingsApp {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        egui::CentralPanel::default().show(ctx, |ui| {
-            ui.heading("WFinfo-ng Settings");
-            if let Some(path) = &self.config_path_hint {
-                ui.label(format!("Config file: {path}"));
-            }
-            ui.separator();
+    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
+        ui.heading("WFinfo-ng Settings");
+        if let Some(path) = &self.config_path_hint {
+            ui.label(format!("Config file: {path}"));
+        }
+        ui.separator();
 
-            ui.label("Game log file path");
-            ui.text_edit_singleline(&mut self.state.game_log_file_path);
+        ui.label("Game log file path");
+        ui.text_edit_singleline(&mut self.state.game_log_file_path);
 
-            ui.label("Window name");
-            ui.text_edit_singleline(&mut self.state.window_name);
+        ui.label("Window name");
+        ui.text_edit_singleline(&mut self.state.window_name);
 
-            ui.label("Hotkey");
-            ui.text_edit_singleline(&mut self.state.hotkey);
+        ui.label("Hotkey");
+        ui.text_edit_singleline(&mut self.state.hotkey);
 
-            ui.label("Capture delay (ms)");
-            ui.add(egui::DragValue::new(&mut self.state.capture_delay_ms).speed(50));
+        ui.label("Capture delay (ms)");
+        ui.add(egui::DragValue::new(&mut self.state.capture_delay_ms).speed(50));
 
-            ui.label("Prices file path");
-            ui.text_edit_singleline(&mut self.state.prices_file_path);
+        ui.label("Prices file path");
+        ui.text_edit_singleline(&mut self.state.prices_file_path);
 
-            ui.label("Items file path");
-            ui.text_edit_singleline(&mut self.state.items_file_path);
+        ui.label("Items file path");
+        ui.text_edit_singleline(&mut self.state.items_file_path);
 
-            ui.label("Log level");
-            ui.text_edit_singleline(&mut self.state.log_level);
+        ui.label("Log level");
+        ui.text_edit_singleline(&mut self.state.log_level);
 
-            ui.checkbox(&mut self.state.log_timestamps, "Log timestamps");
-            ui.checkbox(&mut self.state.save_screenshots, "Save screenshots to test-images");
+        ui.checkbox(&mut self.state.log_timestamps, "Log timestamps");
+        ui.checkbox(&mut self.state.save_screenshots, "Save screenshots to test-images");
 
-            ui.separator();
+        ui.separator();
 
-            ui.label("Capture mode");
-            ui.horizontal(|ui| {
-                ui.radio_value(&mut self.state.capture_mode, CaptureMode::Window, "Window");
-                ui.radio_value(&mut self.state.capture_mode, CaptureMode::Monitor, "Monitor");
-            });
+        ui.label("Capture mode");
+        ui.horizontal(|ui| {
+            ui.radio_value(&mut self.state.capture_mode, CaptureMode::Window, "Window");
+            ui.radio_value(&mut self.state.capture_mode, CaptureMode::Monitor, "Monitor");
+        });
 
-            ui.separator();
-            if ui.button("Save settings").clicked() {
-                let config = self.state.to_config();
-                match config.validate() {
-                    Ok(()) => match config.save() {
-                        Ok(()) => {
-                            let saved_path = Config::get_config_file_path()
-                                .ok()
-                                .map(|p| p.display().to_string())
-                                .unwrap_or_else(|| "unknown location".to_string());
-                            self.status = Some(format!("Saved to {saved_path}"));
-                        }
-                        Err(err) => {
-                            self.status = Some(format!("Save failed: {err}"));
-                        }
-                    },
-                    Err(err) => {
-                        self.status = Some(format!("Validation failed: {err}"));
+        ui.separator();
+        if ui.button("Save settings").clicked() {
+            let config = self.state.to_config();
+            match config.validate() {
+                Ok(()) => match config.save() {
+                    Ok(()) => {
+                        let saved_path = Config::get_config_file_path()
+                            .ok()
+                            .map(|p| p.display().to_string())
+                            .unwrap_or_else(|| "unknown location".to_string());
+                        self.status = Some(format!("Saved to {saved_path}"));
                     }
+                    Err(err) => {
+                        self.status = Some(format!("Save failed: {err}"));
+                    }
+                },
+                Err(err) => {
+                    self.status = Some(format!("Validation failed: {err}"));
                 }
             }
+        }
 
-            if let Some(status) = &self.status {
-                ui.label(status);
-            }
-        });
+        if let Some(status) = &self.status {
+            ui.label(status);
+        }
     }
 }
 

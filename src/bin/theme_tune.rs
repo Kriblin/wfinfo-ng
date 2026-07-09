@@ -7,10 +7,9 @@ use std::{
     thread,
 };
 
-use eframe::{
-    egui::{self, Key},
-    epaint::ColorImage,
-};
+use eframe::egui;
+use eframe::egui::Key;
+use eframe::epaint::ColorImage;
 use image::{DynamicImage, ImageReader, Rgb};
 use palette::{FromColor, Hsl, Srgb};
 use wfinfo::{
@@ -166,11 +165,11 @@ fn spawn_ocr_thread(
 }
 
 impl eframe::App for MyApp {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        ctx.request_repaint();
+    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
+        ui.ctx().request_repaint();
 
         // Handle next image key press
-        if ctx.input_mut(|i| i.consume_key(egui::Modifiers::NONE, Key::N))
+        if ui.ctx().input_mut(|i| i.consume_key(egui::Modifiers::NONE, Key::N))
             && !self.original_images.is_empty()
         {
             self.selected_image_index =
@@ -188,7 +187,7 @@ impl eframe::App for MyApp {
         }
 
         // Handle previous image key press
-        if ctx.input_mut(|i| i.consume_key(egui::Modifiers::NONE, Key::P))
+        if ui.ctx().input_mut(|i| i.consume_key(egui::Modifiers::NONE, Key::P))
             && !self.original_images.is_empty()
         {
             self.selected_image_index = if self.selected_image_index == 0 {
@@ -211,7 +210,7 @@ impl eframe::App for MyApp {
         // Process image if needed
         if self.image.is_none() && !self.original_images.is_empty() {
             let image = self.process_image(&self.original_images[self.selected_image_index]);
-            self.image = Some(convert_image(ctx, &image));
+            self.image = Some(convert_image(ui.ctx(), &image));
 
             if let Err(e) = self
                 .ocr_request_sender
@@ -230,67 +229,71 @@ impl eframe::App for MyApp {
             }
         }
 
-        egui::CentralPanel::default().show(ctx, |ui| match self.image.as_ref() {
-            Some(texture) => {
-                let size = texture.size_vec2();
-                ui.add(egui::Image::new(texture).fit_to_exact_size(size * 3.0));
-                if let Some(detections) = self.ocr_result.as_ref() {
-                    ui.label(format!("{:#?}", detections));
-                } else {
+        ui.vertical(|ui| {
+            match self.image.as_ref() {
+                Some(texture) => {
+                    let size = texture.size_vec2();
+                    ui.add(egui::Image::new(texture).fit_to_exact_size(size * 3.0));
+                    if let Some(detections) = self.ocr_result.as_ref() {
+                        ui.label(format!("{:#?}", detections));
+                    } else {
+                        ui.spinner();
+                    }
+                }
+                None => {
                     ui.spinner();
                 }
             }
-            None => {
-                ui.spinner();
-            }
-        });
-        egui::TopBottomPanel::bottom("Bottom Panel").show(ctx, |ui| {
-            if ui
-                .add(
-                    egui::Slider::new(&mut self.settings.saturation.start, 0.0..=1.0)
-                        .text("Saturation min"),
-                )
-                .changed()
-                || ui
+
+            ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
+                ui.add_space(10.0);
+                if ui
                     .add(
-                        egui::Slider::new(&mut self.settings.saturation.end, 0.0..=1.0)
-                            .text("Saturation max"),
+                        egui::Slider::new(&mut self.settings.saturation.start, 0.0..=1.0)
+                            .text("Saturation min"),
                     )
                     .changed()
-                || ui
-                    .add(
-                        egui::Slider::new(&mut self.settings.lightness.start, 0.0..=1.0)
-                            .text("Lightness min"),
-                    )
-                    .changed()
-                || ui
-                    .add(
-                        egui::Slider::new(&mut self.settings.lightness.end, 0.0..=1.0)
-                            .text("Lightness max"),
-                    )
-                    .changed()
-                || ui
-                    .add(
-                        egui::Slider::new(&mut self.settings.hue.start, -180.0..=180.0)
-                            .text("Hue min"),
-                    )
-                    .changed()
-                || ui
-                    .add(
-                        egui::Slider::new(&mut self.settings.hue.end, -180.0..=180.0)
-                            .text("Hue max"),
-                    )
-                    .changed()
-            {
-                self.image = None;
-                if let Err(e) = self
-                    .ocr_request_sender
-                    .send((self.selected_image_index, self.settings.clone()))
+                    || ui
+                        .add(
+                            egui::Slider::new(&mut self.settings.saturation.end, 0.0..=1.0)
+                                .text("Saturation max"),
+                        )
+                        .changed()
+                    || ui
+                        .add(
+                            egui::Slider::new(&mut self.settings.lightness.start, 0.0..=1.0)
+                                .text("Lightness min"),
+                        )
+                        .changed()
+                    || ui
+                        .add(
+                            egui::Slider::new(&mut self.settings.lightness.end, 0.0..=1.0)
+                                .text("Lightness max"),
+                        )
+                        .changed()
+                    || ui
+                        .add(
+                            egui::Slider::new(&mut self.settings.hue.start, -180.0..=180.0)
+                                .text("Hue min"),
+                        )
+                        .changed()
+                    || ui
+                        .add(
+                            egui::Slider::new(&mut self.settings.hue.end, -180.0..=180.0)
+                                .text("Hue max"),
+                        )
+                        .changed()
                 {
-                    eprintln!("Error sending OCR request after slider change: {}", e);
-                }
-                self.ocr_result = None;
-            };
+                    self.image = None;
+                    if let Err(e) = self
+                        .ocr_request_sender
+                        .send((self.selected_image_index, self.settings.clone()))
+                    {
+                        eprintln!("Error sending OCR request after slider change: {}", e);
+                    }
+                    self.ocr_result = None;
+                };
+            });
         });
     }
 }

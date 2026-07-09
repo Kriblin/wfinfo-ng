@@ -62,70 +62,59 @@ impl OverlayState {
     }
 }
 
-pub fn draw_overlay(ctx: &egui::Context, state: &OverlayState) {
-    let panel_frame = egui::Frame {
-        fill: egui::Color32::TRANSPARENT,
-        corner_radius: egui::CornerRadius::same(8),
-        inner_margin: egui::Margin::same(10),
-        ..Default::default()
-    };
-
+pub fn draw_overlay(ui: &mut egui::Ui, state: &OverlayState) {
     if !state.rewards.is_empty() {
-        egui::CentralPanel::default()
-            .frame(panel_frame)
-            .show(ctx, |ui| {
-                ui.heading(egui::RichText::new("Rewards").color(egui::Color32::WHITE));
-                for chunk in state.rewards.chunks(4) {
-                    ui.columns(4, |columns| {
-                        for (i, reward) in chunk.iter().enumerate() {
-                            let ui = &mut columns[i];
-                            ui.vertical(|ui| {
-                                if reward.is_best {
-                                    ui.label(
-                                        egui::RichText::new(&reward.name)
-                                            .color(egui::Color32::GREEN)
-                                            .strong(),
-                                    );
-                                    ui.label(
-                                        egui::RichText::new(format!(
-                                            "{}p, {}d",
-                                            reward.platinum, reward.ducats
-                                        ))
-                                        .color(egui::Color32::GREEN)
-                                        .strong(),
-                                    );
-                                    ui.label(
-                                        egui::RichText::new("BEST")
-                                            .color(egui::Color32::GOLD)
-                                            .strong(),
-                                    );
-                                    ui.label(
-                                        egui::RichText::new(&reward.set_info)
-                                            .color(egui::Color32::LIGHT_GRAY),
-                                    );
-                                } else {
-                                    ui.label(
-                                        egui::RichText::new(&reward.name)
-                                            .color(egui::Color32::LIGHT_GRAY),
-                                    );
-                                    ui.label(
-                                        egui::RichText::new(format!(
-                                            "{}p, {}d",
-                                            reward.platinum, reward.ducats
-                                        ))
-                                        .color(egui::Color32::LIGHT_GRAY),
-                                    );
+        ui.heading(egui::RichText::new("Rewards").color(egui::Color32::WHITE));
+        for chunk in state.rewards.chunks(4) {
+            ui.columns(4, |columns| {
+                for (i, reward) in chunk.iter().enumerate() {
+                    let ui = &mut columns[i];
+                    ui.vertical(|ui| {
+                        if reward.is_best {
+                            ui.label(
+                                egui::RichText::new(&reward.name)
+                                    .color(egui::Color32::GREEN)
+                                    .strong(),
+                            );
+                            ui.label(
+                                egui::RichText::new(format!(
+                                    "{}p, {}d",
+                                    reward.platinum, reward.ducats
+                                ))
+                                .color(egui::Color32::GREEN)
+                                .strong(),
+                            );
+                            ui.label(
+                                egui::RichText::new("BEST")
+                                    .color(egui::Color32::GOLD)
+                                    .strong(),
+                            );
+                            ui.label(
+                                egui::RichText::new(&reward.set_info)
+                                    .color(egui::Color32::LIGHT_GRAY),
+                            );
+                        } else {
+                            ui.label(
+                                egui::RichText::new(&reward.name)
+                                    .color(egui::Color32::LIGHT_GRAY),
+                            );
+                            ui.label(
+                                egui::RichText::new(format!(
+                                    "{}p, {}d",
+                                    reward.platinum, reward.ducats
+                                ))
+                                .color(egui::Color32::LIGHT_GRAY),
+                            );
 
-                                    ui.label(
-                                        egui::RichText::new(&reward.set_info)
-                                            .color(egui::Color32::LIGHT_GRAY),
-                                    );
-                                }
-                            });
+                            ui.label(
+                                egui::RichText::new(&reward.set_info)
+                                    .color(egui::Color32::LIGHT_GRAY),
+                            );
                         }
                     });
                 }
             });
+        }
     }
 }
 
@@ -144,11 +133,11 @@ impl OverlayApp {
 }
 
 impl eframe::App for OverlayApp {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
         let did_update = self.state.try_receive(&self.receiver);
 
         if did_update {
-            ctx.request_repaint();
+            ui.ctx().request_repaint();
             debug!(
                 "Overlay received update: rewards_count={}, rewards={:?}, last_update_elapsed={:?}",
                 self.state.rewards.len(),
@@ -157,16 +146,16 @@ impl eframe::App for OverlayApp {
             );
         }
 
-        draw_overlay(ctx, &self.state);
+        draw_overlay(ui, &self.state);
 
         if self.state.is_visible() {
             if let Some(last_update) = self.state.last_update {
                 let timeout = Duration::from_secs(10);
                 if last_update.elapsed() >= timeout {
                     self.state.rewards.clear();
-                    ctx.request_repaint();
+                    ui.ctx().request_repaint();
                 } else {
-                    ctx.request_repaint_after(timeout - last_update.elapsed());
+                    ui.ctx().request_repaint_after(timeout - last_update.elapsed());
                 }
             }
         }
