@@ -165,11 +165,11 @@ fn spawn_ocr_thread(
 }
 
 impl eframe::App for MyApp {
-    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
-        ui.ctx().request_repaint();
+    fn logic(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        ctx.request_repaint();
 
         // Handle next image key press
-        if ui.ctx().input_mut(|i| i.consume_key(egui::Modifiers::NONE, Key::N))
+        if ctx.input_mut(|i| i.consume_key(egui::Modifiers::NONE, Key::N))
             && !self.original_images.is_empty()
         {
             self.selected_image_index =
@@ -187,7 +187,7 @@ impl eframe::App for MyApp {
         }
 
         // Handle previous image key press
-        if ui.ctx().input_mut(|i| i.consume_key(egui::Modifiers::NONE, Key::P))
+        if ctx.input_mut(|i| i.consume_key(egui::Modifiers::NONE, Key::P))
             && !self.original_images.is_empty()
         {
             self.selected_image_index = if self.selected_image_index == 0 {
@@ -210,7 +210,7 @@ impl eframe::App for MyApp {
         // Process image if needed
         if self.image.is_none() && !self.original_images.is_empty() {
             let image = self.process_image(&self.original_images[self.selected_image_index]);
-            self.image = Some(convert_image(ui.ctx(), &image));
+            self.image = Some(convert_image(ctx, &image));
 
             if let Err(e) = self
                 .ocr_request_sender
@@ -228,7 +228,9 @@ impl eframe::App for MyApp {
                 eprintln!("OCR thread disconnected");
             }
         }
+    }
 
+    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
         ui.vertical(|ui| {
             match self.image.as_ref() {
                 Some(texture) => {
