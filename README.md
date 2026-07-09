@@ -21,7 +21,7 @@ To build and run WFinfo-ng, you need the following system dependencies:
 - **Rust**: Edition 2024 (stable recommended). Install via [rustup.rs](https://rustup.rs).
 - **Kreuzberg Tesseract OCR**: Required for OCR processing. Ensure English language data (`tessdata/eng.traineddata`) is installed.
 - **libxrandr**: Required for X11 screenshot capturing.
-- **curl & jq**: Required for the update scripts (`update.sh` / `update.bat`) to fetch data.
+- **curl**: Optional; only needed if you use the helper scripts to download Tesseract OCR language data.
 
 ## Installation
 
@@ -31,8 +31,8 @@ To build and run WFinfo-ng, you need the following system dependencies:
     cd wfinfo-ng
     ```
 
-2.  **Setup the database and Tesseract data**:
-    The application requires item price, metadata, and Tesseract OCR data to function. Run the update script:
+2.  **Setup Tesseract data**:
+    The application downloads item price and metadata files from WarframeStat.us automatically when they are missing. Tesseract OCR data must be present in `tessdata/` or installed on the system. You can use the helper script:
     - **Linux/macOS**:
       ```bash
       sh update.sh
@@ -41,7 +41,7 @@ To build and run WFinfo-ng, you need the following system dependencies:
       ```batch
       update.bat
       ```
-    *Note: The application will also attempt to download price data on startup if it's missing, but Tesseract data must be present in `tessdata/` or installed on the system.*
+    *Note: Item data is stored in the app cache by default. Custom `prices.json` and `filtered_items.json` paths can still be configured.*
 
 3.  **Build the project**:
     ```bash
@@ -83,6 +83,8 @@ WFinfo-ng uses a TOML configuration file located at `~/.config/wfinfo-ng/config.
 | `window_name` | `-w`, `--window-name` | Title of the Warframe window | `Warframe` |
 | `hotkey` | `--hotkey` | Hotkey for manual detection | `F12` |
 | `capture_delay_ms` | `--capture-delay-ms` | Delay (ms) after event before capturing | `1500` |
+| `prices_file_path` | N/A | Optional custom path for WarframeStat.us price data | App cache |
+| `items_file_path` | N/A | Optional custom path for WarframeStat.us filtered item data | App cache |
 | `log_level` | `--log-level` | Logging level (error, warn, info, debug, trace) | `info` |
 | `log_timestamps` | `-l`, `--log-timestamps` | Enable timestamps in logs | `false` |
 
@@ -98,7 +100,7 @@ WFinfo-ng uses a TOML configuration file located at `~/.config/wfinfo-ng/config.
 - `src/database/`: Database loading and fuzzy item searching logic.
 - `src/overlay/`: Egui-based implementation of the transparent HUD.
 - `src/theme/`: Detection logic for different Warframe UI color themes.
-- `update.sh` / `update.bat`: Fetches latest price data from WarframeStat.us.
+- `update.sh` / `update.bat`: Optional helper scripts for downloading Tesseract OCR language data.
 
 ## Utility Binaries
 
