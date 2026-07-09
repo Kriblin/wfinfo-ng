@@ -71,15 +71,17 @@ impl MyApp {
 }
 
 impl eframe::App for MyApp {
-    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
-        ui.ctx().request_repaint();
+    fn logic(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        ctx.request_repaint();
 
         while let Ok(event) = self.event_receiver.try_recv() {
             if event.event_type == EventType::KeyPress(self.key) {
                 self.last_activated = Some(Instant::now())
             }
         }
+    }
 
+    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
         let color = if self
             .last_activated
             .is_some_and(|last_activated| last_activated.elapsed() < self.timeout)
