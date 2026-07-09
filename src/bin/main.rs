@@ -112,7 +112,9 @@ fn save_screenshot_and_label(
         fs::create_dir_all(&test_images_dir)?;
     }
 
-    let timestamp = chrono::Local::now().format("%Y-%m-%d %H-%M-%S%f").to_string();
+    let timestamp = chrono::Local::now()
+        .format("%Y-%m-%d %H-%M-%S%f")
+        .to_string();
     let filename = format!("FullScreenShot{}.png", timestamp);
     let image_path = test_images_dir.join(&filename);
 
@@ -423,7 +425,8 @@ impl eframe::App for MainApp {
                 let current_title = self.window_title_state.get();
                 find_window_by_title(&current_title, &self.window_capture_state);
             } else if self.capture_mode == CaptureMode::Monitor && ui.button("Refresh").clicked() {
-                self.window_capture_state.set_found("Primary Monitor".to_string());
+                self.window_capture_state
+                    .set_found("Primary Monitor".to_string());
             }
         });
 
@@ -478,8 +481,8 @@ impl eframe::App for MainApp {
             ui.ctx().show_viewport_deferred(
                 egui::ViewportId::from_hash_of("wfinfo-overlay"),
                 overlay_builder,
-                move |overlay_ctx, _class| {
-                    egui::CentralPanel::default().show(overlay_ctx, |ui| {
+                move |viewport_ui, _class| {
+                    egui::CentralPanel::default().show(viewport_ui, |ui| {
                         draw_overlay(ui, &overlay_snapshot);
                     });
                 },
@@ -690,7 +693,8 @@ fn main() -> Result<(), Box<dyn Error>> {
                     match run_detection(image.clone(), &db_thread) {
                         Ok((rewards, theme, raw_text)) => {
                             if config_thread.save_screenshots {
-                                if let Err(e) = save_screenshot_and_label(&image, &theme, &raw_text) {
+                                if let Err(e) = save_screenshot_and_label(&image, &theme, &raw_text)
+                                {
                                     error!("Failed to save screenshot: {}", e);
                                 }
                             }
@@ -813,7 +817,8 @@ mod test {
                     if normalized.is_empty() {
                         None
                     } else {
-                        db.find_item(&normalized, None).map(|item| item.drop_name.clone())
+                        db.find_item(&normalized, None)
+                            .map(|item| item.drop_name.clone())
                     }
                 })
                 .collect();
@@ -876,7 +881,8 @@ mod test {
                         }
                     };
 
-                    let items: Vec<Option<&Item>> = text.iter().map(|s| db.find_item(s, None)).collect();
+                    let items: Vec<Option<&Item>> =
+                        text.iter().map(|s| db.find_item(s, None)).collect();
                     println!("{:#?}", items);
                     println!("{}", filename);
 
@@ -893,7 +899,8 @@ mod test {
                             if normalized.is_empty() {
                                 None
                             } else {
-                                db.find_item(&normalized, None).map(|item| item.drop_name.clone())
+                                db.find_item(&normalized, None)
+                                    .map(|item| item.drop_name.clone())
                             }
                         })
                         .collect();
