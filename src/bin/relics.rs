@@ -1,8 +1,10 @@
 use std::collections::HashMap;
 
 use wfinfo::{
+    config::Config,
     database::Database,
     models::item::{Refinement, Relic},
+    utils::ensure_database_files,
 };
 
 fn relic_values(database: &Database, relics: &HashMap<String, Relic>, relic_count: u32) {
@@ -87,8 +89,11 @@ fn best_trace_dump(database: &Database) {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let (prices_path, items_path) = ensure_database_files(&Config::default())
+        .map_err(|e| format!("Error updating database files: {}", e))?;
+
     // Load the database
-    let database = Database::load_from_file(None, None)
+    let database = Database::load_from_file(Some(&prices_path), Some(&items_path))
         .map_err(|e| format!("Error loading database: {}", e))?;
 
     let mut args = std::env::args().skip(1);
