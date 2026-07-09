@@ -770,12 +770,12 @@ mod test {
     #[allow(dead_code)]
     fn wfi_images_exact() -> Result<(), Box<dyn Error>> {
         let labels: IndexMap<String, Label> = serde_json::from_str(
-            &read_to_string("WFI test images/labels.json")
+            &read_to_string("test-images/labels.json")
                 .map_err(|e| format!("Failed to read labels file: {}", e))?,
         )?;
 
         for (filename, label) in labels {
-            let image = ImageReader::open("WFI test images/".to_string() + &filename)
+            let image = ImageReader::open("test-images/".to_string() + &filename)
                 .map_err(|e| format!("Failed to open image {}: {}", filename, e))?
                 .decode()
                 .map_err(|e| format!("Failed to decode image {}: {}", filename, e))?;
@@ -808,7 +808,7 @@ mod test {
     #[test]
     fn wfi_images_99_percent() -> Result<(), Box<dyn Error>> {
         // Skip this dataset-heavy test when images are not present in the repo
-        let has_images = std::fs::read_dir("WFI test images")
+        let has_images = std::fs::read_dir("test-images")
             .ok()
             .map(|rd| {
                 rd.filter_map(Result::ok)
@@ -817,12 +817,12 @@ mod test {
             })
             .unwrap_or(false);
         if !has_images {
-            eprintln!("Skipping wfi_images_99_percent: no images found in 'WFI test images/'");
+            eprintln!("Skipping wfi_images_99_percent: no images found in 'test-images/'");
             return Ok(());
         }
 
         let labels: BTreeMap<String, Label> = serde_json::from_str(
-            &read_to_string("WFI test images/labels.json")
+            &read_to_string("test-images/labels.json")
                 .map_err(|e| format!("Failed to read labels file: {}", e))?,
         )?;
 
@@ -831,7 +831,7 @@ mod test {
             .into_par_iter()
             .map(
                 |(filename, label)| -> Result<usize, Box<dyn Error + Send + Sync>> {
-                    let image = ImageReader::open("WFI test images/".to_string() + &filename)
+                    let image = ImageReader::open("test-images/".to_string() + &filename)
                         .map_err(|e| format!("Failed to open image {}: {}", filename, e))?
                         .decode()
                         .map_err(|e| format!("Failed to decode image {}: {}", filename, e))?;
