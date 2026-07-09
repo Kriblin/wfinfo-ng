@@ -115,7 +115,7 @@ Run the test suite using Cargo:
 cargo test
 ```
 - **Unit Tests**: Found within individual module files.
-- **Integration Tests**: OCR verification using images in `test-images/` and `WFI test images/`.
+- **Integration Tests**: OCR verification using images in `test-images/`.
 
 ## License
 

@@ -4,7 +4,7 @@ use image::ImageReader;
 use indexmap::IndexMap;
 use wfinfo::{
     database::Database,
-    ocr::{detect_theme, normalize_string, reward_image_to_reward_names},
+    ocr::{normalize_string, reward_image_to_reward_names},
     testing::Label,
 };
 
@@ -31,8 +31,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         };
 
         // Process the image with OCR
-        let detections = match reward_image_to_reward_names(image.clone(), None) {
-            Ok(detections) => detections,
+        let (detections, theme) = match reward_image_to_reward_names(image.clone(), None) {
+            Ok(res) => res,
             Err(e) => {
                 eprintln!("Error processing image {:?} with OCR: {}", filepath, e);
                 continue; // Skip this file and continue with the next one
@@ -55,7 +55,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let items: Vec<_> = text.iter().map(|s| db.find_item(s, None)).collect();
         for item in items.iter() {
             if let Some(item) = item {
-                println!("{}: {}\n", item.name, item.platinum);
+                println!("{}: {}\n", item.drop_name, item.platinum);
             } else {
                 println!("Unknown item\n");
             }
@@ -64,19 +64,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let item_names = items
             .iter()
             .map(|item| {
-                item.map(|item| item.name.clone())
+                item.map(|item| item.drop_name.clone())
                     .unwrap_or_else(|| "ERROR".to_string())
             })
             .collect();
-
-        // Detect the theme
-        let theme = match detect_theme(&image) {
-            Ok(theme) => theme,
-            Err(e) => {
-                eprintln!("Error detecting theme for {:?}: {}", filepath, e);
-                continue; // Skip this file and continue with the next one
-            }
-        };
 
         // Get the filename
         let filename = match filepath.file_name() {

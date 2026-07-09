@@ -12,10 +12,10 @@ use global_hotkey::{GlobalHotKeyEvent, GlobalHotKeyManager, HotKeyState, hotkey:
 use image::DynamicImage;
 use log::{debug, error, info, warn};
 use notify::{RecommendedWatcher, RecursiveMode, Watcher};
-use xcap::Window;
+use xcap::{Window, Monitor};
 
 use wfinfo::{
-    config::{Args, Config},
+    config::{Args, Config, CaptureMode},
     database::{Database, Item},
     main_ui::{DetectionState, MainUiState, SettingsLauncher, WindowCaptureState, WindowTitleState},
     ocr::{OCR, normalize_string, reward_image_to_reward_names},
@@ -23,14 +23,12 @@ use wfinfo::{
     utils::fetch_prices_and_items,
 };
 
-fn run_detection(capturer: &Window, db: &Database) -> Result<Vec<Reward>, wfinfo::error::Error> {
-    let frame = capturer
-        .capture_image()
-        .map_err(|e| wfinfo::error::OcrError::CaptureError(e.to_string()))?;
-    info!("Captured");
-    let image = DynamicImage::ImageRgba8(frame);
-    info!("Converted");
-    let text = reward_image_to_reward_names(image, None)?;
+fn run_detection(
+    image: DynamicImage,
+    db: &Database,
+) -> Result<(Vec<Reward>, wfinfo::theme::Theme, Vec<String>), wfinfo::error::Error> {
+    let (text, theme) = reward_image_to_reward_names(image, None)?;
+    let raw_text = text.clone();
     let text: Vec<String> = text.iter().map(|s| normalize_string(s)).collect();
     debug!("{:#?}", text);
 
@@ -78,7 +76,7 @@ fn run_detection(capturer: &Window, db: &Database) -> Result<Vec<Reward>, wfinfo
         }
     }
 
-    Ok(rewards)
+    Ok((rewards, theme, raw_text))
 }
 
 fn try_find_set(item_name: String, db: &Database) -> Option<&Item> {
@@ -94,6 +92,70 @@ fn try_find_set(item_name: String, db: &Database) -> Option<&Item> {
         return Some(set);
     }
     None
+}
+
+fn save_screenshot_and_label(
+    image: &DynamicImage,
+    theme: &wfinfo::theme::Theme,
+    items: &[String],
+) -> Result<(), Box<dyn Error>> {
+    use std::fs;
+    use wfinfo::testing::Label;
+
+    let test_images_dir = PathBuf::from("test-images");
+    if !test_images_dir.exists() {
+        fs::create_dir_all(&test_images_dir)?;
+    }
+
+    let timestamp = chrono::Local::now().format("%Y-%m-%d %H-%M-%S%f").to_string();
+    let filename = format!("FullScreenShot{}.png", timestamp);
+    let image_path = test_images_dir.join(&filename);
+
+    image.save(&image_path)?;
+
+    let labels_path = test_images_dir.join("labels.json");
+    let mut labels: indexmap::IndexMap<String, Label> = if labels_path.exists() {
+        let content = fs::read_to_string(&labels_path)?;
+        serde_json::from_str(&content).unwrap_or_default()
+    } else {
+        indexmap::IndexMap::new()
+    };
+
+    labels.insert(
+        filename,
+        Label {
+            theme: theme.clone(),
+            items: items.to_vec(),
+        },
+    );
+
+    let content = serde_json::to_string_pretty(&labels)?;
+    fs::write(labels_path, content)?;
+
+    Ok(())
+}
+
+fn find_window_by_title(title: &str, capture_state: &WindowCaptureState) -> Option<Window> {
+    let title_str = title.to_string();
+    match Window::all() {
+        Ok(windows) => {
+            let found = windows
+                .into_iter()
+                .find(|x| x.title().ok().as_ref() == Some(&title_str));
+
+            if found.is_some() {
+                capture_state.set_found(title_str);
+            } else {
+                capture_state.set_not_found(title_str);
+            }
+            found
+        }
+        Err(err) => {
+            error!("Failed to get windows: {}", err);
+            capture_state.set_not_found(title_str);
+            None
+        }
+    }
 }
 
 fn log_watcher(path: PathBuf, event_sender: mpsc::Sender<()>, capture_delay_ms: u64) {
@@ -260,24 +322,30 @@ impl SettingsLauncher for ProcessSettingsLauncher {
 
 struct MainApp<L: SettingsLauncher> {
     overlay_state: OverlayState,
-    reward_receiver: mpsc::Receiver<Vec<Reward>>,
+    reward_receiver: mpsc::Receiver<(Vec<Reward>, wfinfo::theme::Theme, Vec<String>)>,
     ui_state: MainUiState<L>,
     window_title_state: WindowTitleState,
     window_capture_state: WindowCaptureState,
     window_title_input: String,
+    capture_mode: CaptureMode,
     overlay_active: bool,
     last_window_check: std::time::Instant,
 }
 
 impl<L: SettingsLauncher> MainApp<L> {
     fn new(
-        reward_receiver: mpsc::Receiver<Vec<Reward>>,
+        reward_receiver: mpsc::Receiver<(Vec<Reward>, wfinfo::theme::Theme, Vec<String>)>,
         detection: DetectionState,
         launcher: L,
         window_title_state: WindowTitleState,
         window_capture_state: WindowCaptureState,
+        capture_mode: CaptureMode,
     ) -> Self {
         let window_title_input = window_title_state.get();
+        if capture_mode == CaptureMode::Monitor {
+            window_capture_state.set_found("Primary Monitor".to_string());
+        }
+
         Self {
             overlay_state: OverlayState::new(),
             reward_receiver,
@@ -285,6 +353,7 @@ impl<L: SettingsLauncher> MainApp<L> {
             window_title_state,
             window_capture_state,
             window_title_input,
+            capture_mode,
             overlay_active: false,
             last_window_check: std::time::Instant::now(),
         }
@@ -292,34 +361,31 @@ impl<L: SettingsLauncher> MainApp<L> {
 }
 
 impl<L: SettingsLauncher> eframe::App for MainApp<L> {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        if self.last_window_check.elapsed() >= Duration::from_secs(5) {
-            let current_title = self.window_title_state.get();
-            match Window::all() {
-                Ok(windows) => {
-                    if windows
-                        .iter()
-                        .any(|x| x.title().ok().as_ref() == Some(&current_title))
-                    {
-                        self.window_capture_state.set_found(current_title);
-                    } else {
-                        self.window_capture_state.set_not_found(current_title);
-                    }
-                }
-                Err(err) => {
-                    error!("Failed to get windows: {}", err);
-                    self.window_capture_state.set_not_found(current_title);
-                }
+    fn logic(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        let check_interval = Duration::from_secs(3);
+        let elapsed = self.last_window_check.elapsed();
+        if self.capture_mode == CaptureMode::Window {
+            if elapsed >= check_interval {
+                let current_title = self.window_title_state.get();
+                find_window_by_title(&current_title, &self.window_capture_state);
+                self.last_window_check = std::time::Instant::now();
+                ctx.request_repaint_after(check_interval);
+            } else {
+                ctx.request_repaint_after(check_interval - elapsed);
             }
-            self.last_window_check = std::time::Instant::now();
         }
 
-        let did_update = self.overlay_state.try_receive(&self.reward_receiver);
-        self.overlay_state
-            .clear_if_timed_out(Duration::from_secs(10));
+        let did_update = if let Ok((rewards, _, _)) = self.reward_receiver.try_recv() {
+            self.overlay_state.rewards = rewards;
+            self.overlay_state.last_update = Some(std::time::Instant::now());
+            true
+        } else {
+            false
+        };
 
         if did_update {
             self.overlay_active = true;
+            ctx.request_repaint();
             debug!(
                 "Main UI received update: rewards_count={}, rewards={:?}, last_update_elapsed={:?}",
                 self.overlay_state.rewards.len(),
@@ -328,56 +394,65 @@ impl<L: SettingsLauncher> eframe::App for MainApp<L> {
             );
         }
 
-        egui::CentralPanel::default().show(ctx, |ui| {
-            ui.heading("WFinfo-ng");
-            ui.horizontal(|ui| {
-                ui.label("Detection status:");
-                ui.strong(self.ui_state.detection.status_label());
-            });
-            ui.horizontal(|ui| {
-                ui.label("Window capture:");
-                ui.strong(self.window_capture_state.status_label());
-            });
-
-            ui.separator();
-            ui.label("Window title");
-            let response = ui.text_edit_singleline(&mut self.window_title_input);
-            if response.changed() {
-                debug!("Window title changed to {}", self.window_title_input);
-                let new_title = self.window_title_input.trim().to_string();
-                self.window_title_state.set(new_title.clone());
-                self.window_capture_state.set_not_found(new_title);
-            }
-            if ui.button("Detect window").clicked() {
-                let current_title = self.window_title_state.get();
-                match Window::all() {
-                    Ok(windows) => {
-                        if windows
-                            .iter()
-                            .any(|x| x.title().ok().as_ref() == Some(&current_title))
-                        {
-                            self.window_capture_state.set_found(current_title);
-                        } else {
-                            self.window_capture_state.set_not_found(current_title);
-                        }
-                    }
-                    Err(err) => {
-                        error!("Failed to get windows: {}", err);
-                        self.window_capture_state.set_not_found(current_title);
-                    }
+        if self.overlay_active {
+            if let Some(last_update) = self.overlay_state.last_update {
+                let timeout = Duration::from_secs(10);
+                if last_update.elapsed() >= timeout {
+                    self.overlay_state.rewards.clear();
+                    self.overlay_active = false;
+                    ctx.request_repaint();
+                } else {
+                    ctx.request_repaint_after(timeout - last_update.elapsed());
                 }
             }
+        }
+    }
 
-            if let Some(error) = &self.ui_state.last_error {
-                ui.colored_label(egui::Color32::RED, error);
-            }
+    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
 
-            ui.with_layout(egui::Layout::bottom_up(egui::Align::RIGHT), |ui| {
+        ui.horizontal(|ui| {
+            ui.heading("WFinfo-ng");
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                 if ui.button("Settings").clicked() {
                     let _ = self.ui_state.open_settings();
                 }
             });
         });
+
+        ui.horizontal(|ui| {
+            ui.label("Status:");
+            ui.strong(self.ui_state.detection.status_label());
+            ui.separator();
+            ui.label("Capture:");
+            ui.strong(self.window_capture_state.status_label());
+        });
+
+        ui.separator();
+
+        ui.horizontal(|ui| {
+            ui.label("Window:");
+            let response = ui.text_edit_singleline(&mut self.window_title_input);
+            if response.changed() && self.capture_mode == CaptureMode::Window {
+                debug!("Window title changed to {}", self.window_title_input);
+                let new_title = self.window_title_input.trim().to_string();
+                self.window_title_state.set(new_title.clone());
+                self.window_capture_state.set_not_found(new_title);
+            } else if response.changed() {
+                let new_title = self.window_title_input.trim().to_string();
+                self.window_title_state.set(new_title);
+            }
+
+            if self.capture_mode == CaptureMode::Window && ui.button("Refresh").clicked() {
+                let current_title = self.window_title_state.get();
+                find_window_by_title(&current_title, &self.window_capture_state);
+            } else if self.capture_mode == CaptureMode::Monitor && ui.button("Refresh").clicked() {
+                self.window_capture_state.set_found("Primary Monitor".to_string());
+            }
+        });
+
+        if let Some(error) = &self.ui_state.last_error {
+            ui.colored_label(egui::Color32::RED, error);
+        }
 
         if self.overlay_active {
             let overlay_snapshot = self.overlay_state.clone();
@@ -388,15 +463,16 @@ impl<L: SettingsLauncher> eframe::App for MainApp<L> {
                 .with_transparent(true)
                 .with_mouse_passthrough(true);
 
-            ctx.show_viewport_deferred(
+            ui.ctx().show_viewport_deferred(
                 egui::ViewportId::from_hash_of("wfinfo-overlay"),
                 overlay_builder,
                 move |overlay_ctx, _class| {
-                    draw_overlay(overlay_ctx, &overlay_snapshot);
+                    egui::CentralPanel::default().show(overlay_ctx, |ui| {
+                        draw_overlay(ui, &overlay_snapshot);
+                    });
                 },
             );
         }
-        ctx.request_repaint();
     }
 }
 
@@ -405,9 +481,9 @@ fn benchmark() -> Result<(), Box<dyn Error>> {
     for _ in 0..10 {
         let image = image::open("input3.png").map_err(|e| Box::<dyn Error>::from(e))?;
         println!("Converted");
-        let text = reward_image_to_reward_names(image, None)?;
+        let (text, _theme) = reward_image_to_reward_names(image, None)?;
         println!("got names");
-        let text = text.iter().map(|s| normalize_string(s));
+        let text: Vec<_> = text.iter().map(|s| normalize_string(s)).collect();
         println!("{:#?}", text);
     }
 
@@ -465,23 +541,23 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let window_capture_state = WindowCaptureState::new(config.window_name.clone());
 
-    let windows = Window::all()?;
-    if let Some(warframe_window) = windows
-        .iter()
-        .find(|x| x.title().ok().as_ref() == Some(&config.window_name))
-    {
-        window_capture_state.set_found(config.window_name.clone());
-        debug!(
-            "Capture source resolution: {:?}x{:?}",
-            warframe_window.width().unwrap_or(0),
-            warframe_window.height().unwrap_or(0)
-        );
+    if config.capture_mode == CaptureMode::Window {
+        if let Some(warframe_window) =
+            find_window_by_title(&config.window_name, &window_capture_state)
+        {
+            debug!(
+                "Capture source resolution: {:?}x{:?}",
+                warframe_window.width().unwrap_or(0),
+                warframe_window.height().unwrap_or(0)
+            );
+        } else {
+            warn!(
+                "Warframe window with title '{}' not found. Update the title in the main UI to continue.",
+                config.window_name
+            );
+        }
     } else {
-        window_capture_state.set_not_found(config.window_name.clone());
-        warn!(
-            "Warframe window with title '{}' not found. Update the title in the main UI to continue.",
-            config.window_name
-        );
+        window_capture_state.set_found("Primary Monitor".to_string());
     }
 
     // Use configured file paths if provided, otherwise download the data
@@ -507,7 +583,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     info!("Loaded database");
 
     let (event_sender, event_receiver) = mpsc::channel();
-    let (reward_sender, reward_receiver) = mpsc::channel();
+    let (reward_sender, reward_receiver) =
+        mpsc::channel::<(Vec<Reward>, wfinfo::theme::Theme, Vec<String>)>();
     let detection_state = DetectionState::new();
 
     if let Some(log_path) = &config.game_log_file_path {
@@ -523,62 +600,109 @@ fn main() -> Result<(), Box<dyn Error>> {
     hotkey_watcher(config.hotkey.parse()?, event_sender);
 
     let window_title_state = WindowTitleState::new(config.window_name.clone());
-    let detection_state_thread = detection_state.clone();
-    let window_title_thread = window_title_state.clone();
-    let window_capture_thread = window_capture_state.clone();
-    thread::spawn(move || {
-        while let Ok(()) = event_receiver.recv() {
-            info!("Capturing");
-            detection_state_thread.set_running(true);
-            let windows = match Window::all() {
-                Ok(windows) => windows,
-                Err(e) => {
-                    error!("Failed to get windows: {}", e);
-                    detection_state_thread.set_running(false);
-                    continue;
-                }
-            };
-            let current_title = window_title_thread.get();
-            let Some(warframe_window) = windows
-                .iter()
-                .find(|x| x.title().ok().as_ref() == Some(&current_title))
-            else {
-                error!("Warframe window not found during detection");
-                window_capture_thread.set_not_found(current_title);
-                detection_state_thread.set_running(false);
-                continue;
-            };
-            window_capture_thread.set_found(current_title.clone());
-
-            match run_detection(warframe_window, &db) {
-                Ok(rewards) => {
-                    if let Err(e) = reward_sender.send(rewards) {
-                        error!("Failed to send rewards to UI: {}", e);
-                    }
-                }
-                Err(e) => {
-                    error!("Error during detection: {}", e);
-                }
-            }
-            detection_state_thread.set_running(false);
-        }
-    });
 
     let options = eframe::NativeOptions::default();
     let detection_state_ui = detection_state.clone();
     let window_title_ui = window_title_state.clone();
     let window_capture_ui = window_capture_state.clone();
 
+    let config_clone = config.clone();
     eframe::run_native(
         "WFinfo-ng",
         options,
-        Box::new(move |_cc| {
+        Box::new(move |cc| {
+            let ctx = cc.egui_ctx.clone();
+            let detection_state_thread = detection_state.clone();
+            let window_title_thread = window_title_state.clone();
+            let window_capture_thread = window_capture_state.clone();
+            let db_thread = db.clone();
+            let config_thread = config_clone.clone();
+
+            thread::spawn(move || {
+                while let Ok(()) = event_receiver.recv() {
+                    info!("Capturing");
+                    detection_state_thread.set_running(true);
+                    ctx.request_repaint();
+
+                    let image = match config_thread.capture_mode {
+                        CaptureMode::Window => {
+                            let current_title = window_title_thread.get();
+                            let Some(warframe_window) =
+                                find_window_by_title(&current_title, &window_capture_thread)
+                            else {
+                                error!("Warframe window not found during detection");
+                                detection_state_thread.set_running(false);
+                                ctx.request_repaint();
+                                continue;
+                            };
+
+                            match warframe_window.capture_image() {
+                                Ok(frame) => DynamicImage::ImageRgba8(frame),
+                                Err(e) => {
+                                    error!("Failed to capture window: {}", e);
+                                    detection_state_thread.set_running(false);
+                                    ctx.request_repaint();
+                                    continue;
+                                }
+                            }
+                        }
+                        CaptureMode::Monitor => {
+                            let monitors = match Monitor::all() {
+                                Ok(monitors) => monitors,
+                                Err(e) => {
+                                    error!("Failed to get monitors: {}", e);
+                                    detection_state_thread.set_running(false);
+                                    ctx.request_repaint();
+                                    continue;
+                                }
+                            };
+                            let Some(monitor) = monitors.first() else {
+                                error!("No monitors found");
+                                detection_state_thread.set_running(false);
+                                ctx.request_repaint();
+                                continue;
+                            };
+                            window_capture_thread.set_found("Primary Monitor".to_string());
+                            match monitor.capture_image() {
+                                Ok(frame) => DynamicImage::ImageRgba8(frame),
+                                Err(e) => {
+                                    error!("Failed to capture monitor: {}", e);
+                                    detection_state_thread.set_running(false);
+                                    ctx.request_repaint();
+                                    continue;
+                                }
+                            }
+                        }
+                    };
+
+                    match run_detection(image.clone(), &db_thread) {
+                        Ok((rewards, theme, raw_text)) => {
+                            if config_thread.save_screenshots {
+                                if let Err(e) = save_screenshot_and_label(&image, &theme, &raw_text) {
+                                    error!("Failed to save screenshot: {}", e);
+                                }
+                            }
+                            if let Err(e) = reward_sender.send((rewards, theme, raw_text)) {
+                                error!("Failed to send rewards to UI: {}", e);
+                            }
+                            ctx.request_repaint();
+                        }
+                        Err(e) => {
+                            error!("Error during detection: {}", e);
+                        }
+                    }
+                    detection_state_thread.set_running(false);
+                    ctx.request_repaint();
+                }
+            });
+
             Ok(Box::new(MainApp::new(
                 reward_receiver,
                 detection_state_ui,
                 ProcessSettingsLauncher::new(),
                 window_title_ui,
                 window_capture_ui,
+                config_clone.capture_mode.clone(),
             )))
         }),
     )
@@ -609,72 +733,82 @@ mod test {
 
     #[test]
     fn single_image() -> Result<(), Box<dyn Error>> {
-        let image = ImageReader::open(format!("test-images/{}.png", 1))
+        let image = ImageReader::open("test-images/FullScreenShot2026-02-25 22-36-26255760907.png")
             .map_err(|e| format!("Failed to open image: {}", e))?
             .decode()
             .map_err(|e| format!("Failed to decode image: {}", e))?;
 
-        let text = reward_image_to_reward_names(image, None)?;
-        let text = text.iter().map(|s| normalize_string(s));
+        let (text, _theme) = reward_image_to_reward_names(image, None)?;
+        let text: Vec<_> = text.iter().map(|s| normalize_string(s)).collect();
         println!("{:#?}", text);
 
         let db = Database::load_from_file(None, None)?;
-        let items: Vec<_> = text.map(|s| db.find_item(&s, None)).collect();
+        let items: Vec<_> = text.iter().map(|s| db.find_item(s, None)).collect();
         println!("{:#?}", items);
 
         assert_eq!(
             items[0].ok_or("Didn't find item 0")?.drop_name,
-            "Octavia Prime Systems Blueprint"
+            "Daikyu Prime Blueprint"
         );
         assert_eq!(
             items[1].ok_or("Didn't find item 1")?.drop_name,
-            "Octavia Prime Blueprint"
+            "Forma Blueprint"
         );
         assert_eq!(
             items[2].ok_or("Didn't find item 2")?.drop_name,
-            "Tenora Prime Blueprint"
+            "Forma Blueprint"
         );
         assert_eq!(
             items[3].ok_or("Didn't find item 3")?.drop_name,
-            "Harrow Prime Systems Blueprint"
+            "Sevagoth Prime Blueprint"
         );
 
         Ok(())
     }
 
-    // #[test]
+    #[test]
     #[allow(dead_code)]
     fn wfi_images_exact() -> Result<(), Box<dyn Error>> {
         let labels: IndexMap<String, Label> = serde_json::from_str(
-            &read_to_string("WFI test images/labels.json")
+            &read_to_string("test-images/labels.json")
                 .map_err(|e| format!("Failed to read labels file: {}", e))?,
         )?;
 
         for (filename, label) in labels {
-            let image = ImageReader::open("WFI test images/".to_string() + &filename)
+            let image = ImageReader::open("test-images/".to_string() + &filename)
                 .map_err(|e| format!("Failed to open image {}: {}", filename, e))?
                 .decode()
                 .map_err(|e| format!("Failed to decode image {}: {}", filename, e))?;
 
-            let text = reward_image_to_reward_names(image, None)?;
+            let (text, _theme) = reward_image_to_reward_names(image, None)?;
             let text: Vec<_> = text.iter().map(|s| normalize_string(s)).collect();
             println!("{:#?}", text);
 
             let db = Database::load_from_file(None, None)?;
-            let items: Vec<_> = text.iter().map(|s| db.find_item(s, None)).collect();
+            let items: Vec<Option<&Item>> = text.iter().map(|s| db.find_item(s, None)).collect();
             println!("{:#?}", items);
             println!("{}", filename);
 
-            let item_names = items
+            let item_names: Vec<Option<String>> = items
                 .iter()
-                .map(|item| item.map(|item| item.drop_name.clone()));
+                .map(|item| item.map(|item| item.drop_name.clone()))
+                .collect();
 
-            for (result, expectation) in item_names.zip(label.items) {
-                if expectation.is_empty() {
-                    assert_eq!(result, None)
-                } else {
-                    assert_eq!(result, Some(expectation))
-                }
+            let expected_item_names: Vec<Option<String>> = label
+                .items
+                .iter()
+                .map(|s| {
+                    let normalized = normalize_string(s);
+                    if normalized.is_empty() {
+                        None
+                    } else {
+                        db.find_item(&normalized, None).map(|item| item.drop_name.clone())
+                    }
+                })
+                .collect();
+
+            for (result, expectation) in item_names.into_iter().zip(expected_item_names) {
+                assert_eq!(result, expectation)
             }
         }
 
@@ -684,7 +818,7 @@ mod test {
     #[test]
     fn wfi_images_99_percent() -> Result<(), Box<dyn Error>> {
         // Skip this dataset-heavy test when images are not present in the repo
-        let has_images = std::fs::read_dir("WFI test images")
+        let has_images = std::fs::read_dir("test-images")
             .ok()
             .map(|rd| {
                 rd.filter_map(Result::ok)
@@ -693,12 +827,12 @@ mod test {
             })
             .unwrap_or(false);
         if !has_images {
-            eprintln!("Skipping wfi_images_99_percent: no images found in 'WFI test images/'");
+            eprintln!("Skipping wfi_images_99_percent: no images found in 'test-images/'");
             return Ok(());
         }
 
         let labels: BTreeMap<String, Label> = serde_json::from_str(
-            &read_to_string("WFI test images/labels.json")
+            &read_to_string("test-images/labels.json")
                 .map_err(|e| format!("Failed to read labels file: {}", e))?,
         )?;
 
@@ -707,13 +841,13 @@ mod test {
             .into_par_iter()
             .map(
                 |(filename, label)| -> Result<usize, Box<dyn Error + Send + Sync>> {
-                    let image = ImageReader::open("WFI test images/".to_string() + &filename)
+                    let image = ImageReader::open("test-images/".to_string() + &filename)
                         .map_err(|e| format!("Failed to open image {}: {}", filename, e))?
                         .decode()
                         .map_err(|e| format!("Failed to decode image {}: {}", filename, e))?;
 
-                    let text = match reward_image_to_reward_names(image, None) {
-                        Ok(text) => text,
+                    let (text, _theme) = match reward_image_to_reward_names(image, None) {
+                        Ok(res) => res,
                         Err(e) => {
                             println!("Error processing image {}: {}", filename, e);
                             return Ok(0);
@@ -731,17 +865,29 @@ mod test {
                         }
                     };
 
-                    let items: Vec<_> = text.iter().map(|s| db.find_item(s, None)).collect();
+                    let items: Vec<Option<&Item>> = text.iter().map(|s| db.find_item(s, None)).collect();
                     println!("{:#?}", items);
                     println!("{}", filename);
 
-                    let item_names = items
+                    let item_names: Vec<Option<String>> = items
                         .iter()
-                        .map(|item| item.map(|item| item.drop_name.clone()));
+                        .map(|item| item.map(|item| item.drop_name.clone()))
+                        .collect();
 
-                    if item_names.zip(label.items).all(|(result, expectation)| {
-                        expectation == result.unwrap_or_else(|| "".to_string())
-                    }) {
+                    let expected_item_names: Vec<Option<String>> = label
+                        .items
+                        .iter()
+                        .map(|s| {
+                            let normalized = normalize_string(s);
+                            if normalized.is_empty() {
+                                None
+                            } else {
+                                db.find_item(&normalized, None).map(|item| item.drop_name.clone())
+                            }
+                        })
+                        .collect();
+
+                    if item_names == expected_item_names {
                         Ok(1)
                     } else {
                         Ok(0)
@@ -760,9 +906,9 @@ mod test {
     #[test]
     #[allow(dead_code)]
     fn images() -> Result<(), Box<dyn Error>> {
-        let tests = [1];
+        let tests = ["FullScreenShot2026-02-25 22-49-36599898510.png"];
         for i in tests {
-            let image_path = format!("test-images/{}.png", i);
+            let image_path = format!("test-images/{}", i);
             let image = ImageReader::open(&image_path)
                 .map_err(|e| format!("Failed to open image {}: {}", image_path, e))?
                 .decode()
@@ -774,7 +920,7 @@ mod test {
 
             let parts = extract_parts(&image, theme);
 
-            let ocr = Tesseract::new();
+            let ocr = Tesseract::new().map_err(|e| format!("Could not create Tesseract: {}", e))?;
             ocr.init(get_tessdata_path(), "eng")
                 .map_err(|e| format!("Could not initialize Tesseract: {}", e))?;
 

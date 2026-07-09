@@ -30,7 +30,7 @@ const RATIO_BOT: f32 = 0.007;
 
 lazy_static! {
     pub static ref OCR: Mutex<Option<Tesseract>> = {
-        let ocr = Tesseract::new();
+        let ocr = Tesseract::new().expect("Failed to create Tesseract instance");
         let datapath = get_tessdata_path();
         debug!("Initializing Tesseract with datapath: {}", datapath);
         ocr.init(&datapath, "eng")
@@ -239,13 +239,13 @@ pub fn image_to_string(tesseract: &mut Option<Tesseract>, image: &DynamicImage) 
 pub fn reward_image_to_reward_names(
     image: DynamicImage,
     theme: Option<Theme>,
-) -> Result<Vec<String>> {
+) -> Result<(Vec<String>, Theme)> {
     let theme = match theme {
         Some(t) => t,
         None => detect_theme(&image)?,
     };
 
-    let parts = extract_parts(&image, theme);
+    let parts = extract_parts(&image, theme.clone());
     debug!("Extracted {} part images", parts.len());
 
     let mut results = Vec::new();
@@ -258,7 +258,7 @@ pub fn reward_image_to_reward_names(
         results.push(text);
     }
 
-    Ok(results)
+    Ok((results, theme))
 }
 
 // --- Helper Functions ---

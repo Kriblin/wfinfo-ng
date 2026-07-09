@@ -5,7 +5,7 @@ use std::{
 };
 
 use clap::Parser;
-use eframe::egui::{CentralPanel, Color32, Context, Frame};
+use eframe::egui::{self, Color32, Frame};
 use rdev::{EventType, Key};
 
 fn main() {
@@ -71,7 +71,7 @@ impl MyApp {
 }
 
 impl eframe::App for MyApp {
-    fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
+    fn logic(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         ctx.request_repaint();
 
         while let Ok(event) = self.event_receiver.try_recv() {
@@ -79,7 +79,9 @@ impl eframe::App for MyApp {
                 self.last_activated = Some(Instant::now())
             }
         }
+    }
 
+    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
         let color = if self
             .last_activated
             .is_some_and(|last_activated| last_activated.elapsed() < self.timeout)
@@ -90,6 +92,6 @@ impl eframe::App for MyApp {
         };
 
         let frame = Frame::default().fill(color).inner_margin(4.0);
-        CentralPanel::default().frame(frame).show(ctx, |_ui| {});
+        frame.show(ui, |_ui| {});
     }
 }

@@ -8,6 +8,13 @@ use clap::Parser;
 use log::{info, warn};
 use serde::{Deserialize, Serialize};
 
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Default)]
+pub enum CaptureMode {
+    #[default]
+    Window,
+    Monitor,
+}
+
 /// Configuration for WFinfo-ng
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Config {
@@ -38,6 +45,13 @@ pub struct Config {
 
     /// Whether to show log timestamps
     pub log_timestamps: bool,
+
+    /// Whether to save screenshots for testing
+    pub save_screenshots: bool,
+
+    /// Capture mode (Window or Monitor)
+    #[serde(default)]
+    pub capture_mode: CaptureMode,
 }
 
 impl Default for Config {
@@ -56,6 +70,8 @@ impl Default for Config {
             items_file_path: None,
             log_level: "info".to_string(),
             log_timestamps: false,
+            save_screenshots: false,
+            capture_mode: CaptureMode::Window,
         }
     }
 }
