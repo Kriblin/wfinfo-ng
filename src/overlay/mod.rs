@@ -133,11 +133,11 @@ impl OverlayApp {
 }
 
 impl eframe::App for OverlayApp {
-    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
+    fn logic(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         let did_update = self.state.try_receive(&self.receiver);
 
         if did_update {
-            ui.ctx().request_repaint();
+            ctx.request_repaint();
             debug!(
                 "Overlay received update: rewards_count={}, rewards={:?}, last_update_elapsed={:?}",
                 self.state.rewards.len(),
@@ -146,19 +146,21 @@ impl eframe::App for OverlayApp {
             );
         }
 
-        draw_overlay(ui, &self.state);
-
         if self.state.is_visible() {
             if let Some(last_update) = self.state.last_update {
                 let timeout = Duration::from_secs(10);
                 if last_update.elapsed() >= timeout {
                     self.state.rewards.clear();
-                    ui.ctx().request_repaint();
+                    ctx.request_repaint();
                 } else {
-                    ui.ctx().request_repaint_after(timeout - last_update.elapsed());
+                    ctx.request_repaint_after(timeout - last_update.elapsed());
                 }
             }
         }
+    }
+
+    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
+        draw_overlay(ui, &self.state);
     }
 
     fn clear_color(&self, _visuals: &egui::Visuals) -> [f32; 4] {
