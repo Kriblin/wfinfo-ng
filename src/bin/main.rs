@@ -361,7 +361,7 @@ impl<L: SettingsLauncher> MainApp<L> {
 }
 
 impl<L: SettingsLauncher> eframe::App for MainApp<L> {
-    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
+    fn logic(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         let check_interval = Duration::from_secs(3);
         let elapsed = self.last_window_check.elapsed();
         if self.capture_mode == CaptureMode::Window {
@@ -369,9 +369,9 @@ impl<L: SettingsLauncher> eframe::App for MainApp<L> {
                 let current_title = self.window_title_state.get();
                 find_window_by_title(&current_title, &self.window_capture_state);
                 self.last_window_check = std::time::Instant::now();
-                ui.ctx().request_repaint_after(check_interval);
+                ctx.request_repaint_after(check_interval);
             } else {
-                ui.ctx().request_repaint_after(check_interval - elapsed);
+                ctx.request_repaint_after(check_interval - elapsed);
             }
         }
 
@@ -385,7 +385,7 @@ impl<L: SettingsLauncher> eframe::App for MainApp<L> {
 
         if did_update {
             self.overlay_active = true;
-            ui.ctx().request_repaint();
+            ctx.request_repaint();
             debug!(
                 "Main UI received update: rewards_count={}, rewards={:?}, last_update_elapsed={:?}",
                 self.overlay_state.rewards.len(),
@@ -400,12 +400,15 @@ impl<L: SettingsLauncher> eframe::App for MainApp<L> {
                 if last_update.elapsed() >= timeout {
                     self.overlay_state.rewards.clear();
                     self.overlay_active = false;
-                    ui.ctx().request_repaint();
+                    ctx.request_repaint();
                 } else {
-                    ui.ctx().request_repaint_after(timeout - last_update.elapsed());
+                    ctx.request_repaint_after(timeout - last_update.elapsed());
                 }
             }
         }
+    }
+
+    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
 
         ui.horizontal(|ui| {
             ui.heading("WFinfo-ng");
