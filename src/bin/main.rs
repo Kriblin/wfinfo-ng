@@ -1,5 +1,9 @@
 use std::error::Error;
 use std::io::{BufRead, BufReader, Read, Seek, SeekFrom};
+use std::sync::{
+    Arc, Mutex,
+    atomic::{AtomicBool, Ordering},
+};
 use std::thread::sleep;
 use std::time::Duration;
 use std::{fs::File, thread};
@@ -12,14 +16,15 @@ use global_hotkey::{GlobalHotKeyEvent, GlobalHotKeyManager, HotKeyState, hotkey:
 use image::DynamicImage;
 use log::{debug, error, info, warn};
 use notify::{RecommendedWatcher, RecursiveMode, Watcher};
-use xcap::{Window, Monitor};
+use xcap::{Monitor, Window};
 
 use wfinfo::{
-    config::{Args, Config, CaptureMode},
+    config::{Args, CaptureMode, Config},
     database::{Database, Item},
-    main_ui::{DetectionState, MainUiState, SettingsLauncher, WindowCaptureState, WindowTitleState},
+    main_ui::{DetectionState, MainUiState, WindowCaptureState, WindowTitleState},
     ocr::{OCR, normalize_string, reward_image_to_reward_names},
     overlay::{OverlayState, Reward, draw_overlay},
+    settings::SettingsApp,
     utils::fetch_prices_and_items,
 };
 
@@ -289,54 +294,24 @@ fn hotkey_watcher(hotkey: HotKey, event_sender: mpsc::Sender<()>) {
     });
 }
 
-struct ProcessSettingsLauncher {
-    settings_executable: PathBuf,
-}
-
-impl ProcessSettingsLauncher {
-    fn new() -> Self {
-        let settings_executable = std::env::current_exe()
-            .ok()
-            .and_then(|exe| exe.parent().map(|dir| dir.join("settings")))
-            .unwrap_or_else(|| PathBuf::from("settings"));
-        Self {
-            settings_executable,
-        }
-    }
-}
-
-impl SettingsLauncher for ProcessSettingsLauncher {
-    fn open_settings(&self) -> Result<(), String> {
-        let settings_executable = self.settings_executable.clone();
-
-        std::thread::spawn(move || {
-            std::process::Command::new(settings_executable)
-                .spawn()
-                .expect("Failed to start settings process")
-                .wait()
-                .expect("Failed to start settings process");
-        });
-        Ok(())
-    }
-}
-
-struct MainApp<L: SettingsLauncher> {
+struct MainApp {
     overlay_state: OverlayState,
     reward_receiver: mpsc::Receiver<(Vec<Reward>, wfinfo::theme::Theme, Vec<String>)>,
-    ui_state: MainUiState<L>,
+    ui_state: MainUiState,
     window_title_state: WindowTitleState,
     window_capture_state: WindowCaptureState,
     window_title_input: String,
     capture_mode: CaptureMode,
     overlay_active: bool,
+    settings_open: Arc<AtomicBool>,
+    settings_app: Arc<Mutex<SettingsApp>>,
     last_window_check: std::time::Instant,
 }
 
-impl<L: SettingsLauncher> MainApp<L> {
+impl MainApp {
     fn new(
         reward_receiver: mpsc::Receiver<(Vec<Reward>, wfinfo::theme::Theme, Vec<String>)>,
         detection: DetectionState,
-        launcher: L,
         window_title_state: WindowTitleState,
         window_capture_state: WindowCaptureState,
         capture_mode: CaptureMode,
@@ -349,18 +324,20 @@ impl<L: SettingsLauncher> MainApp<L> {
         Self {
             overlay_state: OverlayState::new(),
             reward_receiver,
-            ui_state: MainUiState::new(detection, launcher),
+            ui_state: MainUiState::new(detection),
             window_title_state,
             window_capture_state,
             window_title_input,
             capture_mode,
             overlay_active: false,
+            settings_open: Arc::new(AtomicBool::new(false)),
+            settings_app: Arc::new(Mutex::new(SettingsApp::new())),
             last_window_check: std::time::Instant::now(),
         }
     }
 }
 
-impl<L: SettingsLauncher> eframe::App for MainApp<L> {
+impl eframe::App for MainApp {
     fn logic(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         let check_interval = Duration::from_secs(3);
         let elapsed = self.last_window_check.elapsed();
@@ -409,12 +386,12 @@ impl<L: SettingsLauncher> eframe::App for MainApp<L> {
     }
 
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
-
         ui.horizontal(|ui| {
             ui.heading("WFinfo-ng");
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                 if ui.button("Settings").clicked() {
-                    let _ = self.ui_state.open_settings();
+                    self.ui_state.open_settings();
+                    self.settings_open.store(true, Ordering::SeqCst);
                 }
             });
         });
@@ -452,6 +429,41 @@ impl<L: SettingsLauncher> eframe::App for MainApp<L> {
 
         if let Some(error) = &self.ui_state.last_error {
             ui.colored_label(egui::Color32::RED, error);
+        }
+
+        if self.settings_open.load(Ordering::SeqCst) {
+            let settings_open = self.settings_open.clone();
+            let settings_app = self.settings_app.clone();
+            let settings_builder = egui::ViewportBuilder::default()
+                .with_title("WFinfo-ng Settings")
+                .with_inner_size([600.0, 500.0]);
+
+            ui.ctx().show_viewport_deferred(
+                egui::ViewportId::from_hash_of("wfinfo-settings"),
+                settings_builder,
+                move |viewport_ui, _class| {
+                    if viewport_ui
+                        .ctx()
+                        .input(|input| input.viewport().close_requested())
+                    {
+                        settings_open.store(false, Ordering::SeqCst);
+                        viewport_ui.ctx().request_repaint();
+                        return;
+                    }
+
+                    egui::CentralPanel::default().show(viewport_ui, |ui| {
+                        match settings_app.lock() {
+                            Ok(mut settings_app) => settings_app.ui(ui),
+                            Err(_) => {
+                                ui.colored_label(
+                                    egui::Color32::RED,
+                                    "Settings UI state is unavailable",
+                                );
+                            }
+                        }
+                    });
+                },
+            );
         }
 
         if self.overlay_active {
@@ -699,7 +711,6 @@ fn main() -> Result<(), Box<dyn Error>> {
             Ok(Box::new(MainApp::new(
                 reward_receiver,
                 detection_state_ui,
-                ProcessSettingsLauncher::new(),
                 window_title_ui,
                 window_capture_ui,
                 config_clone.capture_mode.clone(),
