@@ -95,8 +95,7 @@ pub fn draw_overlay(ui: &mut egui::Ui, state: &OverlayState) {
                             );
                         } else {
                             ui.label(
-                                egui::RichText::new(&reward.name)
-                                    .color(egui::Color32::LIGHT_GRAY),
+                                egui::RichText::new(&reward.name).color(egui::Color32::LIGHT_GRAY),
                             );
                             ui.label(
                                 egui::RichText::new(format!(
