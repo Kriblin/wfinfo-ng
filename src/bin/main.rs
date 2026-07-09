@@ -733,7 +733,7 @@ mod test {
 
     #[test]
     fn single_image() -> Result<(), Box<dyn Error>> {
-        let image = ImageReader::open(format!("test-images/{}.png", 1))
+        let image = ImageReader::open("test-images/FullScreenShot2026-02-25 22-36-26255760907.png")
             .map_err(|e| format!("Failed to open image: {}", e))?
             .decode()
             .map_err(|e| format!("Failed to decode image: {}", e))?;
@@ -748,19 +748,19 @@ mod test {
 
         assert_eq!(
             items[0].ok_or("Didn't find item 0")?.drop_name,
-            "Octavia Prime Systems Blueprint"
+            "Daikyu Prime Blueprint"
         );
         assert_eq!(
             items[1].ok_or("Didn't find item 1")?.drop_name,
-            "Octavia Prime Blueprint"
+            "Forma Blueprint"
         );
         assert_eq!(
             items[2].ok_or("Didn't find item 2")?.drop_name,
-            "Tenora Prime Blueprint"
+            "Forma Blueprint"
         );
         assert_eq!(
             items[3].ok_or("Didn't find item 3")?.drop_name,
-            "Harrow Prime Systems Blueprint"
+            "Sevagoth Prime Blueprint"
         );
 
         Ok(())
@@ -906,9 +906,9 @@ mod test {
     #[test]
     #[allow(dead_code)]
     fn images() -> Result<(), Box<dyn Error>> {
-        let tests = [1];
+        let tests = ["FullScreenShot2026-02-25 22-49-36599898510.png"];
         for i in tests {
-            let image_path = format!("test-images/{}.png", i);
+            let image_path = format!("test-images/{}", i);
             let image = ImageReader::open(&image_path)
                 .map_err(|e| format!("Failed to open image {}: {}", image_path, e))?
                 .decode()
