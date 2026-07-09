@@ -789,16 +789,26 @@ mod test {
             println!("{:#?}", items);
             println!("{}", filename);
 
-            let item_names = items
+            let item_names: Vec<Option<String>> = items
                 .iter()
-                .map(|item| item.map(|item| item.drop_name.clone()));
+                .map(|item| item.map(|item| item.drop_name.clone()))
+                .collect();
 
-            for (result, expectation) in item_names.zip(label.items) {
-                if expectation.is_empty() {
-                    assert_eq!(result, None)
-                } else {
-                    assert_eq!(result, Some(expectation))
-                }
+            let expected_item_names: Vec<Option<String>> = label
+                .items
+                .iter()
+                .map(|s| {
+                    let normalized = normalize_string(s);
+                    if normalized.is_empty() {
+                        None
+                    } else {
+                        db.find_item(&normalized, None).map(|item| item.drop_name.clone())
+                    }
+                })
+                .collect();
+
+            for (result, expectation) in item_names.into_iter().zip(expected_item_names) {
+                assert_eq!(result, expectation)
             }
         }
 
@@ -859,13 +869,25 @@ mod test {
                     println!("{:#?}", items);
                     println!("{}", filename);
 
-                    let item_names = items
+                    let item_names: Vec<Option<String>> = items
                         .iter()
-                        .map(|item| item.map(|item| item.drop_name.clone()));
+                        .map(|item| item.map(|item| item.drop_name.clone()))
+                        .collect();
 
-                    if item_names.zip(label.items).all(|(result, expectation)| {
-                        expectation == result.unwrap_or_else(|| "".to_string())
-                    }) {
+                    let expected_item_names: Vec<Option<String>> = label
+                        .items
+                        .iter()
+                        .map(|s| {
+                            let normalized = normalize_string(s);
+                            if normalized.is_empty() {
+                                None
+                            } else {
+                                db.find_item(&normalized, None).map(|item| item.drop_name.clone())
+                            }
+                        })
+                        .collect();
+
+                    if item_names == expected_item_names {
                         Ok(1)
                     } else {
                         Ok(0)
