@@ -895,7 +895,7 @@ mod test {
 
             let parts = extract_parts(&image, theme);
 
-            let ocr = Tesseract::new();
+            let ocr = Tesseract::new().map_err(|e| format!("Could not create Tesseract: {}", e))?;
             ocr.init(get_tessdata_path(), "eng")
                 .map_err(|e| format!("Could not initialize Tesseract: {}", e))?;
 

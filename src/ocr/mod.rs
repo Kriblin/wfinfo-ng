@@ -30,7 +30,7 @@ const RATIO_BOT: f32 = 0.007;
 
 lazy_static! {
     pub static ref OCR: Mutex<Option<Tesseract>> = {
-        let ocr = Tesseract::new();
+        let ocr = Tesseract::new().expect("Failed to create Tesseract instance");
         let datapath = get_tessdata_path();
         debug!("Initializing Tesseract with datapath: {}", datapath);
         ocr.init(&datapath, "eng")
