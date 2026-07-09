@@ -106,64 +106,27 @@ impl WindowCaptureState {
     }
 }
 
-pub trait SettingsLauncher {
-    fn open_settings(&self) -> Result<(), String>;
-}
-
-pub struct MainUiState<L: SettingsLauncher> {
+pub struct MainUiState {
     pub detection: DetectionState,
     pub last_error: Option<String>,
-    launcher: L,
 }
 
-impl<L: SettingsLauncher> MainUiState<L> {
-    pub fn new(detection: DetectionState, launcher: L) -> Self {
+impl MainUiState {
+    pub fn new(detection: DetectionState) -> Self {
         Self {
             detection,
             last_error: None,
-            launcher,
         }
     }
 
-    pub fn open_settings(&mut self) -> Result<(), String> {
-        match self.launcher.open_settings() {
-            Ok(()) => {
-                self.last_error = None;
-                Ok(())
-            }
-            Err(err) => {
-                self.last_error = Some(err.clone());
-                Err(err)
-            }
-        }
+    pub fn open_settings(&mut self) {
+        self.last_error = None;
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::cell::Cell;
-
-    struct TestLauncher {
-        calls: Cell<usize>,
-        result: Result<(), String>,
-    }
-
-    impl TestLauncher {
-        fn new(result: Result<(), String>) -> Self {
-            Self {
-                calls: Cell::new(0),
-                result,
-            }
-        }
-    }
-
-    impl SettingsLauncher for TestLauncher {
-        fn open_settings(&self) -> Result<(), String> {
-            self.calls.set(self.calls.get() + 1);
-            self.result.clone()
-        }
-    }
 
     #[test]
     fn detection_state_tracks_running() {
@@ -180,30 +143,14 @@ mod tests {
     }
 
     #[test]
-    fn open_settings_clears_error_on_success() {
+    fn open_settings_clears_previous_error() {
         let detection = DetectionState::new();
-        let launcher = TestLauncher::new(Ok(()));
-        let mut state = MainUiState::new(detection, launcher);
+        let mut state = MainUiState::new(detection);
         state.last_error = Some("previous".to_string());
 
-        let result = state.open_settings();
+        state.open_settings();
 
-        assert!(result.is_ok());
         assert!(state.last_error.is_none());
-        assert_eq!(state.launcher.calls.get(), 1);
-    }
-
-    #[test]
-    fn open_settings_stores_error_on_failure() {
-        let detection = DetectionState::new();
-        let launcher = TestLauncher::new(Err("boom".to_string()));
-        let mut state = MainUiState::new(detection, launcher);
-
-        let result = state.open_settings();
-
-        assert!(result.is_err());
-        assert_eq!(state.last_error.as_deref(), Some("boom"));
-        assert_eq!(state.launcher.calls.get(), 1);
     }
 
     #[test]
