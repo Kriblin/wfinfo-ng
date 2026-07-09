@@ -25,7 +25,7 @@ use wfinfo::{
     ocr::{OCR, normalize_string, reward_image_to_reward_names},
     overlay::{OverlayState, Reward, draw_overlay},
     settings::SettingsApp,
-    utils::fetch_prices_and_items,
+    utils::ensure_database_files,
 };
 
 fn run_detection(
@@ -575,25 +575,11 @@ fn main() -> Result<(), Box<dyn Error>> {
         window_capture_state.set_found("Primary Monitor".to_string());
     }
 
-    // Use configured file paths if provided, otherwise download the data
-    let (prices_path, items_path) =
-        if config.prices_file_path.is_some() && config.items_file_path.is_some() {
-            info!("Using configured database file paths");
-            (
-                config.prices_file_path.as_ref().map(|p| p.clone()),
-                config.items_file_path.as_ref().map(|p| p.clone()),
-            )
-        } else {
-            info!("Downloading database files");
-            let (prices, items) = fetch_prices_and_items()?;
-            (Some(prices), Some(items))
-        };
+    info!("Ensuring database files are available");
+    let (prices_path, items_path) = ensure_database_files(&config)?;
 
-    let db = Database::load_from_file(
-        prices_path.as_ref().map(|p| p.as_path()),
-        items_path.as_ref().map(|p| p.as_path()),
-    )
-    .map_err(|e| Box::<dyn Error>::from(e))?;
+    let db = Database::load_from_file(Some(prices_path.as_path()), Some(items_path.as_path()))
+        .map_err(|e| Box::<dyn Error>::from(e))?;
 
     info!("Loaded database");
 
