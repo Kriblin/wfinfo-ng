@@ -3,7 +3,10 @@ use std::path::{Path, PathBuf};
 use anyhow::Result;
 use eframe::egui;
 
-use crate::config::{CaptureMode, Config};
+use crate::{
+    config::{CaptureMode, Config},
+    utils::refresh_database_files,
+};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct SettingsState {
@@ -169,6 +172,22 @@ impl SettingsApp {
                 },
                 Err(err) => {
                     self.status = Some(format!("Validation failed: {err}"));
+                }
+            }
+        }
+
+        if ui.button("Update item data").clicked() {
+            let config = self.state.to_config();
+            match refresh_database_files(&config) {
+                Ok((prices_path, items_path)) => {
+                    self.status = Some(format!(
+                        "Updated item data: {}, {}",
+                        prices_path.display(),
+                        items_path.display()
+                    ));
+                }
+                Err(err) => {
+                    self.status = Some(format!("Update failed: {err:#}"));
                 }
             }
         }
