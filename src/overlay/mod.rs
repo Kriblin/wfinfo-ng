@@ -1,5 +1,5 @@
 use eframe::egui;
-use log::{debug, info};
+use log::debug;
 use std::sync::mpsc::Receiver;
 use std::time::{Duration, Instant};
 
