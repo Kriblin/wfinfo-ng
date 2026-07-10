@@ -5,8 +5,12 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 
-use anyhow::{Context, Result, anyhow};
+use anyhow::{Context, Result, anyhow, bail};
 use log::info;
+use reqwest::{
+    StatusCode,
+    header::{ETAG, IF_NONE_MATCH},
+};
 use serde_json::Value;
 
 use crate::config::Config;
@@ -16,12 +20,56 @@ pub const FILTERED_ITEMS_URL: &str = "https://api.warframestat.us/wfinfo/filtere
 pub const PRICES_FILE_NAME: &str = "prices.json";
 pub const FILTERED_ITEMS_FILE_NAME: &str = "filtered_items.json";
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum CacheRefreshState {
+    Updated,
+    NotModified,
+    Skipped,
+    Failed,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CachedFileRefreshResult {
+    pub path: PathBuf,
+    pub etag: Option<String>,
+    pub http_status: Option<u16>,
+    pub state: CacheRefreshState,
+    pub message: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DatabaseRefreshResult {
+    pub prices: CachedFileRefreshResult,
+    pub items: CachedFileRefreshResult,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct FetchResponse {
+    pub status: u16,
+    pub etag: Option<String>,
+    pub body: Option<String>,
+}
+
 pub fn ensure_database_files(config: &Config) -> Result<(PathBuf, PathBuf)> {
     ensure_database_files_with_fetcher(config, fetch_url)
 }
 
 pub fn refresh_database_files(config: &Config) -> Result<(PathBuf, PathBuf)> {
+    let result = refresh_database_files_with_status(config)?;
+    ensure_refresh_succeeded(&result)?;
+    Ok((result.prices.path, result.items.path))
+}
+
+pub fn refresh_database_files_with_status(config: &Config) -> Result<DatabaseRefreshResult> {
     refresh_database_files_with_fetcher(config, fetch_url)
+}
+
+pub fn database_cache_status(config: &Config) -> Result<DatabaseRefreshResult> {
+    let (prices_path, items_path) = resolve_database_paths(config)?;
+    Ok(DatabaseRefreshResult {
+        prices: cached_file_status(&prices_path, "Price data cache"),
+        items: cached_file_status(&items_path, "Filtered item data cache"),
+    })
 }
 
 pub fn fetch_prices_and_items() -> Result<(PathBuf, PathBuf)> {
@@ -69,36 +117,143 @@ fn ensure_database_files_with_fetcher(
     Ok((prices_path, items_path))
 }
 
-fn refresh_database_files_with_fetcher(
+pub fn refresh_database_files_with_fetcher(
     config: &Config,
-    fetcher: impl Fn(&str) -> Result<String>,
-) -> Result<(PathBuf, PathBuf)> {
+    fetcher: impl Fn(&str, Option<&str>) -> Result<FetchResponse>,
+) -> Result<DatabaseRefreshResult> {
     let (prices_path, items_path) = resolve_database_paths(config)?;
-    download_json_to_file_with_fetcher(PRICES_URL, &prices_path, &fetcher)?;
-    download_json_to_file_with_fetcher(FILTERED_ITEMS_URL, &items_path, &fetcher)?;
-    Ok((prices_path, items_path))
+    Ok(DatabaseRefreshResult {
+        prices: refresh_cached_url(PRICES_URL, &prices_path, &fetcher)?,
+        items: refresh_cached_url(FILTERED_ITEMS_URL, &items_path, &fetcher)?,
+    })
 }
 
-fn download_json_to_file_with_fetcher(
+fn refresh_cached_url(
     url: &str,
     destination: &Path,
-    fetcher: impl Fn(&str) -> Result<String>,
-) -> Result<()> {
-    let body = fetcher(url).with_context(|| format!("Failed to download {url}"))?;
-    write_json_to_file(&body, destination)
+    fetcher: impl Fn(&str, Option<&str>) -> Result<FetchResponse>,
+) -> Result<CachedFileRefreshResult> {
+    let existing_etag = read_etag(destination)?;
+    let response = fetcher(url, existing_etag.as_deref())
+        .with_context(|| format!("Failed to download {url}"))?;
+
+    match StatusCode::from_u16(response.status) {
+        Ok(StatusCode::OK) => {
+            let body = response
+                .body
+                .ok_or_else(|| anyhow!("Server returned 200 OK for {url} without a body"))?;
+            write_json_to_file(&body, destination)?;
+
+            let etag = if let Some(etag) = response.etag {
+                write_etag(destination, &etag)?;
+                Some(etag)
+            } else {
+                existing_etag
+            };
+
+            Ok(CachedFileRefreshResult {
+                path: destination.to_path_buf(),
+                etag,
+                http_status: Some(response.status),
+                state: CacheRefreshState::Updated,
+                message: format!("Updated from HTTP {}", response.status),
+            })
+        }
+        Ok(StatusCode::NOT_MODIFIED) => {
+            if !is_valid_json_file(destination) {
+                bail!(
+                    "Server returned 304 Not Modified for {url}, but no valid local cache exists at {}",
+                    destination.display()
+                );
+            }
+
+            Ok(CachedFileRefreshResult {
+                path: destination.to_path_buf(),
+                etag: existing_etag,
+                http_status: Some(response.status),
+                state: CacheRefreshState::NotModified,
+                message: "Cache is current (HTTP 304 Not Modified)".to_string(),
+            })
+        }
+        Ok(StatusCode::SERVICE_UNAVAILABLE) => Ok(CachedFileRefreshResult {
+            path: destination.to_path_buf(),
+            etag: existing_etag,
+            http_status: Some(response.status),
+            state: CacheRefreshState::Failed,
+            message: "Refresh failed: service temporarily unavailable (HTTP 503)".to_string(),
+        }),
+        _ => Ok(CachedFileRefreshResult {
+            path: destination.to_path_buf(),
+            etag: existing_etag,
+            http_status: Some(response.status),
+            state: CacheRefreshState::Failed,
+            message: format!("Refresh failed with HTTP {}", response.status),
+        }),
+    }
 }
 
-fn fetch_url(url: &str) -> Result<String> {
-    let response =
-        reqwest::blocking::get(url).with_context(|| format!("Failed to send request to {url}"))?;
-    let status = response.status();
-    if !status.is_success() {
-        return Err(anyhow!("Server returned {status} for {url}"));
+fn fetch_url(url: &str, etag: Option<&str>) -> Result<FetchResponse> {
+    let client = reqwest::blocking::Client::new();
+    let mut request = client.get(url);
+    if let Some(etag) = etag {
+        request = request.header(IF_NONE_MATCH, etag);
     }
 
-    response
-        .text()
-        .with_context(|| format!("Failed to read response body from {url}"))
+    let response = request
+        .send()
+        .with_context(|| format!("Failed to send request to {url}"))?;
+    let status = response.status();
+    let etag = response
+        .headers()
+        .get(ETAG)
+        .and_then(|value| value.to_str().ok())
+        .map(ToOwned::to_owned);
+
+    let body = if status == StatusCode::OK {
+        Some(
+            response
+                .text()
+                .with_context(|| format!("Failed to read response body from {url}"))?,
+        )
+    } else {
+        None
+    };
+
+    Ok(FetchResponse {
+        status: status.as_u16(),
+        etag,
+        body,
+    })
+}
+
+fn ensure_refresh_succeeded(result: &DatabaseRefreshResult) -> Result<()> {
+    ensure_file_refresh_succeeded(&result.prices)?;
+    ensure_file_refresh_succeeded(&result.items)?;
+    Ok(())
+}
+
+fn ensure_file_refresh_succeeded(result: &CachedFileRefreshResult) -> Result<()> {
+    if result.state == CacheRefreshState::Failed {
+        bail!("{}", result.message);
+    }
+
+    Ok(())
+}
+
+fn cached_file_status(path: &Path, label: &str) -> CachedFileRefreshResult {
+    let etag = read_etag(path).unwrap_or_default();
+    let exists = path.exists();
+    CachedFileRefreshResult {
+        path: path.to_path_buf(),
+        etag,
+        http_status: None,
+        state: CacheRefreshState::Skipped,
+        message: if exists {
+            format!("{label} is present")
+        } else {
+            format!("{label} is not downloaded")
+        },
+    }
 }
 
 fn write_json_to_file(json: &str, destination: &Path) -> Result<()> {
@@ -149,6 +304,40 @@ fn is_valid_json_file(path: &Path) -> bool {
     };
 
     serde_json::from_reader::<_, Value>(file).is_ok()
+}
+
+fn etag_path(destination: &Path) -> PathBuf {
+    let Some(file_name) = destination.file_name() else {
+        return destination.with_extension("etag");
+    };
+    let mut etag_file_name = file_name.to_os_string();
+    etag_file_name.push(".etag");
+    destination.with_file_name(etag_file_name)
+}
+
+fn read_etag(destination: &Path) -> Result<Option<String>> {
+    let path = etag_path(destination);
+    match fs::read_to_string(&path) {
+        Ok(etag) => {
+            let etag = etag.trim().to_string();
+            if etag.is_empty() {
+                Ok(None)
+            } else {
+                Ok(Some(etag))
+            }
+        }
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => Ok(None),
+        Err(err) => Err(err).with_context(|| format!("Failed to read ETag {}", path.display())),
+    }
+}
+
+fn write_etag(destination: &Path, etag: &str) -> Result<()> {
+    let path = etag_path(destination);
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent)
+            .with_context(|| format!("Failed to create ETag directory {}", parent.display()))?;
+    }
+    fs::write(&path, etag).with_context(|| format!("Failed to write ETag {}", path.display()))
 }
 
 fn default_database_dir() -> Result<PathBuf> {
