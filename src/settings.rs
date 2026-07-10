@@ -1,11 +1,18 @@
-use std::path::{Path, PathBuf};
+use std::{
+    path::{Path, PathBuf},
+    sync::mpsc,
+    thread,
+};
 
 use anyhow::Result;
 use eframe::egui;
 
 use crate::{
     config::{CaptureMode, Config},
-    utils::refresh_database_files,
+    utils::{
+        CacheRefreshState, CachedFileRefreshResult, DatabaseRefreshResult, database_cache_status,
+        refresh_database_files_with_status,
+    },
 };
 
 #[derive(Debug, Clone, PartialEq)]
@@ -90,6 +97,10 @@ pub struct SettingsApp {
     state: SettingsState,
     status: Option<String>,
     config_path_hint: Option<String>,
+    database_refresh_result: Option<DatabaseRefreshResult>,
+    database_refresh_receiver:
+        Option<mpsc::Receiver<std::result::Result<DatabaseRefreshResult, String>>>,
+    database_refresh_in_progress: bool,
 }
 
 impl SettingsApp {
@@ -105,10 +116,15 @@ impl SettingsApp {
             state: SettingsState::from_config(&config),
             status: None,
             config_path_hint,
+            database_refresh_result: database_cache_status(&config).ok(),
+            database_refresh_receiver: None,
+            database_refresh_in_progress: false,
         }
     }
 
     pub fn ui(&mut self, ui: &mut egui::Ui) {
+        self.poll_database_refresh();
+
         ui.heading("WFinfo-ng Settings");
         if let Some(path) = &self.config_path_hint {
             ui.label(format!("Config file: {path}"));
