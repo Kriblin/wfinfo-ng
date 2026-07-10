@@ -96,20 +96,22 @@ fn resolve_database_paths_in_dir(config: &Config, default_dir: &Path) -> (PathBu
 
 fn ensure_database_files_with_fetcher(
     config: &Config,
-    fetcher: impl Fn(&str) -> Result<String>,
+    fetcher: impl Fn(&str, Option<&str>) -> Result<FetchResponse>,
 ) -> Result<(PathBuf, PathBuf)> {
     let (prices_path, items_path) = resolve_database_paths(config)?;
 
     if !is_valid_json_file(&prices_path) {
         info!("Downloading price data to {}", prices_path.display());
-        download_json_to_file_with_fetcher(PRICES_URL, &prices_path, &fetcher)?;
+        let result = refresh_cached_url(PRICES_URL, &prices_path, &fetcher)?;
+        ensure_file_refresh_succeeded(&result)?;
     } else {
         info!("Using price data from {}", prices_path.display());
     }
 
     if !is_valid_json_file(&items_path) {
         info!("Downloading filtered item data to {}", items_path.display());
-        download_json_to_file_with_fetcher(FILTERED_ITEMS_URL, &items_path, &fetcher)?;
+        let result = refresh_cached_url(FILTERED_ITEMS_URL, &items_path, &fetcher)?;
+        ensure_file_refresh_succeeded(&result)?;
     } else {
         info!("Using filtered item data from {}", items_path.display());
     }
