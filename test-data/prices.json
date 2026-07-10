@@ -1,0 +1,4292 @@
+[
+  {
+    "name": "Frost Prime Set",
+    "yesterday_vol": "89",
+    "today_vol": "52",
+    "custom_avg": "69.5"
+  },
+  {
+    "name": "Hydroid Prime Set",
+    "yesterday_vol": "71",
+    "today_vol": "69",
+    "custom_avg": "78.3"
+  },
+  {
+    "name": "Zephyr Prime Chassis Blueprint",
+    "yesterday_vol": "25",
+    "today_vol": "20",
+    "custom_avg": "5.4"
+  },
+  {
+    "name": "Redeemer Prime Blade",
+    "yesterday_vol": "26",
+    "today_vol": "21",
+    "custom_avg": "5.4"
+  },
+  {
+    "name": "Akjagara Prime Receiver",
+    "yesterday_vol": "70",
+    "today_vol": "57",
+    "custom_avg": "9.1"
+  },
+  {
+    "name": "Zhuge Prime Grip",
+    "yesterday_vol": "8",
+    "today_vol": "6",
+    "custom_avg": "4.9"
+  },
+  {
+    "name": "Wyrm Prime Blueprint",
+    "yesterday_vol": "58",
+    "today_vol": "42",
+    "custom_avg": "9.4"
+  },
+  {
+    "name": "Orthos Prime Blade",
+    "yesterday_vol": "24",
+    "today_vol": "20",
+    "custom_avg": "2.9"
+  },
+  {
+    "name": "Loki Prime Systems Blueprint",
+    "yesterday_vol": "63",
+    "today_vol": "41",
+    "custom_avg": "24.3"
+  },
+  {
+    "name": "Odonata Prime Harness Blueprint",
+    "yesterday_vol": "26",
+    "today_vol": "20",
+    "custom_avg": "7.2"
+  },
+  {
+    "name": "Odonata Prime Systems Blueprint",
+    "yesterday_vol": "21",
+    "today_vol": "29",
+    "custom_avg": "5.7"
+  },
+  {
+    "name": "Hikou Prime Pouch",
+    "yesterday_vol": "34",
+    "today_vol": "20",
+    "custom_avg": "9.8"
+  },
+  {
+    "name": "Reaper Prime Blueprint",
+    "yesterday_vol": "19",
+    "today_vol": "40",
+    "custom_avg": "8.3"
+  },
+  {
+    "name": "Rhino Prime Neuroptics Blueprint",
+    "yesterday_vol": "17",
+    "today_vol": "13",
+    "custom_avg": "18.5"
+  },
+  {
+    "name": "Ballistica Prime String",
+    "yesterday_vol": "23",
+    "today_vol": "28",
+    "custom_avg": "7.7"
+  },
+  {
+    "name": "Vasto Prime Set",
+    "yesterday_vol": "41",
+    "today_vol": "38",
+    "custom_avg": "29.1"
+  },
+  {
+    "name": "Oberon Prime Neuroptics Blueprint",
+    "yesterday_vol": "81",
+    "today_vol": "62",
+    "custom_avg": "26.7"
+  },
+  {
+    "name": "Volt Prime Neuroptics Blueprint",
+    "yesterday_vol": "87",
+    "today_vol": "91",
+    "custom_avg": "15.2"
+  },
+  {
+    "name": "Ballistica Prime Lower Limb",
+    "yesterday_vol": "26",
+    "today_vol": "28",
+    "custom_avg": "6"
+  },
+  {
+    "name": "Volt Prime Chassis Blueprint",
+    "yesterday_vol": "134",
+    "today_vol": "110",
+    "custom_avg": "8.6"
+  },
+  {
+    "name": "Zhuge Prime Blueprint",
+    "yesterday_vol": "7",
+    "today_vol": "4",
+    "custom_avg": "5.1"
+  },
+  {
+    "name": "Ninkondi Prime Chain",
+    "yesterday_vol": "7",
+    "today_vol": "3",
+    "custom_avg": "4"
+  },
+  {
+    "name": "Zhuge Prime Receiver",
+    "yesterday_vol": "11",
+    "today_vol": "9",
+    "custom_avg": "8.7"
+  },
+  {
+    "name": "Zhuge Prime Set",
+    "yesterday_vol": "26",
+    "today_vol": "17",
+    "custom_avg": "48.7"
+  },
+  {
+    "name": "Wukong Prime Neuroptics Blueprint",
+    "yesterday_vol": "82",
+    "today_vol": "45",
+    "custom_avg": "7.6"
+  },
+  {
+    "name": "Ember Prime Neuroptics Blueprint",
+    "yesterday_vol": "73",
+    "today_vol": "52",
+    "custom_avg": "7.4"
+  },
+  {
+    "name": "Nyx Prime Blueprint",
+    "yesterday_vol": "50",
+    "today_vol": "40",
+    "custom_avg": "10.1"
+  },
+  {
+    "name": "Nyx Prime Systems Blueprint",
+    "yesterday_vol": "71",
+    "today_vol": "37",
+    "custom_avg": "9.7"
+  },
+  {
+    "name": "Dual Kamas Prime Set",
+    "yesterday_vol": "8",
+    "today_vol": "13",
+    "custom_avg": "130.7"
+  },
+  {
+    "name": "Nyx Prime Neuroptics Blueprint",
+    "yesterday_vol": "47",
+    "today_vol": "48",
+    "custom_avg": "39.1"
+  },
+  {
+    "name": "Rhino Prime Blueprint",
+    "yesterday_vol": "27",
+    "today_vol": "37",
+    "custom_avg": "26.7"
+  },
+  {
+    "name": "Tigris Prime Receiver",
+    "yesterday_vol": "25",
+    "today_vol": "38",
+    "custom_avg": "7.9"
+  },
+  {
+    "name": "Helios Prime Carapace",
+    "yesterday_vol": "11",
+    "today_vol": "7",
+    "custom_avg": "4.6"
+  },
+  {
+    "name": "Wyrm Prime Systems",
+    "yesterday_vol": "79",
+    "today_vol": "61",
+    "custom_avg": "19.3"
+  },
+  {
+    "name": "Trinity Prime Neuroptics Blueprint",
+    "yesterday_vol": "44",
+    "today_vol": "33",
+    "custom_avg": "11.5"
+  },
+  {
+    "name": "Fang Prime Handle",
+    "yesterday_vol": "16",
+    "today_vol": "17",
+    "custom_avg": "1.8"
+  },
+  {
+    "name": "Nyx Prime Chassis Blueprint",
+    "yesterday_vol": "46",
+    "today_vol": "43",
+    "custom_avg": "13.5"
+  },
+  {
+    "name": "Loki Prime Chassis Blueprint",
+    "yesterday_vol": "63",
+    "today_vol": "35",
+    "custom_avg": "14"
+  },
+  {
+    "name": "Mag Prime Chassis Blueprint",
+    "yesterday_vol": "39",
+    "today_vol": "19",
+    "custom_avg": "9"
+  },
+  {
+    "name": "Nami Skyla Prime Handle",
+    "yesterday_vol": "81",
+    "today_vol": "71",
+    "custom_avg": "7.3"
+  },
+  {
+    "name": "Pyrana Prime Blueprint",
+    "yesterday_vol": "16",
+    "today_vol": "20",
+    "custom_avg": "31.2"
+  },
+  {
+    "name": "Pyrana Prime Receiver",
+    "yesterday_vol": "14",
+    "today_vol": "10",
+    "custom_avg": "6.9"
+  },
+  {
+    "name": "Pyrana Prime Barrel",
+    "yesterday_vol": "11",
+    "today_vol": "6",
+    "custom_avg": "4.9"
+  },
+  {
+    "name": "Destreza Prime Set",
+    "yesterday_vol": "11",
+    "today_vol": "9",
+    "custom_avg": "57.2"
+  },
+  {
+    "name": "Loki Prime Neuroptics Blueprint",
+    "yesterday_vol": "36",
+    "today_vol": "63",
+    "custom_avg": "12.7"
+  },
+  {
+    "name": "Ankyros Prime Blade",
+    "yesterday_vol": "11",
+    "today_vol": "26",
+    "custom_avg": "8.9"
+  },
+  {
+    "name": "Ankyros Prime Gauntlet",
+    "yesterday_vol": "19",
+    "today_vol": "16",
+    "custom_avg": "13.6"
+  },
+  {
+    "name": "Bo Prime Blueprint",
+    "yesterday_vol": "63",
+    "today_vol": "52",
+    "custom_avg": "10.4"
+  },
+  {
+    "name": "Silva & Aegis Prime Guard",
+    "yesterday_vol": "38",
+    "today_vol": "24",
+    "custom_avg": "14.9"
+  },
+  {
+    "name": "Tigris Prime Stock",
+    "yesterday_vol": "15",
+    "today_vol": "27",
+    "custom_avg": "5.8"
+  },
+  {
+    "name": "Ash Prime Neuroptics Blueprint",
+    "yesterday_vol": "73",
+    "today_vol": "80",
+    "custom_avg": "8.4"
+  },
+  {
+    "name": "Vectis Prime Stock",
+    "yesterday_vol": "36",
+    "today_vol": "25",
+    "custom_avg": "11.2"
+  },
+  {
+    "name": "Bo Prime Handle",
+    "yesterday_vol": "65",
+    "today_vol": "62",
+    "custom_avg": "14.2"
+  },
+  {
+    "name": "Carrier Prime Blueprint",
+    "yesterday_vol": "55",
+    "today_vol": "19",
+    "custom_avg": "9.2"
+  },
+  {
+    "name": "Vectis Prime Barrel",
+    "yesterday_vol": "41",
+    "today_vol": "36",
+    "custom_avg": "11.2"
+  },
+  {
+    "name": "Soma Prime Blueprint",
+    "yesterday_vol": "19",
+    "today_vol": "21",
+    "custom_avg": "7.6"
+  },
+  {
+    "name": "Vasto Prime Barrel",
+    "yesterday_vol": "40",
+    "today_vol": "26",
+    "custom_avg": "7.9"
+  },
+  {
+    "name": "Vasto Prime Blueprint",
+    "yesterday_vol": "21",
+    "today_vol": "16",
+    "custom_avg": "6.7"
+  },
+  {
+    "name": "Saryn Prime Set",
+    "yesterday_vol": "143",
+    "today_vol": "132",
+    "custom_avg": "59.6"
+  },
+  {
+    "name": "Tipedo Prime Handle",
+    "yesterday_vol": "14",
+    "today_vol": "11",
+    "custom_avg": "31.1"
+  },
+  {
+    "name": "Stradavar Prime Set",
+    "yesterday_vol": "26",
+    "today_vol": "19",
+    "custom_avg": "32.1"
+  },
+  {
+    "name": "Equinox Prime Blueprint",
+    "yesterday_vol": "44",
+    "today_vol": "35",
+    "custom_avg": "14.8"
+  },
+  {
+    "name": "Bronco Prime Barrel",
+    "yesterday_vol": "25",
+    "today_vol": "26",
+    "custom_avg": "2.1"
+  },
+  {
+    "name": "Nova Prime Systems Blueprint",
+    "yesterday_vol": "49",
+    "today_vol": "52",
+    "custom_avg": "11.2"
+  },
+  {
+    "name": "Frost Prime Blueprint",
+    "yesterday_vol": "103",
+    "today_vol": "103",
+    "custom_avg": "28.8"
+  },
+  {
+    "name": "Bronco Prime Blueprint",
+    "yesterday_vol": "6",
+    "today_vol": "11",
+    "custom_avg": "2.6"
+  },
+  {
+    "name": "Burston Prime Receiver",
+    "yesterday_vol": "42",
+    "today_vol": "34",
+    "custom_avg": "3.6"
+  },
+  {
+    "name": "Fang Prime Blade",
+    "yesterday_vol": "12",
+    "today_vol": "15",
+    "custom_avg": "2.2"
+  },
+  {
+    "name": "Vauban Prime Neuroptics Blueprint",
+    "yesterday_vol": "128",
+    "today_vol": "94",
+    "custom_avg": "31.5"
+  },
+  {
+    "name": "Hikou Prime Stars",
+    "yesterday_vol": "24",
+    "today_vol": "17",
+    "custom_avg": "8.8"
+  },
+  {
+    "name": "Nova Prime Neuroptics Blueprint",
+    "yesterday_vol": "43",
+    "today_vol": "52",
+    "custom_avg": "11"
+  },
+  {
+    "name": "Nova Prime Chassis Blueprint",
+    "yesterday_vol": "37",
+    "today_vol": "54",
+    "custom_avg": "36"
+  },
+  {
+    "name": "Nova Prime Blueprint",
+    "yesterday_vol": "40",
+    "today_vol": "54",
+    "custom_avg": "11.8"
+  },
+  {
+    "name": "Frost Prime Neuroptics Blueprint",
+    "yesterday_vol": "119",
+    "today_vol": "97",
+    "custom_avg": "8.9"
+  },
+  {
+    "name": "Trinity Prime Blueprint",
+    "yesterday_vol": "36",
+    "today_vol": "20",
+    "custom_avg": "18"
+  },
+  {
+    "name": "Sybaris Prime Barrel",
+    "yesterday_vol": "41",
+    "today_vol": "39",
+    "custom_avg": "20.7"
+  },
+  {
+    "name": "Banshee Prime Chassis Blueprint",
+    "yesterday_vol": "38",
+    "today_vol": "35",
+    "custom_avg": "26.3"
+  },
+  {
+    "name": "Wukong Prime Chassis Blueprint",
+    "yesterday_vol": "93",
+    "today_vol": "44",
+    "custom_avg": "10.1"
+  },
+  {
+    "name": "Helios Prime Set",
+    "yesterday_vol": "45",
+    "today_vol": "33",
+    "custom_avg": "61.3"
+  },
+  {
+    "name": "Hydroid Prime Neuroptics Blueprint",
+    "yesterday_vol": "107",
+    "today_vol": "105",
+    "custom_avg": "12.1"
+  },
+  {
+    "name": "Silva & Aegis Prime Set",
+    "yesterday_vol": "18",
+    "today_vol": "14",
+    "custom_avg": "41.4"
+  },
+  {
+    "name": "Kavasa Prime Kubrow Collar Set",
+    "yesterday_vol": "6",
+    "today_vol": "5",
+    "custom_avg": "34.4"
+  },
+  {
+    "name": "Latron Prime Set",
+    "yesterday_vol": "44",
+    "today_vol": "31",
+    "custom_avg": "66.1"
+  },
+  {
+    "name": "Lex Prime Set",
+    "yesterday_vol": "45",
+    "today_vol": "44",
+    "custom_avg": "6.3"
+  },
+  {
+    "name": "Odonata Prime Set",
+    "yesterday_vol": "16",
+    "today_vol": "12",
+    "custom_avg": "34.4"
+  },
+  {
+    "name": "Destreza Prime Handle",
+    "yesterday_vol": "14",
+    "today_vol": "4",
+    "custom_avg": "7.4"
+  },
+  {
+    "name": "Vectis Prime Set",
+    "yesterday_vol": "17",
+    "today_vol": "17",
+    "custom_avg": "83"
+  },
+  {
+    "name": "Rhino Prime Set",
+    "yesterday_vol": "32",
+    "today_vol": "37",
+    "custom_avg": "79"
+  },
+  {
+    "name": "Sicarus Prime Set",
+    "yesterday_vol": "36",
+    "today_vol": "46",
+    "custom_avg": "45.9"
+  },
+  {
+    "name": "Boltor Prime Receiver",
+    "yesterday_vol": "28",
+    "today_vol": "7",
+    "custom_avg": "8.7"
+  },
+  {
+    "name": "Boltor Prime Stock",
+    "yesterday_vol": "19",
+    "today_vol": "8",
+    "custom_avg": "9.5"
+  },
+  {
+    "name": "Tigris Prime Barrel",
+    "yesterday_vol": "18",
+    "today_vol": "25",
+    "custom_avg": "4.1"
+  },
+  {
+    "name": "Soma Prime Receiver",
+    "yesterday_vol": "44",
+    "today_vol": "26",
+    "custom_avg": "9.4"
+  },
+  {
+    "name": "Soma Prime Stock",
+    "yesterday_vol": "74",
+    "today_vol": "33",
+    "custom_avg": "29.2"
+  },
+  {
+    "name": "Braton Prime Set",
+    "yesterday_vol": "47",
+    "today_vol": "48",
+    "custom_avg": "6"
+  },
+  {
+    "name": "Silva & Aegis Prime Hilt",
+    "yesterday_vol": "20",
+    "today_vol": "21",
+    "custom_avg": "5.7"
+  },
+  {
+    "name": "Hydroid Prime Chassis Blueprint",
+    "yesterday_vol": "115",
+    "today_vol": "127",
+    "custom_avg": "8.8"
+  },
+  {
+    "name": "Aklex Prime Blueprint",
+    "yesterday_vol": "8",
+    "today_vol": "3",
+    "custom_avg": "7"
+  },
+  {
+    "name": "Aklex Prime Set",
+    "yesterday_vol": "24",
+    "today_vol": "20",
+    "custom_avg": "45.5"
+  },
+  {
+    "name": "Ballistica Prime Blueprint",
+    "yesterday_vol": "27",
+    "today_vol": "23",
+    "custom_avg": "21.4"
+  },
+  {
+    "name": "Ninkondi Prime Blueprint",
+    "yesterday_vol": "10",
+    "today_vol": "6",
+    "custom_avg": "4.6"
+  },
+  {
+    "name": "Zhuge Prime Barrel",
+    "yesterday_vol": "23",
+    "today_vol": "12",
+    "custom_avg": "16.2"
+  },
+  {
+    "name": "Ninkondi Prime Handle",
+    "yesterday_vol": "34",
+    "today_vol": "31",
+    "custom_avg": "21"
+  },
+  {
+    "name": "Ninkondi Prime Set",
+    "yesterday_vol": "11",
+    "today_vol": "6",
+    "custom_avg": "62"
+  },
+  {
+    "name": "Wukong Prime Set",
+    "yesterday_vol": "156",
+    "today_vol": "130",
+    "custom_avg": "79.4"
+  },
+  {
+    "name": "Scindo Prime Handle",
+    "yesterday_vol": "12",
+    "today_vol": "8",
+    "custom_avg": "8"
+  },
+  {
+    "name": "Rubico Prime Barrel",
+    "yesterday_vol": "17",
+    "today_vol": "14",
+    "custom_avg": "6.1"
+  },
+  {
+    "name": "Loki Prime Blueprint",
+    "yesterday_vol": "71",
+    "today_vol": "61",
+    "custom_avg": "9.1"
+  },
+  {
+    "name": "Dual Kamas Prime Blueprint",
+    "yesterday_vol": "10",
+    "today_vol": "3",
+    "custom_avg": "6.6"
+  },
+  {
+    "name": "Latron Prime Barrel",
+    "yesterday_vol": "56",
+    "today_vol": "37",
+    "custom_avg": "13"
+  },
+  {
+    "name": "Ember Prime Set",
+    "yesterday_vol": "82",
+    "today_vol": "78",
+    "custom_avg": "49.2"
+  },
+  {
+    "name": "Fang Prime Set",
+    "yesterday_vol": "17",
+    "today_vol": "16",
+    "custom_avg": "6.4"
+  },
+  {
+    "name": "Mag Prime Set",
+    "yesterday_vol": "54",
+    "today_vol": "34",
+    "custom_avg": "68.8"
+  },
+  {
+    "name": "Nekros Prime Neuroptics Blueprint",
+    "yesterday_vol": "102",
+    "today_vol": "71",
+    "custom_avg": "17.4"
+  },
+  {
+    "name": "Euphona Prime Set",
+    "yesterday_vol": "21",
+    "today_vol": "6",
+    "custom_avg": "49.2"
+  },
+  {
+    "name": "Boar Prime Blueprint",
+    "yesterday_vol": "13",
+    "today_vol": "12",
+    "custom_avg": "7.8"
+  },
+  {
+    "name": "Oberon Prime Set",
+    "yesterday_vol": "82",
+    "today_vol": "78",
+    "custom_avg": "72.6"
+  },
+  {
+    "name": "Tiberon Prime Blueprint",
+    "yesterday_vol": "6",
+    "today_vol": "4",
+    "custom_avg": "4.7"
+  },
+  {
+    "name": "Saryn Prime Blueprint",
+    "yesterday_vol": "104",
+    "today_vol": "116",
+    "custom_avg": "8.3"
+  },
+  {
+    "name": "Bo Prime Set",
+    "yesterday_vol": "48",
+    "today_vol": "27",
+    "custom_avg": "68.7"
+  },
+  {
+    "name": "Boar Prime Set",
+    "yesterday_vol": "22",
+    "today_vol": "9",
+    "custom_avg": "72.7"
+  },
+  {
+    "name": "Ballistica Prime Receiver",
+    "yesterday_vol": "14",
+    "today_vol": "27",
+    "custom_avg": "4.8"
+  },
+  {
+    "name": "Boltor Prime Set",
+    "yesterday_vol": "24",
+    "today_vol": "19",
+    "custom_avg": "66.3"
+  },
+  {
+    "name": "Kogake Prime Set",
+    "yesterday_vol": "13",
+    "today_vol": "9",
+    "custom_avg": "85.2"
+  },
+  {
+    "name": "Kogake Prime Gauntlet",
+    "yesterday_vol": "32",
+    "today_vol": "25",
+    "custom_avg": "21.2"
+  },
+  {
+    "name": "Zephyr Prime Blueprint",
+    "yesterday_vol": "35",
+    "today_vol": "27",
+    "custom_avg": "14.1"
+  },
+  {
+    "name": "Valkyr Prime Neuroptics Blueprint",
+    "yesterday_vol": "119",
+    "today_vol": "100",
+    "custom_avg": "8.1"
+  },
+  {
+    "name": "Venka Prime Blueprint",
+    "yesterday_vol": "20",
+    "today_vol": "31",
+    "custom_avg": "5.7"
+  },
+  {
+    "name": "Euphona Prime Blueprint",
+    "yesterday_vol": "1",
+    "today_vol": "4",
+    "custom_avg": "4.4"
+  },
+  {
+    "name": "Dual Kamas Prime Handle",
+    "yesterday_vol": "13",
+    "today_vol": "16",
+    "custom_avg": "8.4"
+  },
+  {
+    "name": "Kavasa Prime Buckle",
+    "yesterday_vol": "4",
+    "today_vol": "6",
+    "custom_avg": "22.1"
+  },
+  {
+    "name": "Kavasa Prime Band",
+    "yesterday_vol": "3",
+    "today_vol": "3",
+    "custom_avg": "6.8"
+  },
+  {
+    "name": "Akvasto Prime Set",
+    "yesterday_vol": "13",
+    "today_vol": "3",
+    "custom_avg": "59.6"
+  },
+  {
+    "name": "Akbronco Prime Link",
+    "yesterday_vol": "18",
+    "today_vol": "13",
+    "custom_avg": "2.4"
+  },
+  {
+    "name": "Dakra Prime Handle",
+    "yesterday_vol": "11",
+    "today_vol": "6",
+    "custom_avg": "6.6"
+  },
+  {
+    "name": "Soma Prime Barrel",
+    "yesterday_vol": "32",
+    "today_vol": "37",
+    "custom_avg": "9.8"
+  },
+  {
+    "name": "Mag Prime Neuroptics Blueprint",
+    "yesterday_vol": "31",
+    "today_vol": "31",
+    "custom_avg": "9"
+  },
+  {
+    "name": "Ash Prime Chassis Blueprint",
+    "yesterday_vol": "82",
+    "today_vol": "73",
+    "custom_avg": "8.6"
+  },
+  {
+    "name": "Tigris Prime Blueprint",
+    "yesterday_vol": "27",
+    "today_vol": "35",
+    "custom_avg": "14.7"
+  },
+  {
+    "name": "Ash Prime Systems Blueprint",
+    "yesterday_vol": "111",
+    "today_vol": "70",
+    "custom_avg": "9.7"
+  },
+  {
+    "name": "Mag Prime Systems Blueprint",
+    "yesterday_vol": "28",
+    "today_vol": "31",
+    "custom_avg": "12.1"
+  },
+  {
+    "name": "Vectis Prime Receiver",
+    "yesterday_vol": "41",
+    "today_vol": "20",
+    "custom_avg": "33.3"
+  },
+  {
+    "name": "Bo Prime Ornament",
+    "yesterday_vol": "114",
+    "today_vol": "91",
+    "custom_avg": "15.5"
+  },
+  {
+    "name": "Ankyros Prime Set",
+    "yesterday_vol": "12",
+    "today_vol": "7",
+    "custom_avg": "68.9"
+  },
+  {
+    "name": "Wyrm Prime Carapace",
+    "yesterday_vol": "68",
+    "today_vol": "39",
+    "custom_avg": "9.8"
+  },
+  {
+    "name": "Paris Prime Set",
+    "yesterday_vol": "33",
+    "today_vol": "20",
+    "custom_avg": "8.1"
+  },
+  {
+    "name": "Trinity Prime Set",
+    "yesterday_vol": "54",
+    "today_vol": "32",
+    "custom_avg": "69.6"
+  },
+  {
+    "name": "Sybaris Prime Blueprint",
+    "yesterday_vol": "16",
+    "today_vol": "20",
+    "custom_avg": "5.3"
+  },
+  {
+    "name": "Ballistica Prime Set",
+    "yesterday_vol": "22",
+    "today_vol": "14",
+    "custom_avg": "67.5"
+  },
+  {
+    "name": "Wukong Prime Blueprint",
+    "yesterday_vol": "78",
+    "today_vol": "44",
+    "custom_avg": "37.7"
+  },
+  {
+    "name": "Wukong Prime Systems Blueprint",
+    "yesterday_vol": "103",
+    "today_vol": "75",
+    "custom_avg": "14.2"
+  },
+  {
+    "name": "Zhuge Prime String",
+    "yesterday_vol": "15",
+    "today_vol": "16",
+    "custom_avg": "7.7"
+  },
+  {
+    "name": "Destreza Prime Blade",
+    "yesterday_vol": "19",
+    "today_vol": "19",
+    "custom_avg": "37.1"
+  },
+  {
+    "name": "Aklex Prime Link",
+    "yesterday_vol": "15",
+    "today_vol": "11",
+    "custom_avg": "39.7"
+  },
+  {
+    "name": "Banshee Prime Systems Blueprint",
+    "yesterday_vol": "41",
+    "today_vol": "33",
+    "custom_avg": "26.8"
+  },
+  {
+    "name": "Hydroid Prime Blueprint",
+    "yesterday_vol": "89",
+    "today_vol": "66",
+    "custom_avg": "10.6"
+  },
+  {
+    "name": "Equinox Prime Systems Blueprint",
+    "yesterday_vol": "44",
+    "today_vol": "30",
+    "custom_avg": "33.4"
+  },
+  {
+    "name": "Paris Prime Blueprint",
+    "yesterday_vol": "6",
+    "today_vol": "5",
+    "custom_avg": "2.3"
+  },
+  {
+    "name": "Akvasto Prime Blueprint",
+    "yesterday_vol": "14",
+    "today_vol": "17",
+    "custom_avg": "33.5"
+  },
+  {
+    "name": "Akvasto Prime Link",
+    "yesterday_vol": "12",
+    "today_vol": "11",
+    "custom_avg": "13.6"
+  },
+  {
+    "name": "Venka Prime Set",
+    "yesterday_vol": "19",
+    "today_vol": "22",
+    "custom_avg": "54.8"
+  },
+  {
+    "name": "Orthos Prime Blueprint",
+    "yesterday_vol": "13",
+    "today_vol": "8",
+    "custom_avg": "2.4"
+  },
+  {
+    "name": "Paris Prime Grip",
+    "yesterday_vol": "19",
+    "today_vol": "14",
+    "custom_avg": "2.4"
+  },
+  {
+    "name": "Mesa Prime Blueprint",
+    "yesterday_vol": "114",
+    "today_vol": "69",
+    "custom_avg": "5.8"
+  },
+  {
+    "name": "Equinox Prime Neuroptics Blueprint",
+    "yesterday_vol": "32",
+    "today_vol": "27",
+    "custom_avg": "5.8"
+  },
+  {
+    "name": "Redeemer Prime Blueprint",
+    "yesterday_vol": "29",
+    "today_vol": "17",
+    "custom_avg": "4.6"
+  },
+  {
+    "name": "Tipedo Prime Blueprint",
+    "yesterday_vol": "6",
+    "today_vol": "2",
+    "custom_avg": "4.1"
+  },
+  {
+    "name": "Bronco Prime Receiver",
+    "yesterday_vol": "6",
+    "today_vol": "11",
+    "custom_avg": "2.2"
+  },
+  {
+    "name": "Burston Prime Blueprint",
+    "yesterday_vol": "21",
+    "today_vol": "32",
+    "custom_avg": "5.9"
+  },
+  {
+    "name": "Burston Prime Stock",
+    "yesterday_vol": "38",
+    "today_vol": "35",
+    "custom_avg": "3.5"
+  },
+  {
+    "name": "Hikou Prime Blueprint",
+    "yesterday_vol": "7",
+    "today_vol": "6",
+    "custom_avg": "4.9"
+  },
+  {
+    "name": "Volt Prime Blueprint",
+    "yesterday_vol": "109",
+    "today_vol": "86",
+    "custom_avg": "8.4"
+  },
+  {
+    "name": "Ember Prime Chassis Blueprint",
+    "yesterday_vol": "66",
+    "today_vol": "61",
+    "custom_avg": "6.5"
+  },
+  {
+    "name": "Rhino Prime Chassis Blueprint",
+    "yesterday_vol": "40",
+    "today_vol": "29",
+    "custom_avg": "11.3"
+  },
+  {
+    "name": "Akbronco Prime Set",
+    "yesterday_vol": "17",
+    "today_vol": "11",
+    "custom_avg": "8.5"
+  },
+  {
+    "name": "Carrier Prime Set",
+    "yesterday_vol": "26",
+    "today_vol": "30",
+    "custom_avg": "77"
+  },
+  {
+    "name": "Dakra Prime Set",
+    "yesterday_vol": "17",
+    "today_vol": "9",
+    "custom_avg": "26.1"
+  },
+  {
+    "name": "Nekros Prime Chassis Blueprint",
+    "yesterday_vol": "136",
+    "today_vol": "104",
+    "custom_avg": "9.4"
+  },
+  {
+    "name": "Atlas Prime Chassis Blueprint",
+    "yesterday_vol": "41",
+    "today_vol": "30",
+    "custom_avg": "6.4"
+  },
+  {
+    "name": "Dethcube Prime Carapace",
+    "yesterday_vol": "41",
+    "today_vol": "17",
+    "custom_avg": "4.7"
+  },
+  {
+    "name": "Dethcube Prime Cerebrum",
+    "yesterday_vol": "60",
+    "today_vol": "34",
+    "custom_avg": "31.3"
+  },
+  {
+    "name": "Tekko Prime Gauntlet",
+    "yesterday_vol": "16",
+    "today_vol": "16",
+    "custom_avg": "6.9"
+  },
+  {
+    "name": "Dethcube Prime Blueprint",
+    "yesterday_vol": "58",
+    "today_vol": "45",
+    "custom_avg": "19.4"
+  },
+  {
+    "name": "Dethcube Prime Set",
+    "yesterday_vol": "20",
+    "today_vol": "51",
+    "custom_avg": "73.7"
+  },
+  {
+    "name": "Limbo Prime Systems Blueprint",
+    "yesterday_vol": "22",
+    "today_vol": "22",
+    "custom_avg": "4.3"
+  },
+  {
+    "name": "Ivara Prime Neuroptics Blueprint",
+    "yesterday_vol": "59",
+    "today_vol": "53",
+    "custom_avg": "5.7"
+  },
+  {
+    "name": "Ivara Prime Chassis Blueprint",
+    "yesterday_vol": "96",
+    "today_vol": "60",
+    "custom_avg": "26.2"
+  },
+  {
+    "name": "Ivara Prime Systems Blueprint",
+    "yesterday_vol": "88",
+    "today_vol": "72",
+    "custom_avg": "8.4"
+  },
+  {
+    "name": "Baza Prime Blueprint",
+    "yesterday_vol": "42",
+    "today_vol": "19",
+    "custom_avg": "9.3"
+  },
+  {
+    "name": "Baza Prime Set",
+    "yesterday_vol": "29",
+    "today_vol": "18",
+    "custom_avg": "65.5"
+  },
+  {
+    "name": "Aksomati Prime Set",
+    "yesterday_vol": "32",
+    "today_vol": "14",
+    "custom_avg": "82.3"
+  },
+  {
+    "name": "Aksomati Prime Link",
+    "yesterday_vol": "25",
+    "today_vol": "28",
+    "custom_avg": "18"
+  },
+  {
+    "name": "Baza Prime Stock",
+    "yesterday_vol": "52",
+    "today_vol": "42",
+    "custom_avg": "30.3"
+  },
+  {
+    "name": "Aksomati Prime Receiver",
+    "yesterday_vol": "57",
+    "today_vol": "47",
+    "custom_avg": "8.4"
+  },
+  {
+    "name": "Gram Prime Handle",
+    "yesterday_vol": "11",
+    "today_vol": "13",
+    "custom_avg": "18.1"
+  },
+  {
+    "name": "Helios Prime Blueprint",
+    "yesterday_vol": "20",
+    "today_vol": "6",
+    "custom_avg": "4.7"
+  },
+  {
+    "name": "Vasto Prime Receiver",
+    "yesterday_vol": "32",
+    "today_vol": "22",
+    "custom_avg": "7"
+  },
+  {
+    "name": "Tipedo Prime Ornament",
+    "yesterday_vol": "28",
+    "today_vol": "14",
+    "custom_avg": "11.9"
+  },
+  {
+    "name": "Stradavar Prime Receiver",
+    "yesterday_vol": "13",
+    "today_vol": "7",
+    "custom_avg": "5.1"
+  },
+  {
+    "name": "Wyrm Prime Cerebrum",
+    "yesterday_vol": "47",
+    "today_vol": "29",
+    "custom_avg": "12.6"
+  },
+  {
+    "name": "Lex Prime Blueprint",
+    "yesterday_vol": "3",
+    "today_vol": "4",
+    "custom_avg": "2.3"
+  },
+  {
+    "name": "Hikou Prime Set",
+    "yesterday_vol": "9",
+    "today_vol": "8",
+    "custom_avg": "51.6"
+  },
+  {
+    "name": "Orthos Prime Handle",
+    "yesterday_vol": "5",
+    "today_vol": "7",
+    "custom_avg": "2.7"
+  },
+  {
+    "name": "Reaper Prime Blade",
+    "yesterday_vol": "23",
+    "today_vol": "23",
+    "custom_avg": "7"
+  },
+  {
+    "name": "Scindo Prime Blueprint",
+    "yesterday_vol": "5",
+    "today_vol": "4",
+    "custom_avg": "4.6"
+  },
+  {
+    "name": "Ember Prime Systems Blueprint",
+    "yesterday_vol": "59",
+    "today_vol": "70",
+    "custom_avg": "7.1"
+  },
+  {
+    "name": "Frost Prime Chassis Blueprint",
+    "yesterday_vol": "63",
+    "today_vol": "65",
+    "custom_avg": "11"
+  },
+  {
+    "name": "Rhino Prime Systems Blueprint",
+    "yesterday_vol": "22",
+    "today_vol": "23",
+    "custom_avg": "8.4"
+  },
+  {
+    "name": "Ember Prime Blueprint",
+    "yesterday_vol": "84",
+    "today_vol": "81",
+    "custom_avg": "18.6"
+  },
+  {
+    "name": "Ash Prime Blueprint",
+    "yesterday_vol": "87",
+    "today_vol": "76",
+    "custom_avg": "7.1"
+  },
+  {
+    "name": "Kavasa Prime Kubrow Collar Blueprint",
+    "yesterday_vol": "1",
+    "today_vol": "0",
+    "custom_avg": "7"
+  },
+  {
+    "name": "Reaper Prime Set",
+    "yesterday_vol": "25",
+    "today_vol": "32",
+    "custom_avg": "29.4"
+  },
+  {
+    "name": "Vauban Prime Blueprint",
+    "yesterday_vol": "72",
+    "today_vol": "70",
+    "custom_avg": "19.4"
+  },
+  {
+    "name": "Carrier Prime Carapace",
+    "yesterday_vol": "61",
+    "today_vol": "32",
+    "custom_avg": "9.6"
+  },
+  {
+    "name": "Ankyros Prime Blueprint",
+    "yesterday_vol": "8",
+    "today_vol": "8",
+    "custom_avg": "6.6"
+  },
+  {
+    "name": "Boar Prime Barrel",
+    "yesterday_vol": "21",
+    "today_vol": "11",
+    "custom_avg": "11"
+  },
+  {
+    "name": "Oberon Prime Chassis Blueprint",
+    "yesterday_vol": "67",
+    "today_vol": "71",
+    "custom_avg": "9.8"
+  },
+  {
+    "name": "Silva & Aegis Prime Blade",
+    "yesterday_vol": "21",
+    "today_vol": "21",
+    "custom_avg": "5.2"
+  },
+  {
+    "name": "Boltor Prime Blueprint",
+    "yesterday_vol": "23",
+    "today_vol": "11",
+    "custom_avg": "25"
+  },
+  {
+    "name": "Sybaris Prime Set",
+    "yesterday_vol": "29",
+    "today_vol": "20",
+    "custom_avg": "49.4"
+  },
+  {
+    "name": "Oberon Prime Systems Blueprint",
+    "yesterday_vol": "91",
+    "today_vol": "80",
+    "custom_avg": "11"
+  },
+  {
+    "name": "Baza Prime Receiver",
+    "yesterday_vol": "28",
+    "today_vol": "23",
+    "custom_avg": "5.9"
+  },
+  {
+    "name": "Redeemer Prime Set",
+    "yesterday_vol": "41",
+    "today_vol": "35",
+    "custom_avg": "39.8"
+  },
+  {
+    "name": "Galatine Prime Blueprint",
+    "yesterday_vol": "45",
+    "today_vol": "29",
+    "custom_avg": "20.9"
+  },
+  {
+    "name": "Orthos Prime Set",
+    "yesterday_vol": "59",
+    "today_vol": "57",
+    "custom_avg": "8.7"
+  },
+  {
+    "name": "Volt Prime Set",
+    "yesterday_vol": "179",
+    "today_vol": "97",
+    "custom_avg": "48.7"
+  },
+  {
+    "name": "Banshee Prime Neuroptics Blueprint",
+    "yesterday_vol": "21",
+    "today_vol": "7",
+    "custom_avg": "4"
+  },
+  {
+    "name": "Reaper Prime Handle",
+    "yesterday_vol": "27",
+    "today_vol": "24",
+    "custom_avg": "9.1"
+  },
+  {
+    "name": "Sicarus Prime Barrel",
+    "yesterday_vol": "35",
+    "today_vol": "23",
+    "custom_avg": "8.5"
+  },
+  {
+    "name": "Braton Prime Barrel",
+    "yesterday_vol": "17",
+    "today_vol": "18",
+    "custom_avg": "3.5"
+  },
+  {
+    "name": "Tigris Prime Set",
+    "yesterday_vol": "26",
+    "today_vol": "22",
+    "custom_avg": "38.6"
+  },
+  {
+    "name": "Paris Prime String",
+    "yesterday_vol": "5",
+    "today_vol": "5",
+    "custom_avg": "1.5"
+  },
+  {
+    "name": "Sicarus Prime Receiver",
+    "yesterday_vol": "48",
+    "today_vol": "47",
+    "custom_avg": "22"
+  },
+  {
+    "name": "Glaive Prime Blade",
+    "yesterday_vol": "64",
+    "today_vol": "43",
+    "custom_avg": "14.2"
+  },
+  {
+    "name": "Fragor Prime Set",
+    "yesterday_vol": "10",
+    "today_vol": "6",
+    "custom_avg": "39.3"
+  },
+  {
+    "name": "Akstiletto Prime Blueprint",
+    "yesterday_vol": "12",
+    "today_vol": "7",
+    "custom_avg": "15.7"
+  },
+  {
+    "name": "Akstiletto Prime Barrel",
+    "yesterday_vol": "23",
+    "today_vol": "15",
+    "custom_avg": "13.9"
+  },
+  {
+    "name": "Akstiletto Prime Receiver",
+    "yesterday_vol": "30",
+    "today_vol": "18",
+    "custom_avg": "21.2"
+  },
+  {
+    "name": "Akbolto Prime Receiver",
+    "yesterday_vol": "28",
+    "today_vol": "26",
+    "custom_avg": "26"
+  },
+  {
+    "name": "Paris Prime Upper Limb",
+    "yesterday_vol": "10",
+    "today_vol": "10",
+    "custom_avg": "2"
+  },
+  {
+    "name": "Akbolto Prime Blueprint",
+    "yesterday_vol": "5",
+    "today_vol": "4",
+    "custom_avg": "3.5"
+  },
+  {
+    "name": "Silva & Aegis Prime Blueprint",
+    "yesterday_vol": "20",
+    "today_vol": "16",
+    "custom_avg": "6.7"
+  },
+  {
+    "name": "Scindo Prime Blade",
+    "yesterday_vol": "16",
+    "today_vol": "15",
+    "custom_avg": "15.7"
+  },
+  {
+    "name": "Euphona Prime Barrel",
+    "yesterday_vol": "8",
+    "today_vol": "5",
+    "custom_avg": "5.7"
+  },
+  {
+    "name": "Mag Prime Blueprint",
+    "yesterday_vol": "31",
+    "today_vol": "28",
+    "custom_avg": "29.4"
+  },
+  {
+    "name": "Frost Prime Systems Blueprint",
+    "yesterday_vol": "104",
+    "today_vol": "95",
+    "custom_avg": "10"
+  },
+  {
+    "name": "Helios Prime Cerebrum",
+    "yesterday_vol": "38",
+    "today_vol": "21",
+    "custom_avg": "37.6"
+  },
+  {
+    "name": "Paris Prime Lower Limb",
+    "yesterday_vol": "9",
+    "today_vol": "9",
+    "custom_avg": "2.1"
+  },
+  {
+    "name": "Equinox Prime Chassis Blueprint",
+    "yesterday_vol": "16",
+    "today_vol": "16",
+    "custom_avg": "4.2"
+  },
+  {
+    "name": "Stradavar Prime Blueprint",
+    "yesterday_vol": "17",
+    "today_vol": "9",
+    "custom_avg": "9.8"
+  },
+  {
+    "name": "Titania Prime Neuroptics Blueprint",
+    "yesterday_vol": "107",
+    "today_vol": "84",
+    "custom_avg": "9"
+  },
+  {
+    "name": "Pangolin Prime Blade",
+    "yesterday_vol": "12",
+    "today_vol": "10",
+    "custom_avg": "6.4"
+  },
+  {
+    "name": "Pangolin Prime Set",
+    "yesterday_vol": "17",
+    "today_vol": "10",
+    "custom_avg": "28.5"
+  },
+  {
+    "name": "Titania Prime Blueprint",
+    "yesterday_vol": "95",
+    "today_vol": "91",
+    "custom_avg": "9.8"
+  },
+  {
+    "name": "Titania Prime Set",
+    "yesterday_vol": "156",
+    "today_vol": "129",
+    "custom_avg": "77.9"
+  },
+  {
+    "name": "Banshee Prime Blueprint",
+    "yesterday_vol": "16",
+    "today_vol": "19",
+    "custom_avg": "5.5"
+  },
+  {
+    "name": "Valkyr Prime Chassis Blueprint",
+    "yesterday_vol": "143",
+    "today_vol": "123",
+    "custom_avg": "25.6"
+  },
+  {
+    "name": "Cernos Prime Blueprint",
+    "yesterday_vol": "12",
+    "today_vol": "8",
+    "custom_avg": "3.7"
+  },
+  {
+    "name": "Cernos Prime Lower Limb",
+    "yesterday_vol": "30",
+    "today_vol": "35",
+    "custom_avg": "18.1"
+  },
+  {
+    "name": "Cernos Prime Upper Limb",
+    "yesterday_vol": "24",
+    "today_vol": "21",
+    "custom_avg": "7.1"
+  },
+  {
+    "name": "Cernos Prime Grip",
+    "yesterday_vol": "20",
+    "today_vol": "15",
+    "custom_avg": "4.8"
+  },
+  {
+    "name": "Wyrm Prime Set",
+    "yesterday_vol": "70",
+    "today_vol": "43",
+    "custom_avg": "67.3"
+  },
+  {
+    "name": "Burston Prime Barrel",
+    "yesterday_vol": "86",
+    "today_vol": "72",
+    "custom_avg": "4.1"
+  },
+  {
+    "name": "Volt Prime Systems Blueprint",
+    "yesterday_vol": "124",
+    "today_vol": "110",
+    "custom_avg": "7.1"
+  },
+  {
+    "name": "Dakra Prime Blade",
+    "yesterday_vol": "15",
+    "today_vol": "12",
+    "custom_avg": "11.4"
+  },
+  {
+    "name": "Glaive Prime Disc",
+    "yesterday_vol": "39",
+    "today_vol": "30",
+    "custom_avg": "6.9"
+  },
+  {
+    "name": "Hydroid Prime Systems Blueprint",
+    "yesterday_vol": "128",
+    "today_vol": "109",
+    "custom_avg": "29"
+  },
+  {
+    "name": "Glaive Prime Set",
+    "yesterday_vol": "32",
+    "today_vol": "52",
+    "custom_avg": "65"
+  },
+  {
+    "name": "Scindo Prime Set",
+    "yesterday_vol": "9",
+    "today_vol": "4",
+    "custom_avg": "32.8"
+  },
+  {
+    "name": "Latron Prime Receiver",
+    "yesterday_vol": "39",
+    "today_vol": "26",
+    "custom_avg": "13.9"
+  },
+  {
+    "name": "Latron Prime Stock",
+    "yesterday_vol": "40",
+    "today_vol": "61",
+    "custom_avg": "10.7"
+  },
+  {
+    "name": "Lex Prime Barrel",
+    "yesterday_vol": "17",
+    "today_vol": "30",
+    "custom_avg": "2.6"
+  },
+  {
+    "name": "Sybaris Prime Receiver",
+    "yesterday_vol": "31",
+    "today_vol": "17",
+    "custom_avg": "6.2"
+  },
+  {
+    "name": "Akstiletto Prime Set",
+    "yesterday_vol": "7",
+    "today_vol": "5",
+    "custom_avg": "132.9"
+  },
+  {
+    "name": "Inaros Prime Set",
+    "yesterday_vol": "79",
+    "today_vol": "41",
+    "custom_avg": "59.7"
+  },
+  {
+    "name": "Inaros Prime Chassis Blueprint",
+    "yesterday_vol": "80",
+    "today_vol": "70",
+    "custom_avg": "5.1"
+  },
+  {
+    "name": "Inaros Prime Neuroptics Blueprint",
+    "yesterday_vol": "112",
+    "today_vol": "81",
+    "custom_avg": "29.9"
+  },
+  {
+    "name": "Inaros Prime Blueprint",
+    "yesterday_vol": "88",
+    "today_vol": "73",
+    "custom_avg": "8.7"
+  },
+  {
+    "name": "Inaros Prime Systems Blueprint",
+    "yesterday_vol": "55",
+    "today_vol": "39",
+    "custom_avg": "7.3"
+  },
+  {
+    "name": "Panthera Prime Stock",
+    "yesterday_vol": "38",
+    "today_vol": "18",
+    "custom_avg": "7"
+  },
+  {
+    "name": "Karyst Prime Handle",
+    "yesterday_vol": "24",
+    "today_vol": "12",
+    "custom_avg": "4.2"
+  },
+  {
+    "name": "Karyst Prime Set",
+    "yesterday_vol": "20",
+    "today_vol": "23",
+    "custom_avg": "28.8"
+  },
+  {
+    "name": "Panthera Prime Set",
+    "yesterday_vol": "35",
+    "today_vol": "24",
+    "custom_avg": "59.5"
+  },
+  {
+    "name": "Panthera Prime Barrel",
+    "yesterday_vol": "34",
+    "today_vol": "35",
+    "custom_avg": "21.5"
+  },
+  {
+    "name": "Panthera Prime Receiver",
+    "yesterday_vol": "32",
+    "today_vol": "24",
+    "custom_avg": "13.4"
+  },
+  {
+    "name": "Panthera Prime Blueprint",
+    "yesterday_vol": "30",
+    "today_vol": "25",
+    "custom_avg": "5.7"
+  },
+  {
+    "name": "Karyst Prime Blueprint",
+    "yesterday_vol": "21",
+    "today_vol": "23",
+    "custom_avg": "5"
+  },
+  {
+    "name": "Karyst Prime Blade",
+    "yesterday_vol": "46",
+    "today_vol": "34",
+    "custom_avg": "14.7"
+  },
+  {
+    "name": "Braton Prime Stock",
+    "yesterday_vol": "7",
+    "today_vol": "19",
+    "custom_avg": "1.6"
+  },
+  {
+    "name": "Dakra Prime Blueprint",
+    "yesterday_vol": "9",
+    "today_vol": "1",
+    "custom_avg": "6.9"
+  },
+  {
+    "name": "Glaive Prime Blueprint",
+    "yesterday_vol": "55",
+    "today_vol": "51",
+    "custom_avg": "16.5"
+  },
+  {
+    "name": "Akstiletto Prime Link",
+    "yesterday_vol": "10",
+    "today_vol": "6",
+    "custom_avg": "8.8"
+  },
+  {
+    "name": "Oberon Prime Blueprint",
+    "yesterday_vol": "88",
+    "today_vol": "85",
+    "custom_avg": "9.6"
+  },
+  {
+    "name": "Cernos Prime String",
+    "yesterday_vol": "18",
+    "today_vol": "16",
+    "custom_avg": "6.1"
+  },
+  {
+    "name": "Cernos Prime Set",
+    "yesterday_vol": "34",
+    "today_vol": "22",
+    "custom_avg": "46.3"
+  },
+  {
+    "name": "Valkyr Prime Blueprint",
+    "yesterday_vol": "93",
+    "today_vol": "51",
+    "custom_avg": "4.9"
+  },
+  {
+    "name": "Valkyr Prime Set",
+    "yesterday_vol": "240",
+    "today_vol": "126",
+    "custom_avg": "59.5"
+  },
+  {
+    "name": "Venka Prime Blades",
+    "yesterday_vol": "42",
+    "today_vol": "41",
+    "custom_avg": "5.8"
+  },
+  {
+    "name": "Odonata Prime Blueprint",
+    "yesterday_vol": "31",
+    "today_vol": "20",
+    "custom_avg": "5.5"
+  },
+  {
+    "name": "Saryn Prime Neuroptics Blueprint",
+    "yesterday_vol": "114",
+    "today_vol": "110",
+    "custom_avg": "8.4"
+  },
+  {
+    "name": "Nami Skyla Prime Blade",
+    "yesterday_vol": "64",
+    "today_vol": "49",
+    "custom_avg": "26.7"
+  },
+  {
+    "name": "Kronen Prime Handle",
+    "yesterday_vol": "30",
+    "today_vol": "13",
+    "custom_avg": "8.6"
+  },
+  {
+    "name": "Boar Prime Receiver",
+    "yesterday_vol": "23",
+    "today_vol": "16",
+    "custom_avg": "9.8"
+  },
+  {
+    "name": "Boar Prime Stock",
+    "yesterday_vol": "22",
+    "today_vol": "14",
+    "custom_avg": "38.3"
+  },
+  {
+    "name": "Kogake Prime Boot",
+    "yesterday_vol": "24",
+    "today_vol": "9",
+    "custom_avg": "6.2"
+  },
+  {
+    "name": "Akbolto Prime Set",
+    "yesterday_vol": "14",
+    "today_vol": "9",
+    "custom_avg": "87.9"
+  },
+  {
+    "name": "Akbolto Prime Link",
+    "yesterday_vol": "7",
+    "today_vol": "4",
+    "custom_avg": "4.7"
+  },
+  {
+    "name": "Akbolto Prime Barrel",
+    "yesterday_vol": "14",
+    "today_vol": "11",
+    "custom_avg": "6.9"
+  },
+  {
+    "name": "Limbo Prime Set",
+    "yesterday_vol": "58",
+    "today_vol": "38",
+    "custom_avg": "91.8"
+  },
+  {
+    "name": "Sicarus Prime Blueprint",
+    "yesterday_vol": "39",
+    "today_vol": "30",
+    "custom_avg": "7.8"
+  },
+  {
+    "name": "Fang Prime Blueprint",
+    "yesterday_vol": "1",
+    "today_vol": "1",
+    "custom_avg": "1.3"
+  },
+  {
+    "name": "Vauban Prime Chassis Blueprint",
+    "yesterday_vol": "130",
+    "today_vol": "117",
+    "custom_avg": "25.5"
+  },
+  {
+    "name": "Latron Prime Blueprint",
+    "yesterday_vol": "50",
+    "today_vol": "49",
+    "custom_avg": "10.3"
+  },
+  {
+    "name": "Braton Prime Blueprint",
+    "yesterday_vol": "4",
+    "today_vol": "8",
+    "custom_avg": "1.6"
+  },
+  {
+    "name": "Nikana Prime Hilt",
+    "yesterday_vol": "52",
+    "today_vol": "54",
+    "custom_avg": "26.5"
+  },
+  {
+    "name": "Nikana Prime Set",
+    "yesterday_vol": "42",
+    "today_vol": "37",
+    "custom_avg": "47.6"
+  },
+  {
+    "name": "Valkyr Prime Systems Blueprint",
+    "yesterday_vol": "133",
+    "today_vol": "122",
+    "custom_avg": "11.1"
+  },
+  {
+    "name": "Venka Prime Gauntlet",
+    "yesterday_vol": "64",
+    "today_vol": "46",
+    "custom_avg": "18.3"
+  },
+  {
+    "name": "Akbronco Prime Blueprint",
+    "yesterday_vol": "5",
+    "today_vol": "4",
+    "custom_avg": "2.5"
+  },
+  {
+    "name": "Euphona Prime Receiver",
+    "yesterday_vol": "18",
+    "today_vol": "14",
+    "custom_avg": "39.1"
+  },
+  {
+    "name": "Carrier Prime Systems",
+    "yesterday_vol": "40",
+    "today_vol": "31",
+    "custom_avg": "7.3"
+  },
+  {
+    "name": "Spira Prime Blueprint",
+    "yesterday_vol": "11",
+    "today_vol": "20",
+    "custom_avg": "4.4"
+  },
+  {
+    "name": "Spira Prime Set",
+    "yesterday_vol": "32",
+    "today_vol": "14",
+    "custom_avg": "86.1"
+  },
+  {
+    "name": "Nami Skyla Prime Set",
+    "yesterday_vol": "15",
+    "today_vol": "16",
+    "custom_avg": "96.2"
+  },
+  {
+    "name": "Kronen Prime Set",
+    "yesterday_vol": "15",
+    "today_vol": "5",
+    "custom_avg": "95.8"
+  },
+  {
+    "name": "Helios Prime Systems",
+    "yesterday_vol": "29",
+    "today_vol": "16",
+    "custom_avg": "8.7"
+  },
+  {
+    "name": "Tiberon Prime Set",
+    "yesterday_vol": "11",
+    "today_vol": "12",
+    "custom_avg": "48.8"
+  },
+  {
+    "name": "Mirage Prime Systems Blueprint",
+    "yesterday_vol": "86",
+    "today_vol": "57",
+    "custom_avg": "15"
+  },
+  {
+    "name": "Mirage Prime Blueprint",
+    "yesterday_vol": "73",
+    "today_vol": "49",
+    "custom_avg": "37.6"
+  },
+  {
+    "name": "Fragor Prime Head",
+    "yesterday_vol": "14",
+    "today_vol": "12",
+    "custom_avg": "8.1"
+  },
+  {
+    "name": "Tipedo Prime Set",
+    "yesterday_vol": "16",
+    "today_vol": "12",
+    "custom_avg": "68.7"
+  },
+  {
+    "name": "Vectis Prime Blueprint",
+    "yesterday_vol": "32",
+    "today_vol": "20",
+    "custom_avg": "6.6"
+  },
+  {
+    "name": "Atlas Prime Set",
+    "yesterday_vol": "45",
+    "today_vol": "53",
+    "custom_avg": "67.5"
+  },
+  {
+    "name": "Tekko Prime Blade",
+    "yesterday_vol": "35",
+    "today_vol": "17",
+    "custom_avg": "25.4"
+  },
+  {
+    "name": "Tekko Prime Set",
+    "yesterday_vol": "18",
+    "today_vol": "15",
+    "custom_avg": "80"
+  },
+  {
+    "name": "Tekko Prime Blueprint",
+    "yesterday_vol": "10",
+    "today_vol": "3",
+    "custom_avg": "4.2"
+  },
+  {
+    "name": "Nezha Prime Blueprint",
+    "yesterday_vol": "28",
+    "today_vol": "29",
+    "custom_avg": "5"
+  },
+  {
+    "name": "Guandao Prime Blueprint",
+    "yesterday_vol": "8",
+    "today_vol": "13",
+    "custom_avg": "4.3"
+  },
+  {
+    "name": "Mirage Prime Chassis Blueprint",
+    "yesterday_vol": "74",
+    "today_vol": "45",
+    "custom_avg": "9.4"
+  },
+  {
+    "name": "Kogake Prime Blueprint",
+    "yesterday_vol": "3",
+    "today_vol": "4",
+    "custom_avg": "5.8"
+  },
+  {
+    "name": "Sybaris Prime Stock",
+    "yesterday_vol": "23",
+    "today_vol": "22",
+    "custom_avg": "8"
+  },
+  {
+    "name": "Chroma Prime Set",
+    "yesterday_vol": "118",
+    "today_vol": "81",
+    "custom_avg": "80"
+  },
+  {
+    "name": "Rubico Prime Set",
+    "yesterday_vol": "29",
+    "today_vol": "22",
+    "custom_avg": "48.8"
+  },
+  {
+    "name": "Gram Prime Blueprint",
+    "yesterday_vol": "6",
+    "today_vol": "5",
+    "custom_avg": "6.4"
+  },
+  {
+    "name": "Spira Prime Pouch",
+    "yesterday_vol": "53",
+    "today_vol": "47",
+    "custom_avg": "27.5"
+  },
+  {
+    "name": "Banshee Prime Set",
+    "yesterday_vol": "49",
+    "today_vol": "49",
+    "custom_avg": "69.1"
+  },
+  {
+    "name": "Vauban Prime Set",
+    "yesterday_vol": "259",
+    "today_vol": "167",
+    "custom_avg": "145.9"
+  },
+  {
+    "name": "Fragor Prime Blueprint",
+    "yesterday_vol": "11",
+    "today_vol": "3",
+    "custom_avg": "9.9"
+  },
+  {
+    "name": "Fragor Prime Handle",
+    "yesterday_vol": "10",
+    "today_vol": "8",
+    "custom_avg": "9.9"
+  },
+  {
+    "name": "Vauban Prime Systems Blueprint",
+    "yesterday_vol": "118",
+    "today_vol": "90",
+    "custom_avg": "49"
+  },
+  {
+    "name": "Carrier Prime Cerebrum",
+    "yesterday_vol": "53",
+    "today_vol": "38",
+    "custom_avg": "32.2"
+  },
+  {
+    "name": "Burston Prime Set",
+    "yesterday_vol": "172",
+    "today_vol": "172",
+    "custom_avg": "14.6"
+  },
+  {
+    "name": "Loki Prime Set",
+    "yesterday_vol": "56",
+    "today_vol": "40",
+    "custom_avg": "69.5"
+  },
+  {
+    "name": "Nova Prime Set",
+    "yesterday_vol": "107",
+    "today_vol": "92",
+    "custom_avg": "76.8"
+  },
+  {
+    "name": "Nyx Prime Set",
+    "yesterday_vol": "59",
+    "today_vol": "25",
+    "custom_avg": "88"
+  },
+  {
+    "name": "Soma Prime Set",
+    "yesterday_vol": "62",
+    "today_vol": "43",
+    "custom_avg": "61.9"
+  },
+  {
+    "name": "Saryn Prime Chassis Blueprint",
+    "yesterday_vol": "133",
+    "today_vol": "134",
+    "custom_avg": "27.9"
+  },
+  {
+    "name": "Tiberon Prime Receiver",
+    "yesterday_vol": "12",
+    "today_vol": "6",
+    "custom_avg": "6.4"
+  },
+  {
+    "name": "Boltor Prime Barrel",
+    "yesterday_vol": "21",
+    "today_vol": "8",
+    "custom_avg": "11.5"
+  },
+  {
+    "name": "Braton Prime Receiver",
+    "yesterday_vol": "26",
+    "today_vol": "26",
+    "custom_avg": "3.1"
+  },
+  {
+    "name": "Saryn Prime Systems Blueprint",
+    "yesterday_vol": "96",
+    "today_vol": "64",
+    "custom_avg": "5.9"
+  },
+  {
+    "name": "Nikana Prime Blueprint",
+    "yesterday_vol": "32",
+    "today_vol": "21",
+    "custom_avg": "4.2"
+  },
+  {
+    "name": "Nikana Prime Blade",
+    "yesterday_vol": "63",
+    "today_vol": "44",
+    "custom_avg": "10.5"
+  },
+  {
+    "name": "Zephyr Prime Neuroptics Blueprint",
+    "yesterday_vol": "26",
+    "today_vol": "22",
+    "custom_avg": "4.8"
+  },
+  {
+    "name": "Zephyr Prime Set",
+    "yesterday_vol": "67",
+    "today_vol": "34",
+    "custom_avg": "70.1"
+  },
+  {
+    "name": "Kronen Prime Blueprint",
+    "yesterday_vol": "4",
+    "today_vol": "2",
+    "custom_avg": "3.5"
+  },
+  {
+    "name": "Tiberon Prime Barrel",
+    "yesterday_vol": "17",
+    "today_vol": "10",
+    "custom_avg": "9.9"
+  },
+  {
+    "name": "Kronen Prime Blade",
+    "yesterday_vol": "45",
+    "today_vol": "22",
+    "custom_avg": "29.9"
+  },
+  {
+    "name": "Ivara Prime Set",
+    "yesterday_vol": "81",
+    "today_vol": "59",
+    "custom_avg": "59.1"
+  },
+  {
+    "name": "Mirage Prime Neuroptics Blueprint",
+    "yesterday_vol": "50",
+    "today_vol": "42",
+    "custom_avg": "6.6"
+  },
+  {
+    "name": "Ballistica Prime Upper Limb",
+    "yesterday_vol": "28",
+    "today_vol": "18",
+    "custom_avg": "6.6"
+  },
+  {
+    "name": "Nami Skyla Prime Blueprint",
+    "yesterday_vol": "26",
+    "today_vol": "16",
+    "custom_avg": "6.6"
+  },
+  {
+    "name": "Akjagara Prime Set",
+    "yesterday_vol": "21",
+    "today_vol": "23",
+    "custom_avg": "88.6"
+  },
+  {
+    "name": "Akjagara Prime Link",
+    "yesterday_vol": "23",
+    "today_vol": "30",
+    "custom_avg": "7.1"
+  },
+  {
+    "name": "Stradavar Prime Barrel",
+    "yesterday_vol": "9",
+    "today_vol": "4",
+    "custom_avg": "4.1"
+  },
+  {
+    "name": "Stradavar Prime Stock",
+    "yesterday_vol": "13",
+    "today_vol": "6",
+    "custom_avg": "8.9"
+  },
+  {
+    "name": "Odonata Prime Wings Blueprint",
+    "yesterday_vol": "57",
+    "today_vol": "46",
+    "custom_avg": "12.1"
+  },
+  {
+    "name": "Tiberon Prime Stock",
+    "yesterday_vol": "19",
+    "today_vol": "20",
+    "custom_avg": "20.3"
+  },
+  {
+    "name": "Mirage Prime Set",
+    "yesterday_vol": "119",
+    "today_vol": "98",
+    "custom_avg": "79.7"
+  },
+  {
+    "name": "Akjagara Prime Barrel",
+    "yesterday_vol": "65",
+    "today_vol": "69",
+    "custom_avg": "21.2"
+  },
+  {
+    "name": "Rubico Prime Receiver",
+    "yesterday_vol": "9",
+    "today_vol": "11",
+    "custom_avg": "4.4"
+  },
+  {
+    "name": "Galatine Prime Blade",
+    "yesterday_vol": "27",
+    "today_vol": "22",
+    "custom_avg": "6.7"
+  },
+  {
+    "name": "Gram Prime Set",
+    "yesterday_vol": "17",
+    "today_vol": "18",
+    "custom_avg": "31.8"
+  },
+  {
+    "name": "Rubico Prime Stock",
+    "yesterday_vol": "25",
+    "today_vol": "13",
+    "custom_avg": "7.3"
+  },
+  {
+    "name": "Nekros Prime Blueprint",
+    "yesterday_vol": "135",
+    "today_vol": "98",
+    "custom_avg": "9.7"
+  },
+  {
+    "name": "Trinity Prime Systems Blueprint",
+    "yesterday_vol": "32",
+    "today_vol": "24",
+    "custom_avg": "11.5"
+  },
+  {
+    "name": "Titania Prime Chassis Blueprint",
+    "yesterday_vol": "89",
+    "today_vol": "63",
+    "custom_avg": "9.7"
+  },
+  {
+    "name": "Corinth Prime Stock",
+    "yesterday_vol": "21",
+    "today_vol": "21",
+    "custom_avg": "13.1"
+  },
+  {
+    "name": "Corinth Prime Blueprint",
+    "yesterday_vol": "5",
+    "today_vol": "7",
+    "custom_avg": "4.2"
+  },
+  {
+    "name": "Titania Prime Systems Blueprint",
+    "yesterday_vol": "118",
+    "today_vol": "108",
+    "custom_avg": "38.9"
+  },
+  {
+    "name": "Atlas Prime Systems Blueprint",
+    "yesterday_vol": "25",
+    "today_vol": "31",
+    "custom_avg": "5"
+  },
+  {
+    "name": "Atlas Prime Neuroptics Blueprint",
+    "yesterday_vol": "10",
+    "today_vol": "35",
+    "custom_avg": "49.6"
+  },
+  {
+    "name": "Atlas Prime Blueprint",
+    "yesterday_vol": "34",
+    "today_vol": "22",
+    "custom_avg": "4"
+  },
+  {
+    "name": "Dethcube Prime Systems",
+    "yesterday_vol": "43",
+    "today_vol": "25",
+    "custom_avg": "6.1"
+  },
+  {
+    "name": "Pyrana Prime Set",
+    "yesterday_vol": "25",
+    "today_vol": "9",
+    "custom_avg": "55.6"
+  },
+  {
+    "name": "Limbo Prime Blueprint",
+    "yesterday_vol": "38",
+    "today_vol": "17",
+    "custom_avg": "6.3"
+  },
+  {
+    "name": "Destreza Prime Blueprint",
+    "yesterday_vol": "6",
+    "today_vol": "2",
+    "custom_avg": "4.3"
+  },
+  {
+    "name": "Gram Prime Blade",
+    "yesterday_vol": "4",
+    "today_vol": "8",
+    "custom_avg": "3.8"
+  },
+  {
+    "name": "Limbo Prime Chassis Blueprint",
+    "yesterday_vol": "49",
+    "today_vol": "35",
+    "custom_avg": "44.3"
+  },
+  {
+    "name": "Spira Prime Blade",
+    "yesterday_vol": "53",
+    "today_vol": "51",
+    "custom_avg": "8.9"
+  },
+  {
+    "name": "Lex Prime Receiver",
+    "yesterday_vol": "12",
+    "today_vol": "9",
+    "custom_avg": "2.8"
+  },
+  {
+    "name": "Mesa Prime Neuroptics Blueprint",
+    "yesterday_vol": "163",
+    "today_vol": "119",
+    "custom_avg": "20.2"
+  },
+  {
+    "name": "Redeemer Prime Handle",
+    "yesterday_vol": "40",
+    "today_vol": "27",
+    "custom_avg": "27.6"
+  },
+  {
+    "name": "Equinox Prime Set",
+    "yesterday_vol": "21",
+    "today_vol": "23",
+    "custom_avg": "68.5"
+  },
+  {
+    "name": "Guandao Prime Set",
+    "yesterday_vol": "23",
+    "today_vol": "15",
+    "custom_avg": "49.3"
+  },
+  {
+    "name": "Zakti Prime Set",
+    "yesterday_vol": "20",
+    "today_vol": "27",
+    "custom_avg": "33.1"
+  },
+  {
+    "name": "Baza Prime Barrel",
+    "yesterday_vol": "16",
+    "today_vol": "12",
+    "custom_avg": "5.1"
+  },
+  {
+    "name": "Aksomati Prime Barrel",
+    "yesterday_vol": "66",
+    "today_vol": "50",
+    "custom_avg": "12.2"
+  },
+  {
+    "name": "Bronco Prime Set",
+    "yesterday_vol": "50",
+    "today_vol": "28",
+    "custom_avg": "6.9"
+  },
+  {
+    "name": "Zephyr Prime Systems Blueprint",
+    "yesterday_vol": "45",
+    "today_vol": "26",
+    "custom_avg": "35.8"
+  },
+  {
+    "name": "Ash Prime Set",
+    "yesterday_vol": "64",
+    "today_vol": "52",
+    "custom_avg": "44.4"
+  },
+  {
+    "name": "Limbo Prime Neuroptics Blueprint",
+    "yesterday_vol": "45",
+    "today_vol": "36",
+    "custom_avg": "25.2"
+  },
+  {
+    "name": "Chroma Prime Blueprint",
+    "yesterday_vol": "74",
+    "today_vol": "34",
+    "custom_avg": "7.9"
+  },
+  {
+    "name": "Mesa Prime Set",
+    "yesterday_vol": "140",
+    "today_vol": "113",
+    "custom_avg": "49.4"
+  },
+  {
+    "name": "Mesa Prime Systems Blueprint",
+    "yesterday_vol": "159",
+    "today_vol": "121",
+    "custom_avg": "9.1"
+  },
+  {
+    "name": "Mesa Prime Chassis Blueprint",
+    "yesterday_vol": "121",
+    "today_vol": "78",
+    "custom_avg": "5.3"
+  },
+  {
+    "name": "Rubico Prime Blueprint",
+    "yesterday_vol": "19",
+    "today_vol": "16",
+    "custom_avg": "18.7"
+  },
+  {
+    "name": "Trinity Prime Chassis Blueprint",
+    "yesterday_vol": "18",
+    "today_vol": "24",
+    "custom_avg": "10.6"
+  },
+  {
+    "name": "Ivara Prime Blueprint",
+    "yesterday_vol": "76",
+    "today_vol": "66",
+    "custom_avg": "8.7"
+  },
+  {
+    "name": "Aksomati Prime Blueprint",
+    "yesterday_vol": "23",
+    "today_vol": "9",
+    "custom_avg": "5"
+  },
+  {
+    "name": "Nekros Prime Set",
+    "yesterday_vol": "142",
+    "today_vol": "112",
+    "custom_avg": "73.5"
+  },
+  {
+    "name": "Nekros Prime Systems Blueprint",
+    "yesterday_vol": "111",
+    "today_vol": "97",
+    "custom_avg": "24.6"
+  },
+  {
+    "name": "Chroma Prime Systems Blueprint",
+    "yesterday_vol": "72",
+    "today_vol": "56",
+    "custom_avg": "27.3"
+  },
+  {
+    "name": "Chroma Prime Chassis Blueprint",
+    "yesterday_vol": "57",
+    "today_vol": "37",
+    "custom_avg": "7.8"
+  },
+  {
+    "name": "Galatine Prime Set",
+    "yesterday_vol": "33",
+    "today_vol": "21",
+    "custom_avg": "39.1"
+  },
+  {
+    "name": "Chroma Prime Neuroptics Blueprint",
+    "yesterday_vol": "59",
+    "today_vol": "32",
+    "custom_avg": "29.2"
+  },
+  {
+    "name": "Akjagara Prime Blueprint",
+    "yesterday_vol": "23",
+    "today_vol": "12",
+    "custom_avg": "3.9"
+  },
+  {
+    "name": "Galatine Prime Handle",
+    "yesterday_vol": "27",
+    "today_vol": "19",
+    "custom_avg": "4.6"
+  },
+  {
+    "name": "Dual Kamas Prime Blade",
+    "yesterday_vol": "24",
+    "today_vol": "21",
+    "custom_avg": "46.2"
+  },
+  {
+    "name": "Pangolin Prime Handle",
+    "yesterday_vol": "15",
+    "today_vol": "8",
+    "custom_avg": "5.2"
+  },
+  {
+    "name": "Corinth Prime Set",
+    "yesterday_vol": "15",
+    "today_vol": "14",
+    "custom_avg": "79.8"
+  },
+  {
+    "name": "Pangolin Prime Blueprint",
+    "yesterday_vol": "12",
+    "today_vol": "14",
+    "custom_avg": "10.9"
+  },
+  {
+    "name": "Corinth Prime Barrel",
+    "yesterday_vol": "18",
+    "today_vol": "24",
+    "custom_avg": "41.8"
+  },
+  {
+    "name": "Corinth Prime Receiver",
+    "yesterday_vol": "7",
+    "today_vol": "13",
+    "custom_avg": "5"
+  },
+  {
+    "name": "Guandao Prime Blade",
+    "yesterday_vol": "42",
+    "today_vol": "32",
+    "custom_avg": "7.2"
+  },
+  {
+    "name": "Zakti Prime Blueprint",
+    "yesterday_vol": "20",
+    "today_vol": "13",
+    "custom_avg": "18.1"
+  },
+  {
+    "name": "Guandao Prime Handle",
+    "yesterday_vol": "17",
+    "today_vol": "27",
+    "custom_avg": "16.9"
+  },
+  {
+    "name": "Zakti Prime Barrel",
+    "yesterday_vol": "11",
+    "today_vol": "9",
+    "custom_avg": "4.6"
+  },
+  {
+    "name": "Nezha Prime Systems Blueprint",
+    "yesterday_vol": "27",
+    "today_vol": "22",
+    "custom_avg": "4.3"
+  },
+  {
+    "name": "Nezha Prime Chassis Blueprint",
+    "yesterday_vol": "54",
+    "today_vol": "49",
+    "custom_avg": "26.3"
+  },
+  {
+    "name": "Zakti Prime Receiver",
+    "yesterday_vol": "8",
+    "today_vol": "9",
+    "custom_avg": "5.1"
+  },
+  {
+    "name": "Nezha Prime Neuroptics Blueprint",
+    "yesterday_vol": "35",
+    "today_vol": "37",
+    "custom_avg": "19.4"
+  },
+  {
+    "name": "Nezha Prime Set",
+    "yesterday_vol": "77",
+    "today_vol": "53",
+    "custom_avg": "66.3"
+  },
+  {
+    "name": "Octavia Prime Blueprint",
+    "yesterday_vol": "39",
+    "today_vol": "30",
+    "custom_avg": "39.3"
+  },
+  {
+    "name": "Tenora Prime Blueprint",
+    "yesterday_vol": "2",
+    "today_vol": "5",
+    "custom_avg": "4.5"
+  },
+  {
+    "name": "Tenora Prime Receiver",
+    "yesterday_vol": "26",
+    "today_vol": "15",
+    "custom_avg": "20.7"
+  },
+  {
+    "name": "Pandero Prime Set",
+    "yesterday_vol": "30",
+    "today_vol": "15",
+    "custom_avg": "30.1"
+  },
+  {
+    "name": "Tenora Prime Stock",
+    "yesterday_vol": "14",
+    "today_vol": "15",
+    "custom_avg": "8.4"
+  },
+  {
+    "name": "Tenora Prime Set",
+    "yesterday_vol": "29",
+    "today_vol": "16",
+    "custom_avg": "57.6"
+  },
+  {
+    "name": "Pandero Prime Barrel",
+    "yesterday_vol": "8",
+    "today_vol": "10",
+    "custom_avg": "4.4"
+  },
+  {
+    "name": "Tenora Prime Barrel",
+    "yesterday_vol": "14",
+    "today_vol": "14",
+    "custom_avg": "13.5"
+  },
+  {
+    "name": "Octavia Prime Chassis Blueprint",
+    "yesterday_vol": "52",
+    "today_vol": "47",
+    "custom_avg": "9.8"
+  },
+  {
+    "name": "Octavia Prime Neuroptics Blueprint",
+    "yesterday_vol": "56",
+    "today_vol": "22",
+    "custom_avg": "5.2"
+  },
+  {
+    "name": "Pandero Prime Receiver",
+    "yesterday_vol": "21",
+    "today_vol": "28",
+    "custom_avg": "20.6"
+  },
+  {
+    "name": "Octavia Prime Systems Blueprint",
+    "yesterday_vol": "53",
+    "today_vol": "27",
+    "custom_avg": "7.9"
+  },
+  {
+    "name": "Pandero Prime Blueprint",
+    "yesterday_vol": "4",
+    "today_vol": "2",
+    "custom_avg": "4.2"
+  },
+  {
+    "name": "Octavia Prime Set",
+    "yesterday_vol": "98",
+    "today_vol": "106",
+    "custom_avg": "73.6"
+  },
+  {
+    "name": "Volnus Prime Handle",
+    "yesterday_vol": "18",
+    "today_vol": "23",
+    "custom_avg": "23.4"
+  },
+  {
+    "name": "Volnus Prime Head",
+    "yesterday_vol": "17",
+    "today_vol": "10",
+    "custom_avg": "5.7"
+  },
+  {
+    "name": "Gara Prime Blueprint",
+    "yesterday_vol": "52",
+    "today_vol": "51",
+    "custom_avg": "38.6"
+  },
+  {
+    "name": "Volnus Prime Set",
+    "yesterday_vol": "18",
+    "today_vol": "13",
+    "custom_avg": "33"
+  },
+  {
+    "name": "Gara Prime Set",
+    "yesterday_vol": "22",
+    "today_vol": "7",
+    "custom_avg": "76.2"
+  },
+  {
+    "name": "Gara Prime Neuroptics Blueprint",
+    "yesterday_vol": "37",
+    "today_vol": "26",
+    "custom_avg": "5.7"
+  },
+  {
+    "name": "Gara Prime Systems Blueprint",
+    "yesterday_vol": "39",
+    "today_vol": "33",
+    "custom_avg": "5.4"
+  },
+  {
+    "name": "Astilla Prime Blueprint",
+    "yesterday_vol": "7",
+    "today_vol": "9",
+    "custom_avg": "5.2"
+  },
+  {
+    "name": "Astilla Prime Receiver",
+    "yesterday_vol": "12",
+    "today_vol": "12",
+    "custom_avg": "6.1"
+  },
+  {
+    "name": "Astilla Prime Barrel",
+    "yesterday_vol": "14",
+    "today_vol": "7",
+    "custom_avg": "17.6"
+  },
+  {
+    "name": "Astilla Prime Set",
+    "yesterday_vol": "26",
+    "today_vol": "20",
+    "custom_avg": "40.3"
+  },
+  {
+    "name": "Astilla Prime Stock",
+    "yesterday_vol": "15",
+    "today_vol": "9",
+    "custom_avg": "4.5"
+  },
+  {
+    "name": "Volnus Prime Blueprint",
+    "yesterday_vol": "5",
+    "today_vol": "0",
+    "custom_avg": "4.4"
+  },
+  {
+    "name": "Gara Prime Chassis Blueprint",
+    "yesterday_vol": "59",
+    "today_vol": "58",
+    "custom_avg": "13.5"
+  },
+  {
+    "name": "Nidus Prime Blueprint",
+    "yesterday_vol": "43",
+    "today_vol": "18",
+    "custom_avg": "6.3"
+  },
+  {
+    "name": "Strun Prime Set",
+    "yesterday_vol": "45",
+    "today_vol": "49",
+    "custom_avg": "48.4"
+  },
+  {
+    "name": "Magnus Prime Set",
+    "yesterday_vol": "58",
+    "today_vol": "41",
+    "custom_avg": "47.5"
+  },
+  {
+    "name": "Nidus Prime Set",
+    "yesterday_vol": "61",
+    "today_vol": "53",
+    "custom_avg": "77.3"
+  },
+  {
+    "name": "Strun Prime Blueprint",
+    "yesterday_vol": "36",
+    "today_vol": "28",
+    "custom_avg": "19.4"
+  },
+  {
+    "name": "Magnus Prime Blueprint",
+    "yesterday_vol": "22",
+    "today_vol": "17",
+    "custom_avg": "6.1"
+  },
+  {
+    "name": "Strun Prime Receiver",
+    "yesterday_vol": "18",
+    "today_vol": "21",
+    "custom_avg": "5.7"
+  },
+  {
+    "name": "Strun Prime Barrel",
+    "yesterday_vol": "23",
+    "today_vol": "26",
+    "custom_avg": "7.5"
+  },
+  {
+    "name": "Nidus Prime Systems Blueprint",
+    "yesterday_vol": "34",
+    "today_vol": "20",
+    "custom_avg": "5.3"
+  },
+  {
+    "name": "Strun Prime Stock",
+    "yesterday_vol": "22",
+    "today_vol": "15",
+    "custom_avg": "6.5"
+  },
+  {
+    "name": "Nidus Prime Neuroptics Blueprint",
+    "yesterday_vol": "79",
+    "today_vol": "38",
+    "custom_avg": "34.6"
+  },
+  {
+    "name": "Nidus Prime Chassis Blueprint",
+    "yesterday_vol": "53",
+    "today_vol": "32",
+    "custom_avg": "26.5"
+  },
+  {
+    "name": "Magnus Prime Receiver",
+    "yesterday_vol": "21",
+    "today_vol": "11",
+    "custom_avg": "5"
+  },
+  {
+    "name": "Magnus Prime Barrel",
+    "yesterday_vol": "34",
+    "today_vol": "42",
+    "custom_avg": "30.3"
+  },
+  {
+    "name": "Knell Prime Set",
+    "yesterday_vol": "35",
+    "today_vol": "27",
+    "custom_avg": "30.4"
+  },
+  {
+    "name": "Scourge Prime Blade",
+    "yesterday_vol": "18",
+    "today_vol": "13",
+    "custom_avg": "4.4"
+  },
+  {
+    "name": "Harrow Prime Blueprint",
+    "yesterday_vol": "72",
+    "today_vol": "52",
+    "custom_avg": "5.9"
+  },
+  {
+    "name": "Harrow Prime Set",
+    "yesterday_vol": "55",
+    "today_vol": "27",
+    "custom_avg": "57.7"
+  },
+  {
+    "name": "Knell Prime Barrel",
+    "yesterday_vol": "45",
+    "today_vol": "51",
+    "custom_avg": "15.5"
+  },
+  {
+    "name": "Harrow Prime Neuroptics Blueprint",
+    "yesterday_vol": "84",
+    "today_vol": "80",
+    "custom_avg": "7.8"
+  },
+  {
+    "name": "Scourge Prime Barrel",
+    "yesterday_vol": "45",
+    "today_vol": "40",
+    "custom_avg": "30"
+  },
+  {
+    "name": "Knell Prime Blueprint",
+    "yesterday_vol": "19",
+    "today_vol": "20",
+    "custom_avg": "4.3"
+  },
+  {
+    "name": "Harrow Prime Chassis Blueprint",
+    "yesterday_vol": "87",
+    "today_vol": "78",
+    "custom_avg": "9.6"
+  },
+  {
+    "name": "Scourge Prime Set",
+    "yesterday_vol": "37",
+    "today_vol": "15",
+    "custom_avg": "74.8"
+  },
+  {
+    "name": "Harrow Prime Systems Blueprint",
+    "yesterday_vol": "97",
+    "today_vol": "76",
+    "custom_avg": "19.5"
+  },
+  {
+    "name": "Scourge Prime Handle",
+    "yesterday_vol": "29",
+    "today_vol": "18",
+    "custom_avg": "6.8"
+  },
+  {
+    "name": "Knell Prime Receiver",
+    "yesterday_vol": "26",
+    "today_vol": "13",
+    "custom_avg": "4.9"
+  },
+  {
+    "name": "Scourge Prime Blueprint",
+    "yesterday_vol": "48",
+    "today_vol": "35",
+    "custom_avg": "16.4"
+  },
+  {
+    "name": "Garuda Prime Chassis Blueprint",
+    "yesterday_vol": "117",
+    "today_vol": "81",
+    "custom_avg": "9.1"
+  },
+  {
+    "name": "Corvas Prime Set",
+    "yesterday_vol": "44",
+    "today_vol": "17",
+    "custom_avg": "42.9"
+  },
+  {
+    "name": "Nagantaka Prime Set",
+    "yesterday_vol": "19",
+    "today_vol": "17",
+    "custom_avg": "38.4"
+  },
+  {
+    "name": "Corvas Prime Barrel",
+    "yesterday_vol": "38",
+    "today_vol": "20",
+    "custom_avg": "14.6"
+  },
+  {
+    "name": "Corvas Prime Blueprint",
+    "yesterday_vol": "21",
+    "today_vol": "15",
+    "custom_avg": "6.3"
+  },
+  {
+    "name": "Nagantaka Prime Receiver",
+    "yesterday_vol": "18",
+    "today_vol": "17",
+    "custom_avg": "4"
+  },
+  {
+    "name": "Nagantaka Prime Blueprint",
+    "yesterday_vol": "35",
+    "today_vol": "34",
+    "custom_avg": "12.4"
+  },
+  {
+    "name": "Corvas Prime Stock",
+    "yesterday_vol": "14",
+    "today_vol": "12",
+    "custom_avg": "4.3"
+  },
+  {
+    "name": "Nagantaka Prime Stock",
+    "yesterday_vol": "35",
+    "today_vol": "30",
+    "custom_avg": "7.2"
+  },
+  {
+    "name": "Garuda Prime Systems Blueprint",
+    "yesterday_vol": "119",
+    "today_vol": "90",
+    "custom_avg": "12"
+  },
+  {
+    "name": "Corvas Prime Receiver",
+    "yesterday_vol": "31",
+    "today_vol": "9",
+    "custom_avg": "9.2"
+  },
+  {
+    "name": "Nagantaka Prime Barrel",
+    "yesterday_vol": "36",
+    "today_vol": "27",
+    "custom_avg": "7.6"
+  },
+  {
+    "name": "Garuda Prime Set",
+    "yesterday_vol": "136",
+    "today_vol": "86",
+    "custom_avg": "61.2"
+  },
+  {
+    "name": "Garuda Prime Neuroptics Blueprint",
+    "yesterday_vol": "147",
+    "today_vol": "86",
+    "custom_avg": "23.3"
+  },
+  {
+    "name": "Garuda Prime Blueprint",
+    "yesterday_vol": "72",
+    "today_vol": "55",
+    "custom_avg": "5.2"
+  },
+  {
+    "name": "Hystrix Prime Blueprint",
+    "yesterday_vol": "18",
+    "today_vol": "9",
+    "custom_avg": "4.6"
+  },
+  {
+    "name": "Khora Prime Chassis Blueprint",
+    "yesterday_vol": "123",
+    "today_vol": "81",
+    "custom_avg": "6.5"
+  },
+  {
+    "name": "Dual Keres Prime Set",
+    "yesterday_vol": "36",
+    "today_vol": "22",
+    "custom_avg": "50.3"
+  },
+  {
+    "name": "Hystrix Prime Set",
+    "yesterday_vol": "28",
+    "today_vol": "15",
+    "custom_avg": "28.6"
+  },
+  {
+    "name": "Dual Keres Prime Handle",
+    "yesterday_vol": "46",
+    "today_vol": "45",
+    "custom_avg": "8.2"
+  },
+  {
+    "name": "Khora Prime Set",
+    "yesterday_vol": "104",
+    "today_vol": "78",
+    "custom_avg": "68.3"
+  },
+  {
+    "name": "Khora Prime Blueprint",
+    "yesterday_vol": "108",
+    "today_vol": "109",
+    "custom_avg": "18.7"
+  },
+  {
+    "name": "Hystrix Prime Receiver",
+    "yesterday_vol": "46",
+    "today_vol": "25",
+    "custom_avg": "16.5"
+  },
+  {
+    "name": "Hystrix Prime Barrel",
+    "yesterday_vol": "26",
+    "today_vol": "21",
+    "custom_avg": "5"
+  },
+  {
+    "name": "Khora Prime Neuroptics Blueprint",
+    "yesterday_vol": "161",
+    "today_vol": "151",
+    "custom_avg": "21.7"
+  },
+  {
+    "name": "Dual Keres Prime Blueprint",
+    "yesterday_vol": "32",
+    "today_vol": "27",
+    "custom_avg": "17.2"
+  },
+  {
+    "name": "Khora Prime Systems Blueprint",
+    "yesterday_vol": "136",
+    "today_vol": "87",
+    "custom_avg": "7.5"
+  },
+  {
+    "name": "Dual Keres Prime Blade",
+    "yesterday_vol": "27",
+    "today_vol": "33",
+    "custom_avg": "6.3"
+  },
+  {
+    "name": "Tatsu Prime Blade",
+    "yesterday_vol": "13",
+    "today_vol": "14",
+    "custom_avg": "4.3"
+  },
+  {
+    "name": "Revenant Prime Chassis Blueprint",
+    "yesterday_vol": "58",
+    "today_vol": "43",
+    "custom_avg": "5.7"
+  },
+  {
+    "name": "Revenant Prime Systems Blueprint",
+    "yesterday_vol": "82",
+    "today_vol": "63",
+    "custom_avg": "9.5"
+  },
+  {
+    "name": "Tatsu Prime Set",
+    "yesterday_vol": "30",
+    "today_vol": "21",
+    "custom_avg": "25.5"
+  },
+  {
+    "name": "Tatsu Prime Blueprint",
+    "yesterday_vol": "2",
+    "today_vol": "3",
+    "custom_avg": "3.6"
+  },
+  {
+    "name": "Revenant Prime Set",
+    "yesterday_vol": "116",
+    "today_vol": "80",
+    "custom_avg": "59.4"
+  },
+  {
+    "name": "Phantasma Prime Barrel",
+    "yesterday_vol": "37",
+    "today_vol": "37",
+    "custom_avg": "22"
+  },
+  {
+    "name": "Revenant Prime Neuroptics Blueprint",
+    "yesterday_vol": "56",
+    "today_vol": "51",
+    "custom_avg": "6.8"
+  },
+  {
+    "name": "Tatsu Prime Handle",
+    "yesterday_vol": "26",
+    "today_vol": "16",
+    "custom_avg": "18.1"
+  },
+  {
+    "name": "Phantasma Prime Blueprint",
+    "yesterday_vol": "11",
+    "today_vol": "16",
+    "custom_avg": "4.3"
+  },
+  {
+    "name": "Phantasma Prime Set",
+    "yesterday_vol": "17",
+    "today_vol": "23",
+    "custom_avg": "66"
+  },
+  {
+    "name": "Phantasma Prime Receiver",
+    "yesterday_vol": "17",
+    "today_vol": "16",
+    "custom_avg": "4.8"
+  },
+  {
+    "name": "Revenant Prime Blueprint",
+    "yesterday_vol": "92",
+    "today_vol": "72",
+    "custom_avg": "25.3"
+  },
+  {
+    "name": "Phantasma Prime Stock",
+    "yesterday_vol": "35",
+    "today_vol": "40",
+    "custom_avg": "18.7"
+  },
+  {
+    "name": "Baruuk Prime Chassis Blueprint",
+    "yesterday_vol": "18",
+    "today_vol": "14",
+    "custom_avg": "3.3"
+  },
+  {
+    "name": "Baruuk Prime Blueprint",
+    "yesterday_vol": "58",
+    "today_vol": "53",
+    "custom_avg": "14.7"
+  },
+  {
+    "name": "Baruuk Prime Systems Blueprint",
+    "yesterday_vol": "31",
+    "today_vol": "26",
+    "custom_avg": "6"
+  },
+  {
+    "name": "Baruuk Prime Neuroptics Blueprint",
+    "yesterday_vol": "59",
+    "today_vol": "44",
+    "custom_avg": "27.9"
+  },
+  {
+    "name": "Baruuk Prime Set",
+    "yesterday_vol": "82",
+    "today_vol": "54",
+    "custom_avg": "60.9"
+  },
+  {
+    "name": "Cobra & Crane Prime Guard",
+    "yesterday_vol": "33",
+    "today_vol": "25",
+    "custom_avg": "10.9"
+  },
+  {
+    "name": "Afuris Prime Barrel",
+    "yesterday_vol": "8",
+    "today_vol": "8",
+    "custom_avg": "4.3"
+  },
+  {
+    "name": "Afuris Prime Set",
+    "yesterday_vol": "27",
+    "today_vol": "17",
+    "custom_avg": "90.4"
+  },
+  {
+    "name": "Afuris Prime Link",
+    "yesterday_vol": "2",
+    "today_vol": "3",
+    "custom_avg": "3.8"
+  },
+  {
+    "name": "Cobra & Crane Prime Blueprint",
+    "yesterday_vol": "11",
+    "today_vol": "5",
+    "custom_avg": "3.4"
+  },
+  {
+    "name": "Afuris Prime Blueprint",
+    "yesterday_vol": "0",
+    "today_vol": "3",
+    "custom_avg": "3"
+  },
+  {
+    "name": "Cobra & Crane Prime Blade",
+    "yesterday_vol": "12",
+    "today_vol": "8",
+    "custom_avg": "4.2"
+  },
+  {
+    "name": "Cobra & Crane Prime Hilt",
+    "yesterday_vol": "13",
+    "today_vol": "6",
+    "custom_avg": "4.6"
+  },
+  {
+    "name": "Cobra & Crane Prime Set",
+    "yesterday_vol": "35",
+    "today_vol": "17",
+    "custom_avg": "22.6"
+  },
+  {
+    "name": "Afuris Prime Receiver",
+    "yesterday_vol": "43",
+    "today_vol": "33",
+    "custom_avg": "37.4"
+  },
+  {
+    "name": "Hildryn Prime Blueprint",
+    "yesterday_vol": "110",
+    "today_vol": "98",
+    "custom_avg": "29.7"
+  },
+  {
+    "name": "Hildryn Prime Systems Blueprint",
+    "yesterday_vol": "46",
+    "today_vol": "35",
+    "custom_avg": "3.9"
+  },
+  {
+    "name": "Shade Prime Blueprint",
+    "yesterday_vol": "12",
+    "today_vol": "21",
+    "custom_avg": "4.7"
+  },
+  {
+    "name": "Hildryn Prime Set",
+    "yesterday_vol": "93",
+    "today_vol": "81",
+    "custom_avg": "58.1"
+  },
+  {
+    "name": "Shade Prime Systems",
+    "yesterday_vol": "24",
+    "today_vol": "25",
+    "custom_avg": "3.7"
+  },
+  {
+    "name": "Larkspur Prime Set",
+    "yesterday_vol": "56",
+    "today_vol": "21",
+    "custom_avg": "48.6"
+  },
+  {
+    "name": "Hildryn Prime Neuroptics Blueprint",
+    "yesterday_vol": "64",
+    "today_vol": "65",
+    "custom_avg": "5.6"
+  },
+  {
+    "name": "Larkspur Prime Barrel",
+    "yesterday_vol": "30",
+    "today_vol": "17",
+    "custom_avg": "28.5"
+  },
+  {
+    "name": "Shade Prime Cerebrum",
+    "yesterday_vol": "27",
+    "today_vol": "22",
+    "custom_avg": "5"
+  },
+  {
+    "name": "Shade Prime Set",
+    "yesterday_vol": "90",
+    "today_vol": "63",
+    "custom_avg": "40.5"
+  },
+  {
+    "name": "Larkspur Prime Stock",
+    "yesterday_vol": "22",
+    "today_vol": "10",
+    "custom_avg": "5.6"
+  },
+  {
+    "name": "Hildryn Prime Chassis Blueprint",
+    "yesterday_vol": "93",
+    "today_vol": "92",
+    "custom_avg": "9.8"
+  },
+  {
+    "name": "Larkspur Prime Receiver",
+    "yesterday_vol": "28",
+    "today_vol": "18",
+    "custom_avg": "4.7"
+  },
+  {
+    "name": "Shade Prime Carapace",
+    "yesterday_vol": "65",
+    "today_vol": "40",
+    "custom_avg": "24.9"
+  },
+  {
+    "name": "Larkspur Prime Blueprint",
+    "yesterday_vol": "10",
+    "today_vol": "8",
+    "custom_avg": "4.7"
+  },
+  {
+    "name": "Wisp Prime Chassis Blueprint",
+    "yesterday_vol": "103",
+    "today_vol": "85",
+    "custom_avg": "13.8"
+  },
+  {
+    "name": "Gunsen Prime Blueprint",
+    "yesterday_vol": "3",
+    "today_vol": "3",
+    "custom_avg": "2.6"
+  },
+  {
+    "name": "Gunsen Prime Set",
+    "yesterday_vol": "23",
+    "today_vol": "17",
+    "custom_avg": "43"
+  },
+  {
+    "name": "Fulmin Prime Blueprint",
+    "yesterday_vol": "15",
+    "today_vol": "4",
+    "custom_avg": "4"
+  },
+  {
+    "name": "Gunsen Prime Handle",
+    "yesterday_vol": "16",
+    "today_vol": "15",
+    "custom_avg": "5.2"
+  },
+  {
+    "name": "Fulmin Prime Barrel",
+    "yesterday_vol": "11",
+    "today_vol": "14",
+    "custom_avg": "4.3"
+  },
+  {
+    "name": "Wisp Prime Set",
+    "yesterday_vol": "213",
+    "today_vol": "175",
+    "custom_avg": "59"
+  },
+  {
+    "name": "Fulmin Prime Set",
+    "yesterday_vol": "56",
+    "today_vol": "52",
+    "custom_avg": "30.7"
+  },
+  {
+    "name": "Fulmin Prime Stock",
+    "yesterday_vol": "25",
+    "today_vol": "13",
+    "custom_avg": "4.4"
+  },
+  {
+    "name": "Wisp Prime Neuroptics Blueprint",
+    "yesterday_vol": "82",
+    "today_vol": "60",
+    "custom_avg": "4.6"
+  },
+  {
+    "name": "Gunsen Prime Blade",
+    "yesterday_vol": "37",
+    "today_vol": "25",
+    "custom_avg": "9.9"
+  },
+  {
+    "name": "Wisp Prime Systems Blueprint",
+    "yesterday_vol": "61",
+    "today_vol": "54",
+    "custom_avg": "4.5"
+  },
+  {
+    "name": "Fulmin Prime Receiver",
+    "yesterday_vol": "49",
+    "today_vol": "45",
+    "custom_avg": "19"
+  },
+  {
+    "name": "Wisp Prime Blueprint",
+    "yesterday_vol": "120",
+    "today_vol": "94",
+    "custom_avg": "30"
+  },
+  {
+    "name": "Grendel Prime Set",
+    "yesterday_vol": "46",
+    "today_vol": "41",
+    "custom_avg": "59"
+  },
+  {
+    "name": "Grendel Prime Blueprint",
+    "yesterday_vol": "56",
+    "today_vol": "46",
+    "custom_avg": "9.8"
+  },
+  {
+    "name": "Grendel Prime Neuroptics Blueprint",
+    "yesterday_vol": "26",
+    "today_vol": "18",
+    "custom_avg": "4.7"
+  },
+  {
+    "name": "Grendel Prime Chassis Blueprint",
+    "yesterday_vol": "26",
+    "today_vol": "24",
+    "custom_avg": "4"
+  },
+  {
+    "name": "Grendel Prime Systems Blueprint",
+    "yesterday_vol": "106",
+    "today_vol": "61",
+    "custom_avg": "30.3"
+  },
+  {
+    "name": "Masseter Prime Set",
+    "yesterday_vol": "28",
+    "today_vol": "19",
+    "custom_avg": "13.8"
+  },
+  {
+    "name": "Masseter Prime Blueprint",
+    "yesterday_vol": "3",
+    "today_vol": "5",
+    "custom_avg": "2.9"
+  },
+  {
+    "name": "Masseter Prime Blade",
+    "yesterday_vol": "38",
+    "today_vol": "29",
+    "custom_avg": "11.3"
+  },
+  {
+    "name": "Masseter Prime Handle",
+    "yesterday_vol": "6",
+    "today_vol": "9",
+    "custom_avg": "3"
+  },
+  {
+    "name": "Zylok Prime Set",
+    "yesterday_vol": "31",
+    "today_vol": "58",
+    "custom_avg": "18"
+  },
+  {
+    "name": "Zylok Prime Blueprint",
+    "yesterday_vol": "9",
+    "today_vol": "23",
+    "custom_avg": "9.4"
+  },
+  {
+    "name": "Zylok Prime Barrel",
+    "yesterday_vol": "6",
+    "today_vol": "10",
+    "custom_avg": "4.2"
+  },
+  {
+    "name": "Zylok Prime Receiver",
+    "yesterday_vol": "5",
+    "today_vol": "5",
+    "custom_avg": "3.3"
+  },
+  {
+    "name": "Gotva Prime",
+    "yesterday_vol": "12",
+    "today_vol": "3",
+    "custom_avg": "75.3"
+  },
+  {
+    "name": "Gauss Prime Set",
+    "yesterday_vol": "233",
+    "today_vol": "164",
+    "custom_avg": "40.7"
+  },
+  {
+    "name": "Gauss Prime Blueprint",
+    "yesterday_vol": "45",
+    "today_vol": "39",
+    "custom_avg": "3.9"
+  },
+  {
+    "name": "Gauss Prime Neuroptics Blueprint",
+    "yesterday_vol": "76",
+    "today_vol": "76",
+    "custom_avg": "7.5"
+  },
+  {
+    "name": "Gauss Prime Chassis Blueprint",
+    "yesterday_vol": "57",
+    "today_vol": "48",
+    "custom_avg": "4.1"
+  },
+  {
+    "name": "Gauss Prime Systems Blueprint",
+    "yesterday_vol": "125",
+    "today_vol": "112",
+    "custom_avg": "22.4"
+  },
+  {
+    "name": "Akarius Prime Set",
+    "yesterday_vol": "66",
+    "today_vol": "56",
+    "custom_avg": "65.8"
+  },
+  {
+    "name": "Akarius Prime Blueprint",
+    "yesterday_vol": "57",
+    "today_vol": "46",
+    "custom_avg": "9.3"
+  },
+  {
+    "name": "Akarius Prime Barrel",
+    "yesterday_vol": "72",
+    "today_vol": "43",
+    "custom_avg": "5.4"
+  },
+  {
+    "name": "Akarius Prime Receiver",
+    "yesterday_vol": "108",
+    "today_vol": "109",
+    "custom_avg": "17.2"
+  },
+  {
+    "name": "Akarius Prime Link",
+    "yesterday_vol": "20",
+    "today_vol": "15",
+    "custom_avg": "3.1"
+  },
+  {
+    "name": "Acceltra Prime Set",
+    "yesterday_vol": "141",
+    "today_vol": "81",
+    "custom_avg": "30.6"
+  },
+  {
+    "name": "Acceltra Prime Blueprint",
+    "yesterday_vol": "8",
+    "today_vol": "8",
+    "custom_avg": "2.6"
+  },
+  {
+    "name": "Acceltra Prime Barrel",
+    "yesterday_vol": "70",
+    "today_vol": "57",
+    "custom_avg": "10.9"
+  },
+  {
+    "name": "Acceltra Prime Receiver",
+    "yesterday_vol": "33",
+    "today_vol": "20",
+    "custom_avg": "4"
+  },
+  {
+    "name": "Acceltra Prime Stock",
+    "yesterday_vol": "51",
+    "today_vol": "61",
+    "custom_avg": "13.6"
+  },
+  {
+    "name": "Protea Prime Set",
+    "yesterday_vol": "285",
+    "today_vol": "187",
+    "custom_avg": "24.5"
+  },
+  {
+    "name": "Protea Prime Blueprint",
+    "yesterday_vol": "23",
+    "today_vol": "22",
+    "custom_avg": "2.1"
+  },
+  {
+    "name": "Protea Prime Neuroptics Blueprint",
+    "yesterday_vol": "84",
+    "today_vol": "57",
+    "custom_avg": "2.1"
+  },
+  {
+    "name": "Protea Prime Chassis Blueprint",
+    "yesterday_vol": "148",
+    "today_vol": "122",
+    "custom_avg": "8"
+  },
+  {
+    "name": "Protea Prime Systems Blueprint",
+    "yesterday_vol": "131",
+    "today_vol": "135",
+    "custom_avg": "9.7"
+  },
+  {
+    "name": "Velox Prime Set",
+    "yesterday_vol": "103",
+    "today_vol": "99",
+    "custom_avg": "10"
+  },
+  {
+    "name": "Velox Prime Blueprint",
+    "yesterday_vol": "54",
+    "today_vol": "20",
+    "custom_avg": "2"
+  },
+  {
+    "name": "Velox Prime Barrel",
+    "yesterday_vol": "58",
+    "today_vol": "57",
+    "custom_avg": "6.5"
+  },
+  {
+    "name": "Velox Prime Receiver",
+    "yesterday_vol": "14",
+    "today_vol": "12",
+    "custom_avg": "3.2"
+  },
+  {
+    "name": "Okina Prime Set",
+    "yesterday_vol": "118",
+    "today_vol": "108",
+    "custom_avg": "25.2"
+  },
+  {
+    "name": "Okina Prime Blueprint",
+    "yesterday_vol": "62",
+    "today_vol": "59",
+    "custom_avg": "8.5"
+  },
+  {
+    "name": "Okina Prime Handle",
+    "yesterday_vol": "57",
+    "today_vol": "36",
+    "custom_avg": "3.5"
+  },
+  {
+    "name": "Okina Prime Blade",
+    "yesterday_vol": "62",
+    "today_vol": "46",
+    "custom_avg": "3.5"
+  },
+  {
+    "name": "Akmagnus Prime Set",
+    "yesterday_vol": "24",
+    "today_vol": "14",
+    "custom_avg": "48.6"
+  },
+  {
+    "name": "Akmagnus Prime Blueprint",
+    "yesterday_vol": "17",
+    "today_vol": "15",
+    "custom_avg": "20.6"
+  },
+  {
+    "name": "Akmagnus Prime Link",
+    "yesterday_vol": "11",
+    "today_vol": "6",
+    "custom_avg": "19.9"
+  },
+  {
+    "name": "Sevagoth Prime Set",
+    "yesterday_vol": "164",
+    "today_vol": "153",
+    "custom_avg": "23.3"
+  },
+  {
+    "name": "Sevagoth Prime Blueprint",
+    "yesterday_vol": "46",
+    "today_vol": "33",
+    "custom_avg": "2.4"
+  },
+  {
+    "name": "Sevagoth Prime Neuroptics Blueprint",
+    "yesterday_vol": "25",
+    "today_vol": "28",
+    "custom_avg": "1.9"
+  },
+  {
+    "name": "Sevagoth Prime Chassis Blueprint",
+    "yesterday_vol": "205",
+    "today_vol": "141",
+    "custom_avg": "18.6"
+  },
+  {
+    "name": "Sevagoth Prime Systems Blueprint",
+    "yesterday_vol": "24",
+    "today_vol": "27",
+    "custom_avg": "1.8"
+  },
+  {
+    "name": "Epitaph Prime Set",
+    "yesterday_vol": "100",
+    "today_vol": "90",
+    "custom_avg": "10.5"
+  },
+  {
+    "name": "Epitaph Prime Blueprint",
+    "yesterday_vol": "12",
+    "today_vol": "9",
+    "custom_avg": "2.1"
+  },
+  {
+    "name": "Epitaph Prime Barrel",
+    "yesterday_vol": "36",
+    "today_vol": "26",
+    "custom_avg": "2"
+  },
+  {
+    "name": "Epitaph Prime Receiver",
+    "yesterday_vol": "74",
+    "today_vol": "73",
+    "custom_avg": "7.4"
+  },
+  {
+    "name": "Nautilus Prime Set",
+    "yesterday_vol": "243",
+    "today_vol": "179",
+    "custom_avg": "32.7"
+  },
+  {
+    "name": "Nautilus Prime Blueprint",
+    "yesterday_vol": "124",
+    "today_vol": "121",
+    "custom_avg": "8.5"
+  },
+  {
+    "name": "Nautilus Prime Cerebrum",
+    "yesterday_vol": "198",
+    "today_vol": "153",
+    "custom_avg": "19.7"
+  },
+  {
+    "name": "Nautilus Prime Carapace",
+    "yesterday_vol": "54",
+    "today_vol": "46",
+    "custom_avg": "3.2"
+  },
+  {
+    "name": "Nautilus Prime Systems",
+    "yesterday_vol": "62",
+    "today_vol": "48",
+    "custom_avg": "1.9"
+  },
+  {
+    "name": "Xaku Prime Set",
+    "yesterday_vol": "212",
+    "today_vol": "141",
+    "custom_avg": "23.3"
+  },
+  {
+    "name": "Xaku Prime Blueprint",
+    "yesterday_vol": "160",
+    "today_vol": "114",
+    "custom_avg": "9.8"
+  },
+  {
+    "name": "Xaku Prime Neuroptics Blueprint",
+    "yesterday_vol": "36",
+    "today_vol": "27",
+    "custom_avg": "2.1"
+  },
+  {
+    "name": "Xaku Prime Chassis Blueprint",
+    "yesterday_vol": "77",
+    "today_vol": "70",
+    "custom_avg": "4.5"
+  },
+  {
+    "name": "Xaku Prime Systems Blueprint",
+    "yesterday_vol": "91",
+    "today_vol": "58",
+    "custom_avg": "4.6"
+  },
+  {
+    "name": "Trumna Prime Set",
+    "yesterday_vol": "83",
+    "today_vol": "56",
+    "custom_avg": "19.7"
+  },
+  {
+    "name": "Trumna Prime Blueprint",
+    "yesterday_vol": "3",
+    "today_vol": "5",
+    "custom_avg": "1.2"
+  },
+  {
+    "name": "Trumna Prime Barrel",
+    "yesterday_vol": "74",
+    "today_vol": "51",
+    "custom_avg": "8.5"
+  },
+  {
+    "name": "Trumna Prime Receiver",
+    "yesterday_vol": "72",
+    "today_vol": "51",
+    "custom_avg": "8.2"
+  },
+  {
+    "name": "Trumna Prime Stock",
+    "yesterday_vol": "23",
+    "today_vol": "22",
+    "custom_avg": "3.1"
+  },
+  {
+    "name": "Quassus Prime Set",
+    "yesterday_vol": "39",
+    "today_vol": "52",
+    "custom_avg": "22.2"
+  },
+  {
+    "name": "Quassus Prime Blueprint",
+    "yesterday_vol": "28",
+    "today_vol": "23",
+    "custom_avg": "2.1"
+  },
+  {
+    "name": "Quassus Prime Handle",
+    "yesterday_vol": "17",
+    "today_vol": "19",
+    "custom_avg": "2.7"
+  },
+  {
+    "name": "Quassus Prime Blade",
+    "yesterday_vol": "86",
+    "today_vol": "67",
+    "custom_avg": "7.9"
+  },
+  {
+    "name": "Cedo Prime Set",
+    "yesterday_vol": "141",
+    "today_vol": "143",
+    "custom_avg": "19.4"
+  },
+  {
+    "name": "Cedo Prime Blueprint",
+    "yesterday_vol": "68",
+    "today_vol": "70",
+    "custom_avg": "8.5"
+  },
+  {
+    "name": "Cedo Prime Receiver",
+    "yesterday_vol": "40",
+    "today_vol": "28",
+    "custom_avg": "3"
+  },
+  {
+    "name": "Cedo Prime Barrel",
+    "yesterday_vol": "31",
+    "today_vol": "28",
+    "custom_avg": "3.3"
+  },
+  {
+    "name": "Cedo Prime Stock",
+    "yesterday_vol": "28",
+    "today_vol": "27",
+    "custom_avg": "3.7"
+  },
+  {
+    "name": "Dual Zoren Prime Set",
+    "yesterday_vol": "35",
+    "today_vol": "25",
+    "custom_avg": "28.9"
+  },
+  {
+    "name": "Dual Zoren Prime Blueprint",
+    "yesterday_vol": "24",
+    "today_vol": "14",
+    "custom_avg": "2.1"
+  },
+  {
+    "name": "Dual Zoren Prime Handle",
+    "yesterday_vol": "13",
+    "today_vol": "13",
+    "custom_avg": "2.3"
+  },
+  {
+    "name": "Dual Zoren Prime Blade",
+    "yesterday_vol": "82",
+    "today_vol": "75",
+    "custom_avg": "9.4"
+  },
+  {
+    "name": "Lavos Prime Set",
+    "yesterday_vol": "109",
+    "today_vol": "87",
+    "custom_avg": "23.1"
+  },
+  {
+    "name": "Lavos Prime Blueprint",
+    "yesterday_vol": "88",
+    "today_vol": "73",
+    "custom_avg": "5.9"
+  },
+  {
+    "name": "Lavos Prime Neuroptics Blueprint",
+    "yesterday_vol": "56",
+    "today_vol": "55",
+    "custom_avg": "4.4"
+  },
+  {
+    "name": "Lavos Prime Chassis Blueprint",
+    "yesterday_vol": "25",
+    "today_vol": "37",
+    "custom_avg": "2"
+  },
+  {
+    "name": "Lavos Prime Systems Blueprint",
+    "yesterday_vol": "100",
+    "today_vol": "93",
+    "custom_avg": "7.9"
+  },
+  {
+    "name": "Yareli Prime Set",
+    "yesterday_vol": "124",
+    "today_vol": "109",
+    "custom_avg": "37.8"
+  },
+  {
+    "name": "Yareli Prime Blueprint",
+    "yesterday_vol": "49",
+    "today_vol": "39",
+    "custom_avg": "2.9"
+  },
+  {
+    "name": "Yareli Prime Neuroptics Blueprint",
+    "yesterday_vol": "134",
+    "today_vol": "86",
+    "custom_avg": "9"
+  },
+  {
+    "name": "Yareli Prime Chassis Blueprint",
+    "yesterday_vol": "41",
+    "today_vol": "56",
+    "custom_avg": "3.1"
+  },
+  {
+    "name": "Yareli Prime Systems Blueprint",
+    "yesterday_vol": "190",
+    "today_vol": "114",
+    "custom_avg": "19.4"
+  },
+  {
+    "name": "Daikyu Prime Set",
+    "yesterday_vol": "32",
+    "today_vol": "13",
+    "custom_avg": "18.7"
+  },
+  {
+    "name": "Daikyu Prime Blueprint",
+    "yesterday_vol": "4",
+    "today_vol": "0",
+    "custom_avg": "1.1"
+  },
+  {
+    "name": "Daikyu Prime Lower Limb",
+    "yesterday_vol": "16",
+    "today_vol": "21",
+    "custom_avg": "2.3"
+  },
+  {
+    "name": "Daikyu Prime Upper Limb",
+    "yesterday_vol": "31",
+    "today_vol": "18",
+    "custom_avg": "3.4"
+  },
+  {
+    "name": "Daikyu Prime Grip",
+    "yesterday_vol": "85",
+    "today_vol": "67",
+    "custom_avg": "6.9"
+  },
+  {
+    "name": "Daikyu Prime String",
+    "yesterday_vol": "32",
+    "today_vol": "25",
+    "custom_avg": "5.1"
+  },
+  {
+    "name": "Kompressa Prime Set",
+    "yesterday_vol": "98",
+    "today_vol": "92",
+    "custom_avg": "15.5"
+  },
+  {
+    "name": "Kompressa Prime Blueprint",
+    "yesterday_vol": "17",
+    "today_vol": "13",
+    "custom_avg": "3.5"
+  },
+  {
+    "name": "Kompressa Prime Barrel",
+    "yesterday_vol": "104",
+    "today_vol": "59",
+    "custom_avg": "7.3"
+  },
+  {
+    "name": "Kompressa Prime Receiver",
+    "yesterday_vol": "50",
+    "today_vol": "31",
+    "custom_avg": "4.3"
+  },
+  {
+    "name": "Caliban Prime Set",
+    "yesterday_vol": "262",
+    "today_vol": "200",
+    "custom_avg": "33.6"
+  },
+  {
+    "name": "Caliban Prime Blueprint",
+    "yesterday_vol": "52",
+    "today_vol": "33",
+    "custom_avg": "2.8"
+  },
+  {
+    "name": "Caliban Prime Neuroptics Blueprint",
+    "yesterday_vol": "178",
+    "today_vol": "116",
+    "custom_avg": "9.1"
+  },
+  {
+    "name": "Caliban Prime Chassis Blueprint",
+    "yesterday_vol": "43",
+    "today_vol": "31",
+    "custom_avg": "1.7"
+  },
+  {
+    "name": "Caliban Prime Systems Blueprint",
+    "yesterday_vol": "159",
+    "today_vol": "140",
+    "custom_avg": "18.5"
+  },
+  {
+    "name": "Vadarya Prime Set",
+    "yesterday_vol": "95",
+    "today_vol": "72",
+    "custom_avg": "14.2"
+  },
+  {
+    "name": "Vadarya Prime Blueprint",
+    "yesterday_vol": "28",
+    "today_vol": "34",
+    "custom_avg": "7.2"
+  },
+  {
+    "name": "Vadarya Prime Barrel",
+    "yesterday_vol": "26",
+    "today_vol": "20",
+    "custom_avg": "3.2"
+  },
+  {
+    "name": "Vadarya Prime Receiver",
+    "yesterday_vol": "45",
+    "today_vol": "27",
+    "custom_avg": "2.2"
+  },
+  {
+    "name": "Vadarya Prime Stock",
+    "yesterday_vol": "21",
+    "today_vol": "22",
+    "custom_avg": "4"
+  },
+  {
+    "name": "Venato Prime Set",
+    "yesterday_vol": "53",
+    "today_vol": "43",
+    "custom_avg": "13.8"
+  },
+  {
+    "name": "Venato Prime Blueprint",
+    "yesterday_vol": "36",
+    "today_vol": "19",
+    "custom_avg": "2.2"
+  },
+  {
+    "name": "Venato Prime Blade",
+    "yesterday_vol": "51",
+    "today_vol": "51",
+    "custom_avg": "8.7"
+  },
+  {
+    "name": "Venato Prime Handle",
+    "yesterday_vol": "18",
+    "today_vol": "11",
+    "custom_avg": "3.3"
+  },
+  {
+    "name": "Gyre Prime Set",
+    "yesterday_vol": "354",
+    "today_vol": "261",
+    "custom_avg": "40.9"
+  },
+  {
+    "name": "Gyre Prime Blueprint",
+    "yesterday_vol": "141",
+    "today_vol": "125",
+    "custom_avg": "5.1"
+  },
+  {
+    "name": "Gyre Prime Neuroptics Blueprint",
+    "yesterday_vol": "221",
+    "today_vol": "178",
+    "custom_avg": "9.5"
+  },
+  {
+    "name": "Gyre Prime Chassis Blueprint",
+    "yesterday_vol": "216",
+    "today_vol": "199",
+    "custom_avg": "11.6"
+  },
+  {
+    "name": "Gyre Prime Systems Blueprint",
+    "yesterday_vol": "77",
+    "today_vol": "81",
+    "custom_avg": "4.1"
+  },
+  {
+    "name": "Alternox Prime Set",
+    "yesterday_vol": "96",
+    "today_vol": "67",
+    "custom_avg": "34.9"
+  },
+  {
+    "name": "Alternox Prime Blueprint",
+    "yesterday_vol": "74",
+    "today_vol": "52",
+    "custom_avg": "10.6"
+  },
+  {
+    "name": "Alternox Prime Barrel",
+    "yesterday_vol": "47",
+    "today_vol": "28",
+    "custom_avg": "2.9"
+  },
+  {
+    "name": "Alternox Prime Receiver",
+    "yesterday_vol": "28",
+    "today_vol": "31",
+    "custom_avg": "4"
+  },
+  {
+    "name": "Alternox Prime Stock",
+    "yesterday_vol": "81",
+    "today_vol": "54",
+    "custom_avg": "8.3"
+  },
+  {
+    "name": "Kestrel Prime Set",
+    "yesterday_vol": "82",
+    "today_vol": "52",
+    "custom_avg": "29.4"
+  },
+  {
+    "name": "Kestrel Prime Blueprint",
+    "yesterday_vol": "26",
+    "today_vol": "26",
+    "custom_avg": "2.9"
+  },
+  {
+    "name": "Kestrel Prime Grip",
+    "yesterday_vol": "61",
+    "today_vol": "45",
+    "custom_avg": "9.3"
+  },
+  {
+    "name": "Kestrel Prime Blade",
+    "yesterday_vol": "92",
+    "today_vol": "78",
+    "custom_avg": "4.2"
+  }
+]

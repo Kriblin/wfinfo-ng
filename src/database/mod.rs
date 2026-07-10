@@ -33,11 +33,11 @@ impl Database {
         prices: Option<&Path>,
         filtered_items: Option<&Path>,
     ) -> Result<Database> {
-        let prices_path = prices.unwrap_or_else(|| Path::new("prices.json"));
+        let prices_path = prices.unwrap_or_else(|| Path::new("test-data/prices.json"));
         let price_table = Self::load_prices(prices_path)?;
 
         let filtered_items_path =
-            filtered_items.unwrap_or_else(|| Path::new("filtered_items.json"));
+            filtered_items.unwrap_or_else(|| Path::new("test-data/filtered_items.json"));
         let filtered_items = Self::load_filtered_items(filtered_items_path)?;
 
         let mut items = Self::process_items(
