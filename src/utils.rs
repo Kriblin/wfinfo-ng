@@ -364,6 +364,7 @@ fn temp_file_path(destination: &Path) -> PathBuf {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::sync::{Arc, Mutex};
     use std::time::{SystemTime, UNIX_EPOCH};
 
     fn unique_temp_dir() -> PathBuf {
@@ -447,7 +448,7 @@ mod tests {
         fs::write(config.prices_file_path.as_ref().unwrap(), "[]").unwrap();
         fs::write(config.items_file_path.as_ref().unwrap(), "{}").unwrap();
 
-        let paths = ensure_database_files_with_fetcher(&config, |_| {
+        let paths = ensure_database_files_with_fetcher(&config, |_, _| {
             panic!("valid existing files should not be downloaded")
         })
         .unwrap();
@@ -467,9 +468,14 @@ mod tests {
         fs::write(config.prices_file_path.as_ref().unwrap(), "invalid").unwrap();
         fs::write(config.items_file_path.as_ref().unwrap(), "{}").unwrap();
 
-        ensure_database_files_with_fetcher(&config, |url| {
+        ensure_database_files_with_fetcher(&config, |url, etag| {
+            assert!(etag.is_none());
             if url == PRICES_URL {
-                Ok("[]".to_string())
+                Ok(FetchResponse {
+                    status: 200,
+                    etag: Some("\"prices-v1\"".to_string()),
+                    body: Some("[]".to_string()),
+                })
             } else {
                 panic!("valid existing items file should not be downloaded")
             }
@@ -479,6 +485,250 @@ mod tests {
         assert_eq!(
             fs::read_to_string(config.prices_file_path.as_ref().unwrap()).unwrap(),
             "[]"
+        );
+        assert_eq!(
+            fs::read_to_string(etag_path(config.prices_file_path.as_ref().unwrap())).unwrap(),
+            "\"prices-v1\""
+        );
+    }
+
+    #[test]
+    fn first_successful_refresh_writes_body_and_etag() {
+        let dir = unique_temp_dir();
+        let config = Config {
+            prices_file_path: Some(dir.join(PRICES_FILE_NAME)),
+            items_file_path: Some(dir.join(FILTERED_ITEMS_FILE_NAME)),
+            ..Config::default()
+        };
+
+        let result = refresh_database_files_with_fetcher(&config, |url, etag| {
+            assert!(etag.is_none());
+            let (body, etag) = if url == PRICES_URL {
+                (r#"[{"item_name":"Forma"}]"#, "\"prices-v1\"")
+            } else {
+                (r#"{"items":[]}"#, "\"items-v1\"")
+            };
+
+            Ok(FetchResponse {
+                status: 200,
+                etag: Some(etag.to_string()),
+                body: Some(body.to_string()),
+            })
+        })
+        .unwrap();
+
+        assert_eq!(result.prices.state, CacheRefreshState::Updated);
+        assert_eq!(result.items.state, CacheRefreshState::Updated);
+        assert_eq!(
+            fs::read_to_string(config.prices_file_path.as_ref().unwrap()).unwrap(),
+            "[\n  {\n    \"item_name\": \"Forma\"\n  }\n]"
+        );
+        assert_eq!(
+            fs::read_to_string(etag_path(config.prices_file_path.as_ref().unwrap())).unwrap(),
+            "\"prices-v1\""
+        );
+        assert_eq!(
+            fs::read_to_string(etag_path(config.items_file_path.as_ref().unwrap())).unwrap(),
+            "\"items-v1\""
+        );
+    }
+
+    #[test]
+    fn second_refresh_sends_if_none_match_and_keeps_not_modified_files() {
+        let dir = unique_temp_dir();
+        let config = Config {
+            prices_file_path: Some(dir.join(PRICES_FILE_NAME)),
+            items_file_path: Some(dir.join(FILTERED_ITEMS_FILE_NAME)),
+            ..Config::default()
+        };
+
+        refresh_database_files_with_fetcher(&config, |url, etag| {
+            assert!(etag.is_none());
+            let (body, etag) = if url == PRICES_URL {
+                (r#"["first-prices"]"#, "\"prices-v1\"")
+            } else {
+                (r#"{"first":"items"}"#, "\"items-v1\"")
+            };
+            Ok(FetchResponse {
+                status: 200,
+                etag: Some(etag.to_string()),
+                body: Some(body.to_string()),
+            })
+        })
+        .unwrap();
+
+        let observed_etags = Arc::new(Mutex::new(Vec::new()));
+        let observed_etags_clone = observed_etags.clone();
+        let result = refresh_database_files_with_fetcher(&config, move |url, etag| {
+            observed_etags_clone
+                .lock()
+                .unwrap()
+                .push((url.to_string(), etag.map(ToOwned::to_owned)));
+            Ok(FetchResponse {
+                status: 304,
+                etag: None,
+                body: None,
+            })
+        })
+        .unwrap();
+
+        assert_eq!(result.prices.state, CacheRefreshState::NotModified);
+        assert_eq!(result.items.state, CacheRefreshState::NotModified);
+        assert_eq!(
+            fs::read_to_string(config.prices_file_path.as_ref().unwrap()).unwrap(),
+            "[\n  \"first-prices\"\n]"
+        );
+        assert_eq!(
+            fs::read_to_string(config.items_file_path.as_ref().unwrap()).unwrap(),
+            "{\n  \"first\": \"items\"\n}"
+        );
+        assert_eq!(
+            *observed_etags.lock().unwrap(),
+            vec![
+                (PRICES_URL.to_string(), Some("\"prices-v1\"".to_string())),
+                (
+                    FILTERED_ITEMS_URL.to_string(),
+                    Some("\"items-v1\"".to_string())
+                ),
+            ]
+        );
+    }
+
+    #[test]
+    fn error_status_does_not_overwrite_cached_file_or_etag() {
+        let dir = unique_temp_dir();
+        let config = Config {
+            prices_file_path: Some(dir.join(PRICES_FILE_NAME)),
+            items_file_path: Some(dir.join(FILTERED_ITEMS_FILE_NAME)),
+            ..Config::default()
+        };
+        fs::write(config.prices_file_path.as_ref().unwrap(), r#"["cached"]"#).unwrap();
+        fs::write(
+            config.items_file_path.as_ref().unwrap(),
+            r#"{"cached":true}"#,
+        )
+        .unwrap();
+        write_etag(config.prices_file_path.as_ref().unwrap(), "\"prices-v1\"").unwrap();
+        write_etag(config.items_file_path.as_ref().unwrap(), "\"items-v1\"").unwrap();
+
+        let result = refresh_database_files_with_fetcher(&config, |_, _| {
+            Ok(FetchResponse {
+                status: 500,
+                etag: Some("\"should-not-write\"".to_string()),
+                body: Some(r#"["server"]"#.to_string()),
+            })
+        })
+        .unwrap();
+
+        assert_eq!(result.prices.state, CacheRefreshState::Failed);
+        assert_eq!(result.items.state, CacheRefreshState::Failed);
+        assert_eq!(
+            fs::read_to_string(config.prices_file_path.as_ref().unwrap()).unwrap(),
+            r#"["cached"]"#
+        );
+        assert_eq!(
+            fs::read_to_string(etag_path(config.prices_file_path.as_ref().unwrap())).unwrap(),
+            "\"prices-v1\""
+        );
+    }
+
+    #[test]
+    fn service_unavailable_does_not_overwrite_cached_file_or_etag() {
+        let dir = unique_temp_dir();
+        let config = Config {
+            prices_file_path: Some(dir.join(PRICES_FILE_NAME)),
+            items_file_path: Some(dir.join(FILTERED_ITEMS_FILE_NAME)),
+            ..Config::default()
+        };
+        fs::write(config.prices_file_path.as_ref().unwrap(), r#"["cached"]"#).unwrap();
+        fs::write(
+            config.items_file_path.as_ref().unwrap(),
+            r#"{"cached":true}"#,
+        )
+        .unwrap();
+        write_etag(config.prices_file_path.as_ref().unwrap(), "\"prices-v1\"").unwrap();
+        write_etag(config.items_file_path.as_ref().unwrap(), "\"items-v1\"").unwrap();
+
+        let result = refresh_database_files_with_fetcher(&config, |_, _| {
+            Ok(FetchResponse {
+                status: 503,
+                etag: Some("\"should-not-write\"".to_string()),
+                body: Some(r#"["server"]"#.to_string()),
+            })
+        })
+        .unwrap();
+
+        assert_eq!(result.prices.state, CacheRefreshState::Failed);
+        assert_eq!(result.prices.http_status, Some(503));
+        assert!(result.prices.message.contains("temporarily unavailable"));
+        assert_eq!(
+            fs::read_to_string(config.prices_file_path.as_ref().unwrap()).unwrap(),
+            r#"["cached"]"#
+        );
+        assert_eq!(
+            fs::read_to_string(etag_path(config.prices_file_path.as_ref().unwrap())).unwrap(),
+            "\"prices-v1\""
+        );
+    }
+
+    #[test]
+    fn missing_local_file_with_not_modified_response_is_an_error() {
+        let dir = unique_temp_dir();
+        let config = Config {
+            prices_file_path: Some(dir.join(PRICES_FILE_NAME)),
+            items_file_path: Some(dir.join(FILTERED_ITEMS_FILE_NAME)),
+            ..Config::default()
+        };
+
+        let error = refresh_database_files_with_fetcher(&config, |_, _| {
+            Ok(FetchResponse {
+                status: 304,
+                etag: None,
+                body: None,
+            })
+        })
+        .unwrap_err();
+
+        assert!(error.to_string().contains("304 Not Modified"));
+        assert!(!config.prices_file_path.as_ref().unwrap().exists());
+    }
+
+    #[test]
+    fn missing_etag_performs_request_without_if_none_match() {
+        let dir = unique_temp_dir();
+        let config = Config {
+            prices_file_path: Some(dir.join(PRICES_FILE_NAME)),
+            items_file_path: Some(dir.join(FILTERED_ITEMS_FILE_NAME)),
+            ..Config::default()
+        };
+        fs::write(config.prices_file_path.as_ref().unwrap(), "[]").unwrap();
+        fs::write(config.items_file_path.as_ref().unwrap(), "{}").unwrap();
+
+        let observed_etags = Arc::new(Mutex::new(Vec::new()));
+        let observed_etags_clone = observed_etags.clone();
+        refresh_database_files_with_fetcher(&config, move |url, etag| {
+            observed_etags_clone
+                .lock()
+                .unwrap()
+                .push((url.to_string(), etag.map(ToOwned::to_owned)));
+            Ok(FetchResponse {
+                status: 200,
+                etag: None,
+                body: Some(if url == PRICES_URL {
+                    "[]".to_string()
+                } else {
+                    "{}".to_string()
+                }),
+            })
+        })
+        .unwrap();
+
+        assert_eq!(
+            *observed_etags.lock().unwrap(),
+            vec![
+                (PRICES_URL.to_string(), None),
+                (FILTERED_ITEMS_URL.to_string(), None),
+            ]
         );
     }
 }
