@@ -3,9 +3,11 @@ use std::{fs::write, path::PathBuf};
 use image::ImageReader;
 use indexmap::IndexMap;
 use wfinfo::{
+    config::Config,
     database::Database,
     ocr::{normalize_string, reward_image_to_reward_names},
     testing::Label,
+    utils::ensure_database_files,
 };
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -43,8 +45,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let text: Vec<_> = detections.iter().map(|s| normalize_string(s)).collect();
         println!("{:#?}", text);
 
+        let (prices_path, items_path) = match ensure_database_files(&Config::default()) {
+            Ok(paths) => paths,
+            Err(e) => {
+                eprintln!("Error updating database files: {}", e);
+                continue;
+            }
+        };
+
         // Load the database
-        let db = match Database::load_from_file(None, None) {
+        let db = match Database::load_from_file(Some(&prices_path), Some(&items_path)) {
             Ok(db) => db,
             Err(e) => {
                 eprintln!("Error loading database: {}", e);

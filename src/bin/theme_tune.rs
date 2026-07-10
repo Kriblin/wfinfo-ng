@@ -13,9 +13,11 @@ use eframe::epaint::ColorImage;
 use image::{DynamicImage, ImageReader, Rgb};
 use palette::{FromColor, Hsl, Srgb};
 use wfinfo::{
+    config::Config,
     database::Database,
     ocr::{self, normalize_string},
     theme::{HslRange, Theme},
+    utils::ensure_database_files,
 };
 
 fn main() {
@@ -90,8 +92,22 @@ fn spawn_ocr_thread(
     let images = images.to_owned();
 
     thread::spawn(move || {
+        let (prices_path, items_path) = match ensure_database_files(&Config::default()) {
+            Ok(paths) => paths,
+            Err(e) => {
+                eprintln!("Error updating database files: {}", e);
+                if let Err(send_err) = response_sender.send(vec![(
+                    "ERROR".to_string(),
+                    format!("Failed to update database files: {}", e),
+                )]) {
+                    eprintln!("Error sending database error: {}", send_err);
+                }
+                return;
+            }
+        };
+
         // Try to load the database
-        let database = match Database::load_from_file(None, None) {
+        let database = match Database::load_from_file(Some(&prices_path), Some(&items_path)) {
             Ok(db) => db,
             Err(e) => {
                 eprintln!("Error loading database: {}", e);
