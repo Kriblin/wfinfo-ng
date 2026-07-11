@@ -28,7 +28,7 @@ use log::{debug, error, info, warn};
 #[allow(dead_code)]
 fn benchmark() -> Result<(), Box<dyn Error>> {
     for _ in 0..10 {
-        let image = image::open("input3.png").map_err(|e| Box::<dyn Error>::from(e))?;
+        let image = image::open("input3.png").map_err(Box::<dyn Error>::from)?;
         println!("Converted");
         let (text, _theme) = reward_image_to_reward_names(image, None)?;
         println!("got names");
@@ -113,7 +113,7 @@ pub fn run() -> Result<(), Box<dyn Error>> {
     let (prices_path, items_path) = ensure_database_files(&config)?;
 
     let db = Database::load_from_file(Some(prices_path.as_path()), Some(items_path.as_path()))
-        .map_err(|e| Box::<dyn Error>::from(e))?;
+        .map_err(Box::<dyn Error>::from)?;
 
     info!("Loaded database");
 
