@@ -145,8 +145,8 @@ impl eframe::App for OverlayApp {
             );
         }
 
-        if self.state.is_visible() {
-            if let Some(last_update) = self.state.last_update {
+        if self.state.is_visible()
+            && let Some(last_update) = self.state.last_update {
                 let timeout = Duration::from_secs(10);
                 if last_update.elapsed() >= timeout {
                     self.state.rewards.clear();
@@ -155,7 +155,6 @@ impl eframe::App for OverlayApp {
                     ctx.request_repaint_after(timeout - last_update.elapsed());
                 }
             }
-        }
     }
 
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {

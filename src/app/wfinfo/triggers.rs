@@ -129,11 +129,10 @@ pub(super) fn hotkey_watcher(hotkey: HotKey, event_sender: mpsc::Sender<()>) {
 
         while let Ok(event) = GlobalHotKeyEvent::receiver().recv() {
             debug!("Hotkey event: {:?}", event);
-            if event.state == HotKeyState::Pressed {
-                if let Err(err) = event_sender.send(()) {
+            if event.state == HotKeyState::Pressed
+                && let Err(err) = event_sender.send(()) {
                     error!("Failed to send event: {}", err);
                 }
-            }
         }
     });
 }

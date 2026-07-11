@@ -37,11 +37,10 @@ fn benchmark() -> Result<(), Box<dyn Error>> {
     }
 
     // Clean up OCR resources
-    if let Ok(mut guard) = OCR.lock() {
-        if let Some(ocr) = guard.take() {
+    if let Ok(mut guard) = OCR.lock()
+        && let Some(ocr) = guard.take() {
             drop(ocr);
         }
-    }
     Ok(())
 }
 
@@ -176,12 +175,11 @@ pub fn run() -> Result<(), Box<dyn Error>> {
 
                     match run_detection(image.clone(), &db_thread) {
                         Ok((rewards, theme, raw_text)) => {
-                            if config_thread.save_screenshots {
-                                if let Err(e) = save_screenshot_and_label(&image, &theme, &raw_text)
+                            if config_thread.save_screenshots
+                                && let Err(e) = save_screenshot_and_label(&image, &theme, &raw_text)
                                 {
                                     error!("Failed to save screenshot: {}", e);
                                 }
-                            }
                             if let Err(e) = reward_sender.send((rewards, theme, raw_text)) {
                                 error!("Failed to send rewards to UI: {}", e);
                             }
@@ -208,11 +206,10 @@ pub fn run() -> Result<(), Box<dyn Error>> {
     .map_err(|e| Box::new(e) as Box<dyn Error>)?;
 
     // Clean up OCR resources
-    if let Ok(mut guard) = OCR.lock() {
-        if let Some(ocr) = guard.take() {
+    if let Ok(mut guard) = OCR.lock()
+        && let Some(ocr) = guard.take() {
             drop(ocr);
         }
-    }
     Ok(())
 }
 
