@@ -1,9 +1,3 @@
-use serde::{Deserialize, Serialize};
+//! Compatibility facade for screenshot label data.
 
-use crate::theme::Theme;
-
-#[derive(Serialize, Deserialize)]
-pub struct Label {
-    pub theme: Theme,
-    pub items: Vec<String>,
-}
+pub use crate::capture::labels::Label;
