@@ -9,7 +9,7 @@ use eframe::egui;
 
 use crate::{
     config::{CaptureMode, Config},
-    utils::{
+    database::cache::{
         CacheRefreshState, CachedFileRefreshResult, DatabaseRefreshResult, database_cache_status,
         refresh_database_files_with_status,
     },

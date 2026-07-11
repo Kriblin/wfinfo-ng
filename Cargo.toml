@@ -17,6 +17,22 @@ path = "src/bin/main.rs"
 name = "settings"
 path = "src/bin/settings.rs"
 
+[[bin]]
+name = "ability-timer"
+path = "src/bin/ability-timer.rs"
+
+[[bin]]
+name = "image"
+path = "src/bin/image.rs"
+
+[[bin]]
+name = "relics"
+path = "src/bin/relics.rs"
+
+[[bin]]
+name = "theme_tune"
+path = "src/bin/theme_tune.rs"
+
 [dependencies]
 anyhow = "1.0"
 approx = "0.5.1"

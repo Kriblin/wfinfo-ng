@@ -39,21 +39,18 @@ impl OverlayState {
     }
 
     pub fn clear_if_timed_out(&mut self, timeout: Duration) {
-        match self.last_update {
-            Some(last_update) => {
-                let elapsed = last_update.elapsed();
-                if elapsed > timeout {
-                    debug!(
-                        "Overlay timed out: elapsed={:?} > timeout={:?}, clearing rewards_count={}",
-                        elapsed,
-                        timeout,
-                        self.rewards.len()
-                    );
-                    self.rewards.clear();
-                    self.last_update = None;
-                }
+        if let Some(last_update) = self.last_update {
+            let elapsed = last_update.elapsed();
+            if elapsed > timeout {
+                debug!(
+                    "Overlay timed out: elapsed={:?} > timeout={:?}, clearing rewards_count={}",
+                    elapsed,
+                    timeout,
+                    self.rewards.len()
+                );
+                self.rewards.clear();
+                self.last_update = None;
             }
-            _ => {}
         }
     }
 
@@ -145,15 +142,15 @@ impl eframe::App for OverlayApp {
             );
         }
 
-        if self.state.is_visible() {
-            if let Some(last_update) = self.state.last_update {
-                let timeout = Duration::from_secs(10);
-                if last_update.elapsed() >= timeout {
-                    self.state.rewards.clear();
-                    ctx.request_repaint();
-                } else {
-                    ctx.request_repaint_after(timeout - last_update.elapsed());
-                }
+        if self.state.is_visible()
+            && let Some(last_update) = self.state.last_update
+        {
+            let timeout = Duration::from_secs(10);
+            if last_update.elapsed() >= timeout {
+                self.state.rewards.clear();
+                ctx.request_repaint();
+            } else {
+                ctx.request_repaint_after(timeout - last_update.elapsed());
             }
         }
     }
