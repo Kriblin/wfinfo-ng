@@ -15,20 +15,24 @@ use crate::{
     config::CaptureMode,
     theme::Theme,
     ui::{
-        overlay::{OverlayState, Reward, draw_overlay},
+        overlay::{OverlayState, Reward, draw_overlay, draw_reward_list},
         settings::SettingsApp,
-        state::{DetectionState, MainUiState, WindowCaptureState, WindowTitleState},
+        state::{
+            DetectionState, LastCaptureState, MainUiState, WindowCaptureState, WindowTitleState,
+        },
     },
 };
 
 pub struct MainApp {
     overlay_state: OverlayState,
+    last_capture_state: LastCaptureState,
     reward_receiver: mpsc::Receiver<(Vec<Reward>, Theme, Vec<String>)>,
     ui_state: MainUiState,
     window_title_state: WindowTitleState,
     window_capture_state: WindowCaptureState,
     window_title_input: String,
     capture_mode: CaptureMode,
+    overlay_enabled: bool,
     overlay_active: bool,
     settings_open: Arc<AtomicBool>,
     settings_app: Arc<Mutex<SettingsApp>>,
@@ -50,12 +54,14 @@ impl MainApp {
 
         Self {
             overlay_state: OverlayState::new(),
+            last_capture_state: LastCaptureState::default(),
             reward_receiver,
             ui_state: MainUiState::new(detection),
             window_title_state,
             window_capture_state,
             window_title_input,
             capture_mode,
+            overlay_enabled: true,
             overlay_active: false,
             settings_open: Arc::new(AtomicBool::new(false)),
             settings_app: Arc::new(Mutex::new(SettingsApp::new())),
