@@ -38,7 +38,6 @@ fn benchmark() -> Result<(), Box<dyn Error>> {
 
     // Clean up OCR resources
     if let Ok(mut guard) = OCR.lock()
-    if let Ok(mut guard) = OCR.lock()
         && let Some(ocr) = guard.take()
     {
         drop(ocr);
@@ -179,8 +178,6 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                         Ok((rewards, theme, raw_text)) => {
                             if config_thread.save_screenshots
                                 && let Err(e) = save_screenshot_and_label(&image, &theme, &raw_text)
-                            if config_thread.save_screenshots
-                                && let Err(e) = save_screenshot_and_label(&image, &theme, &raw_text)
                             {
                                 error!("Failed to save screenshot: {}", e);
                             }
@@ -210,7 +207,6 @@ pub fn run() -> Result<(), Box<dyn Error>> {
     .map_err(|e| Box::new(e) as Box<dyn Error>)?;
 
     // Clean up OCR resources
-    if let Ok(mut guard) = OCR.lock()
     if let Ok(mut guard) = OCR.lock()
         && let Some(ocr) = guard.take()
     {
