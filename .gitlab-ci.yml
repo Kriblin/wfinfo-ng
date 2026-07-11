@@ -19,6 +19,8 @@ cache:
 
 format:
   stage: formatting
+  before_script:
+    - rustup component add rustfmt
   script:
     - cargo fmt --check
 
