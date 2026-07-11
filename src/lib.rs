@@ -1,3 +1,5 @@
+pub mod app;
+pub mod capture;
 pub mod config;
 pub mod database;
 pub mod error;
@@ -9,4 +11,5 @@ pub mod settings;
 pub mod statistics;
 pub mod testing;
 pub mod theme;
+pub mod ui;
 pub mod utils;
