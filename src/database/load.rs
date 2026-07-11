@@ -129,7 +129,7 @@ impl Database {
                     })
                     .chain(set_item)
             })
-            .chain(ignored_items.into_iter().map(|(name, _)| Item {
+            .chain(ignored_items.into_keys().map(|name| Item {
                 name: name.to_owned(),
                 drop_name: name.to_owned(),
                 platinum: 0.0,
