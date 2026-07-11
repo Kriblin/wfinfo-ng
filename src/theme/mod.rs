@@ -5,6 +5,10 @@ use ordered_float::OrderedFloat;
 use palette::{FromColor, Hsl, RgbHue, Srgb};
 use serde::{Deserialize, Serialize};
 
+mod detection;
+
+pub use detection::detect_theme;
+
 #[derive(Clone, Debug, PartialEq, Hash, Eq, Serialize, Deserialize)]
 pub struct HslRange<T> {
     pub hue: Range<T>,
