@@ -62,54 +62,68 @@ impl OverlayState {
 pub fn draw_overlay(ui: &mut egui::Ui, state: &OverlayState) {
     if !state.rewards.is_empty() {
         ui.heading(egui::RichText::new("Rewards").color(egui::Color32::WHITE));
-        for chunk in state.rewards.chunks(4) {
-            ui.columns(4, |columns| {
-                for (i, reward) in chunk.iter().enumerate() {
-                    let ui = &mut columns[i];
-                    ui.vertical(|ui| {
-                        if reward.is_best {
-                            ui.label(
-                                egui::RichText::new(&reward.name)
-                                    .color(egui::Color32::GREEN)
-                                    .strong(),
-                            );
-                            ui.label(
-                                egui::RichText::new(format!(
-                                    "{}p, {}d",
-                                    reward.platinum, reward.ducats
-                                ))
-                                .color(egui::Color32::GREEN)
-                                .strong(),
-                            );
-                            ui.label(
-                                egui::RichText::new("BEST")
-                                    .color(egui::Color32::GOLD)
-                                    .strong(),
-                            );
-                            ui.label(
-                                egui::RichText::new(&reward.set_info)
-                                    .color(egui::Color32::LIGHT_GRAY),
-                            );
-                        } else {
-                            ui.label(
-                                egui::RichText::new(&reward.name).color(egui::Color32::LIGHT_GRAY),
-                            );
-                            ui.label(
-                                egui::RichText::new(format!(
-                                    "{}p, {}d",
-                                    reward.platinum, reward.ducats
-                                ))
-                                .color(egui::Color32::LIGHT_GRAY),
-                            );
+        draw_reward_list_with_style(ui, &state.rewards, RewardListStyle::Overlay);
+    }
+}
 
-                            ui.label(
-                                egui::RichText::new(&reward.set_info)
-                                    .color(egui::Color32::LIGHT_GRAY),
-                            );
-                        }
-                    });
-                }
-            });
+/// Draw rewards using the surrounding UI's normal text colors.
+pub fn draw_reward_list(ui: &mut egui::Ui, rewards: &[Reward]) {
+    draw_reward_list_with_style(ui, rewards, RewardListStyle::MainWindow);
+}
+
+#[derive(Clone, Copy)]
+enum RewardListStyle {
+    Overlay,
+    MainWindow,
+}
+
+fn draw_reward_list_with_style(ui: &mut egui::Ui, rewards: &[Reward], style: RewardListStyle) {
+    for chunk in rewards.chunks(4) {
+        ui.columns(4, |columns| {
+            for (i, reward) in chunk.iter().enumerate() {
+                columns[i].vertical(|ui| draw_reward(ui, reward, style));
+            }
+        });
+    }
+}
+
+fn draw_reward(ui: &mut egui::Ui, reward: &Reward, style: RewardListStyle) {
+    let value = format!("{}p, {}d", reward.platinum, reward.ducats);
+
+    match (style, reward.is_best) {
+        (RewardListStyle::Overlay, true) => {
+            ui.label(
+                egui::RichText::new(&reward.name)
+                    .color(egui::Color32::GREEN)
+                    .strong(),
+            );
+            ui.label(
+                egui::RichText::new(value)
+                    .color(egui::Color32::GREEN)
+                    .strong(),
+            );
+            ui.label(
+                egui::RichText::new("BEST")
+                    .color(egui::Color32::GOLD)
+                    .strong(),
+            );
+            ui.label(egui::RichText::new(&reward.set_info).color(egui::Color32::LIGHT_GRAY));
+        }
+        (RewardListStyle::Overlay, false) => {
+            ui.label(egui::RichText::new(&reward.name).color(egui::Color32::LIGHT_GRAY));
+            ui.label(egui::RichText::new(value).color(egui::Color32::LIGHT_GRAY));
+            ui.label(egui::RichText::new(&reward.set_info).color(egui::Color32::LIGHT_GRAY));
+        }
+        (RewardListStyle::MainWindow, true) => {
+            ui.strong(&reward.name);
+            ui.strong(value);
+            ui.strong("BEST");
+            ui.weak(&reward.set_info);
+        }
+        (RewardListStyle::MainWindow, false) => {
+            ui.label(&reward.name);
+            ui.label(value);
+            ui.weak(&reward.set_info);
         }
     }
 }

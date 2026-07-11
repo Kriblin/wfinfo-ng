@@ -3,6 +3,25 @@ use std::sync::{
     atomic::{AtomicBool, Ordering},
 };
 
+use crate::ui::overlay::Reward;
+
+#[derive(Debug, Default)]
+pub struct LastCaptureState {
+    rewards: Option<Vec<Reward>>,
+}
+
+impl LastCaptureState {
+    pub fn update(&mut self, rewards: Vec<Reward>) {
+        if !rewards.is_empty() {
+            self.rewards = Some(rewards);
+        }
+    }
+
+    pub fn rewards(&self) -> Option<&[Reward]> {
+        self.rewards.as_deref()
+    }
+}
+
 #[derive(Clone, Debug, Default)]
 pub struct DetectionState {
     running: Arc<AtomicBool>,
@@ -127,6 +146,47 @@ impl MainUiState {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn reward(name: &str) -> Reward {
+        Reward {
+            name: name.to_string(),
+            platinum: 10.0,
+            ducats: 15,
+            is_best: false,
+            set_info: String::new(),
+        }
+    }
+
+    #[test]
+    fn last_capture_state_replaces_previous_rewards() {
+        let mut state = LastCaptureState::default();
+        assert!(state.rewards().is_none());
+
+        state.update(vec![reward("First")]);
+        state.update(vec![reward("Second")]);
+
+        assert_eq!(state.rewards(), Some(&[reward("Second")][..]));
+    }
+
+    #[test]
+    fn last_capture_state_ignores_empty_capture_without_previous_result() {
+        let mut state = LastCaptureState::default();
+        assert!(state.rewards().is_none());
+
+        state.update(Vec::new());
+
+        assert!(state.rewards().is_none());
+    }
+
+    #[test]
+    fn last_capture_state_keeps_previous_result_after_empty_capture() {
+        let mut state = LastCaptureState::default();
+        state.update(vec![reward("Previous")]);
+
+        state.update(Vec::new());
+
+        assert_eq!(state.rewards(), Some(&[reward("Previous")][..]));
+    }
 
     #[test]
     fn detection_state_tracks_running() {
