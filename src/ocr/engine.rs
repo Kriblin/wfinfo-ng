@@ -24,18 +24,19 @@ pub fn get_tessdata_path() -> String {
     }
 
     let local_path = Path::new("tessdata");
-    if local_path.exists() && local_path.is_dir()
-        && local_path.join("eng.traineddata").exists() {
-            return local_path.to_string_lossy().to_string();
-        }
+    if local_path.exists() && local_path.is_dir() && local_path.join("eng.traineddata").exists() {
+        return local_path.to_string_lossy().to_string();
+    }
 
     if let Ok(exe_path) = env::current_exe()
-        && let Some(exe_dir) = exe_path.parent() {
-            let exe_tessdata = exe_dir.join("tessdata");
-            if exe_tessdata.exists() && exe_tessdata.is_dir()
-                && exe_tessdata.join("eng.traineddata").exists() {
-                    return exe_tessdata.to_string_lossy().to_string();
-                }
+        && let Some(exe_dir) = exe_path.parent()
+    {
+        let exe_tessdata = exe_dir.join("tessdata");
+        if exe_tessdata.exists()
+            && exe_tessdata.is_dir()
+            && exe_tessdata.join("eng.traineddata").exists()
+        {
+            return exe_tessdata.to_string_lossy().to_string();
         }
 
     "/usr/share/tessdata".to_string()

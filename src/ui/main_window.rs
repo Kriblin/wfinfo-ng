@@ -99,15 +99,15 @@ impl eframe::App for MainApp {
         }
 
         if self.overlay_active
-            && let Some(last_update) = self.overlay_state.last_update {
-                let timeout = Duration::from_secs(10);
-                if last_update.elapsed() >= timeout {
-                    self.overlay_state.rewards.clear();
-                    self.overlay_active = false;
-                    ctx.request_repaint();
-                } else {
-                    ctx.request_repaint_after(timeout - last_update.elapsed());
-                }
+            && let Some(last_update) = self.overlay_state.last_update
+        {
+            let timeout = Duration::from_secs(10);
+            if last_update.elapsed() >= timeout {
+                self.overlay_state.rewards.clear();
+                self.overlay_active = false;
+                ctx.request_repaint();
+            } else {
+                ctx.request_repaint_after(timeout - last_update.elapsed());
             }
     }
 
