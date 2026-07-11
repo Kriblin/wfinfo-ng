@@ -109,6 +109,7 @@ impl eframe::App for MainApp {
             } else {
                 ctx.request_repaint_after(timeout - last_update.elapsed());
             }
+        }
     }
 
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {

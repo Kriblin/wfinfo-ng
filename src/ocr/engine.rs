@@ -38,6 +38,7 @@ pub fn get_tessdata_path() -> String {
         {
             return exe_tessdata.to_string_lossy().to_string();
         }
+    }
 
     "/usr/share/tessdata".to_string()
 }
